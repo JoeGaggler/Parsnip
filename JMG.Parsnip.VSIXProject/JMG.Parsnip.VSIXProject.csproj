@@ -55,12 +55,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CodeGeneration\CodeGenerator.cs" />
-    <Compile Include="CodeGeneration\NameGen.cs" />
+    <Compile Include="CodeGenerator.cs" />
+    <Compile Include="CodeWriting\AccessModifier.cs" />
+    <Compile Include="CodeWriting\AppendingFactory.cs" />
+    <Compile Include="CodeWriting\Class.cs" />
+    <Compile Include="CodeWriting\CodeGenerator.cs" />
+    <Compile Include="CodeWriting\Comment.cs" />
+    <Compile Include="CodeWriting\EmptyLine.cs" />
+    <Compile Include="CodeWriting\FileScope.cs" />
+    <Compile Include="CodeWriting\BraceScope.cs" />
+    <Compile Include="CodeWriting\IClassScopeItem.cs" />
+    <Compile Include="CodeWriting\TextWriterExtensions.cs" />
+    <Compile Include="CodeWriting\IFileScopeItem.cs" />
+    <Compile Include="CodeWriting\INamespaceItem.cs" />
+    <Compile Include="CodeWriting\NameGen.cs" />
+    <Compile Include="CodeWriting\Namespace.cs" />
+    <Compile Include="CodeWriting\UsingNamespace.cs" />
     <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="ParsnipSingleFileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ParsnipPackage.cs" />
+    <Compile Include="SemanticModel\Analyzer.cs" />
     <Compile Include="SemanticModel\SemanticExtensions.cs" />
     <Compile Include="SemanticModel\ParsnipModel.cs" />
     <Compile Include="SyntacticModel\AnyCharacterToken.cs" />
@@ -88,6 +103,10 @@
     <Compile Include="SyntacticModel\TokenCardinality.cs" />
     <Compile Include="SyntacticModel\Union.cs" />
     <Compile Include="SyntacticModel\UnionToken.cs" />
+    <Compile Include="Visiting\AggregateExtensions.cs" />
+    <Compile Include="Visiting\IVisitable.cs" />
+    <Compile Include="Visiting\IVisitor.cs" />
+    <Compile Include="Void.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />

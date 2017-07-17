@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.CodeGeneration
+namespace JMG.Parsnip.VSIXProject.CodeWriting
 {
 	internal static class NameGen
 	{

@@ -18,6 +18,14 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 			return collection.Concat(new[] { item }).ToList();
 		}
 
+		public static IReadOnlyList<T> Appending<T>(this IReadOnlyList<T> collection, IReadOnlyList<T> list)
+		{
+			var newList = new List<T>(collection.Count + list.Count);
+			newList.AddRange(collection);
+			newList.AddRange(list);
+			return newList;
+		}
+
 		public static IReadOnlyList<T> Prepending<T>(this IReadOnlyList<T> collection, T item)
 		{
 			return (new[] { item }).Concat(collection).ToList();
