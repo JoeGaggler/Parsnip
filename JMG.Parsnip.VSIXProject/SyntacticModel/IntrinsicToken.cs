@@ -8,5 +8,11 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
 	internal class IntrinsicToken : IToken
 	{
+		public IntrinsicToken(String identifier)
+		{
+			this.Identifier = identifier;
+		}
+
+		public String Identifier { get; }
 	}
 }

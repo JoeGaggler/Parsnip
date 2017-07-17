@@ -8,5 +8,11 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
 	internal class UnionToken : IToken
 	{
+		public UnionToken(Union union)
+		{
+			this.Union = union;
+		}
+
+		public Union Union { get; }
 	}
 }

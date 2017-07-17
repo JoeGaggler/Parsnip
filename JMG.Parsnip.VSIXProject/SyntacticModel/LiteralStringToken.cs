@@ -8,5 +8,11 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
 	internal class LiteralStringToken : IToken
 	{
+		public LiteralStringToken(String text)
+		{
+			this.Text = text;
+		}
+
+		public String Text { get; }
 	}
 }

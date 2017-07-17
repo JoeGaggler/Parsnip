@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class RuleBody
+	internal class Choice
 	{
-		public RuleBody(IReadOnlyList<Choice> choices)
+		public Choice(Union union)
 		{
-			this.Choices = choices;
+			this.Union = union;
 		}
 
-		public IReadOnlyList<Choice> Choices { get; }
+		public Union Union { get; }
 	}
 }

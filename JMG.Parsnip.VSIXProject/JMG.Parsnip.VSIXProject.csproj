@@ -65,6 +65,7 @@
     <Compile Include="SemanticModel\ParsnipModel.cs" />
     <Compile Include="SyntacticModel\AnyCharacterToken.cs" />
     <Compile Include="SyntacticModel\Cardinality.cs" />
+    <Compile Include="SyntacticModel\Choice.cs" />
     <Compile Include="SyntacticModel\ClassIdentifier.cs" />
     <Compile Include="SyntacticModel\Comment.cs" />
     <Compile Include="SyntacticModel\IntrinsicToken.cs" />
@@ -83,6 +84,8 @@
     <Compile Include="SyntacticModel\SyntaxExtensions.cs" />
     <Compile Include="SyntacticModel\Parser.cs" />
     <Compile Include="SyntacticModel\ParsnipDefinition.cs" />
+    <Compile Include="SyntacticModel\SyntaxFactory.cs" />
+    <Compile Include="SyntacticModel\TokenCardinality.cs" />
     <Compile Include="SyntacticModel\Union.cs" />
     <Compile Include="SyntacticModel\UnionToken.cs" />
   </ItemGroup>
