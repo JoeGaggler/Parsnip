@@ -21,6 +21,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		public INodeType ReturnType => new SingleNodeType("IDontKnowYet");
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
+
+		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
 	}
 
 	internal class SequenceStep

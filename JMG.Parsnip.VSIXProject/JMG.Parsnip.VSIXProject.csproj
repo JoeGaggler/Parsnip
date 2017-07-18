@@ -80,6 +80,10 @@
     <Compile Include="SemanticModel\SemanticExtensions.cs" />
     <Compile Include="SemanticModel\ParsnipModel.cs" />
     <Compile Include="SemanticModel\Sequence.cs" />
+    <Compile Include="SerializedModel\GenerateMethodsVisitor.cs" />
+    <Compile Include="SerializedModel\GenerateSignaturesVisitor.cs" />
+    <Compile Include="SerializedModel\Signature.cs" />
+    <Compile Include="SerializedModel\ParsnipCode.cs" />
     <Compile Include="SyntacticModel\AnyCharacterToken.cs" />
     <Compile Include="SyntacticModel\Cardinality.cs" />
     <Compile Include="SyntacticModel\Choice.cs" />
