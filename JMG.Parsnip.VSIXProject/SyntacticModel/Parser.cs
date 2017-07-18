@@ -231,7 +231,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 
 				// token
 				new Rule(
-					SyntaxFactory.RuleHead(segmentCardinalityRuleName, nameof(IToken)),
+					SyntaxFactory.RuleHead(tokenRuleName, nameof(IToken)),
 					new RuleBody(new[] {
 						SyntaxFactory.ChoiceForSegment(SyntaxFactory.IgnoreSegment(new LiteralStringToken("."))),
 						SyntaxFactory.ChoiceForSegment(SyntaxFactory.ConsumeSegment(new IntrinsicToken(stringIntrinsic))),
@@ -289,7 +289,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 
 				// Whitespace
 				new Rule(
-					SyntaxFactory.RuleHead(SyntaxFactory.optionalHorizontalWhitespaceRuleName, null),
+					SyntaxFactory.RuleHead(SyntaxFactory.whitespaceRuleName, null),
 					new RuleBody(new[] {
 						SyntaxFactory.ChoiceForSegment(SyntaxFactory.ConsumeSegment(new LiteralStringToken(" "))),
 						SyntaxFactory.ChoiceForSegment(SyntaxFactory.ConsumeSegment(new LiteralStringToken("\\t"))),

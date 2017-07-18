@@ -6,19 +6,18 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal class Rule : IParseFunction
+	internal class Rule
 	{
-		public Rule(String ruleIdentifier, Boolean isMemoized, INodeType returnType)
+		public Rule(String ruleIdentifier, INodeType returnType, IParseFunction parseFunction)
 		{
 			this.RuleIdentifier = ruleIdentifier;
-			this.IsMemoized = isMemoized;
 			this.ReturnType = returnType;
+			this.ParseFunction = parseFunction;
 		}
 
 		public String RuleIdentifier { get; }
 
-		public Boolean IsMemoized { get; }
-
 		public INodeType ReturnType { get; }
+		public IParseFunction ParseFunction { get; }
 	}
 }

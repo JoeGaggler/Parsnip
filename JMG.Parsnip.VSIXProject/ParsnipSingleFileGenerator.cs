@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JMG.Parsnip.VSIXProject.Extensions;
 using JMG.Parsnip.VSIXProject.CodeWriting;
+using JMG.Parsnip.VSIXProject.SemanticModel;
 
 namespace JMG.Parsnip.VSIXProject
 {
@@ -82,7 +83,7 @@ namespace JMG.Parsnip.VSIXProject
 					writer.EndOfLine();
 					var firstRule = semanticModel.Rules[0];
 					var firstRuleReturnType = NameGen.TypeString(firstRule.ReturnType);
-					var firstRuleParseMethodName = NameGen.RuleMethodName(firstRule.RuleIdentifier);
+					var firstRuleParseMethodName = NameGen.ParseFunctionMethodName(firstRule.RuleIdentifier);
 					using (writer.Method(Access.Public, true, firstRuleReturnType, "Parse", new[] {
 						new LocalVarDecl("String", "input"),
 						new LocalVarDecl("IParsnipRuleFactory", "factory"),
@@ -123,18 +124,31 @@ namespace JMG.Parsnip.VSIXProject
 							new LocalVarDecl("PackratState", "state"),
 							new LocalVarDecl(interfaceName, "factory")
 						};
+
+						var things = new List<MethodItem>();
 						foreach (var rule in semanticModel.Rules)
 						{
-							writer.EndOfLine();
-							var methodName = NameGen.RuleMethodName(rule.RuleIdentifier);
-							var returnType = $"ParseResult<{NameGen.TypeString(rule.ReturnType)}>";
-							using (writer.Method(methodAccess, false, returnType, methodName, parameters))
-							{
+							var methodName = NameGen.ParseFunctionMethodName(rule.RuleIdentifier);
 
-							}
+							GenerateMethods(things, methodName, methodAccess, rule.ParseFunction);
 
 							// Only the first method is public
 							methodAccess = Access.Private;
+						}
+
+						int attempt = 0;
+						while (things.Count > 0)
+						{
+							attempt++;
+							var thing = things[0];
+							things.RemoveAt(0);
+
+							writer.EndOfLine();
+							var returnType = $"ParseResult<{NameGen.TypeString(thing.Func.ReturnType)}>";
+							using (writer.Method(thing.Access, false, returnType, thing.Name, parameters))
+							{
+
+							}
 						}
 					}
 				}
@@ -142,6 +156,94 @@ namespace JMG.Parsnip.VSIXProject
 			}
 
 			return writer.GetText();
+		}
+
+		private class MethodItem
+		{
+			public MethodItem(String name, Access access, SemanticModel.IParseFunction func)
+			{
+				this.Name = name;
+				this.Access = access;
+				this.Func = func;
+			}
+
+			public String Name { get; }
+			public Access Access { get; }
+			public IParseFunction Func { get; }
+		}
+
+		private void GenerateMethods(List<MethodItem> things, String baseName, Access access, IParseFunction func)
+		{
+			var visitor = new ThingVisitor(things, baseName);
+			if (func != null)
+			{
+				func.ApplyVisitor(visitor);
+			}
+			else
+			{
+
+			}
+		}
+
+		private class ThingVisitor : IParseFunctionActionVisitor
+		{
+			private readonly List<MethodItem> things;
+			private readonly String baseName;
+
+			public ThingVisitor(List<MethodItem> things, String baseName)
+			{
+				this.things = things;
+				this.baseName = baseName;
+			}
+
+			public void Visit(Selection target)
+			{
+				things.Add(new MethodItem(baseName, Access.Private, target));
+
+				int index = 0;
+				foreach (var step in target.Steps)
+				{
+					index++;
+					String stepBaseName = $"{baseName}_C{index}";
+					IParseFunction func = step.Function;
+
+
+					var visitor = new ThingVisitor(things, stepBaseName);
+					func.ApplyVisitor(visitor);
+				}
+			}
+
+			public void Visit(Sequence target)
+			{
+				things.Add(new MethodItem(baseName, Access.Private, target));
+
+				int index = 0;
+				foreach (var step in target.Steps)
+				{
+					index++;
+					String stepBaseName = $"{baseName}_S{index}";
+					IParseFunction func = step.Function;
+
+
+					var visitor = new ThingVisitor(things, stepBaseName);
+					func.ApplyVisitor(visitor);
+				}
+			}
+
+			public void Visit(Intrinsic target)
+			{
+				// No need to generate method for Intrinsic
+			}
+
+			public void Visit(LiteralString target)
+			{
+				// No need to generate method for LiteralString
+			}
+
+			public void Visit(ReferencedRule target)
+			{
+				// No need to generate method for ReferencedRule
+			}
 		}
 	}
 }

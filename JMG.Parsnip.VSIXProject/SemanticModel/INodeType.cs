@@ -21,6 +21,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 	internal class EmptyNodeType : INodeType
 	{
+		private EmptyNodeType() { }
+
+		public static EmptyNodeType Instance = new EmptyNodeType();
+
 		public TOutput ApplyVisitor<TOutput>(INodeTypeFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 	}
 
