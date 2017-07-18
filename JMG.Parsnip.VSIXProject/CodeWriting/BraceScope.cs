@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,24 +8,23 @@ namespace JMG.Parsnip.VSIXProject.CodeWriting
 {
 	internal class BraceScope : IDisposable
 	{
-		private readonly TextWriter writer;
-		private readonly Int32 depth;
+		private CodeWriter codeGenerator;
+		private String closingBrace;
+		private IDisposable scope;
 
-		public BraceScope(TextWriter writer, Int32 depth)
+		public BraceScope(CodeWriter codeGenerator, String withClosingBrace = null)
 		{
-			this.writer = writer;
-			this.depth = depth;
+			this.codeGenerator = codeGenerator;
+			this.closingBrace = "}" + (withClosingBrace ?? String.Empty);
 
-			writer.WriteIndentation(depth);
-			writer.WriteLine("{");
+			this.codeGenerator.LineOfCode("{");
+			this.scope = this.codeGenerator.IndentedScope();
 		}
-
-		public Int32 Depth => depth + 1;
 
 		public void Dispose()
 		{
-			writer.WriteIndentation(depth);
-			writer.WriteLine("}");
+			this.scope.Dispose();
+			this.codeGenerator.LineOfCode(this.closingBrace);
 		}
 	}
 }

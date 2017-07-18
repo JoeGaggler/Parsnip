@@ -13,6 +13,16 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 			return new List<T>();
 		}
 
+		public static IReadOnlyList<TOutput> SelectReadOnlyList<T, TOutput>(this IReadOnlyList<T> list, Func<T, TOutput> func)
+		{
+			var newList = new List<TOutput>(list.Count);
+			foreach (var item in list)
+			{
+				newList.Add(func(item));
+			}
+			return newList;
+		}
+
 		public static IReadOnlyList<T> Appending<T>(this IReadOnlyList<T> collection, T item)
 		{
 			return collection.Concat(new[] { item }).ToList();

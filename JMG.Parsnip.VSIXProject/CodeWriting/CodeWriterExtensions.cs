@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.CodeWriting
 {
-	internal class FileScope
+	public static class CodeWriterExtensions
 	{
-		public FileScope(IReadOnlyList<IFileScopeItem> items)
-		{
-			this.Items = items;
-		}
-
-		public IReadOnlyList<IFileScopeItem> Items { get; }
+		public static void Assign(this CodeWriter writer, String left, String right) => writer.LineOfCode($"{left} = {right};");
 	}
 }

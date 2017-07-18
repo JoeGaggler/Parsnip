@@ -1,5 +1,4 @@
-﻿using JMG.Parsnip.VSIXProject.CodeWriting;
-using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using JMG.Parsnip.VSIXProject.Extensions;
+using JMG.Parsnip.VSIXProject.CodeWriting;
 
 namespace JMG.Parsnip.VSIXProject
 {
@@ -45,7 +45,7 @@ namespace JMG.Parsnip.VSIXProject
 			var syntacticModel = SyntacticModel.Parser.Parse(wszInputFilePath);
 			var semanticModel = SemanticModel.Analyzer.Analyze(syntacticModel);
 
-			var codeGen = new CodeWriter();
+			var writer = new CodeWriter();
 
 			var versionString = typeof(ParsnipSingleFileGenerator).Assembly
 				.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
@@ -53,26 +53,95 @@ namespace JMG.Parsnip.VSIXProject
 				.FirstOrDefault()?.InformationalVersion
 				?? "unknown";
 
-			var items = new List<IFileScopeItem>
+			writer.Comment("Code Generated via Parsnip Packrat Parser Producer");
+			writer.Comment($"Version: {versionString}");
+			writer.Comment($"File: {fileName}");
+			writer.Comment($"Date: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+			writer.EndOfLine();
+			writer.UsingNamespace("System");
+			writer.UsingNamespace("System.Linq");
+			writer.UsingNamespace("System.Diagnostics");
+			writer.UsingNamespace("System.Threading.Tasks");
+			writer.UsingNamespace("System.Collections.Generic");
+			writer.EndOfLine();
+
+			using (writer.Namespace(wszDefaultNamespace))
 			{
-				new Comment("Code Generated via Parsnip Packrat Parser Producer"),
-				new Comment($"Version: {versionString}"),
-				new Comment($"File: {fileName}"),
-				new Comment($"Date: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}"),
-				new EmptyLine(),
-				new UsingNamespace("System"),
-				new UsingNamespace("System.Linq"),
-				new UsingNamespace("System.Diagnostics"),
-				new UsingNamespace("System.Threading.Tasks"),
-				new UsingNamespace("System.Collections.Generic"),
-				new EmptyLine(),
-			};
+				var interfaceName = $"I{className}RuleFactory";
+				using (writer.Interface(interfaceName, Access.Public))
+				{
 
-			var items2 = CodeGenerator.FileScopeItemsForSemanticModel(semanticModel, wszDefaultNamespace, className);
-			var items3 = items.Appending(items2);
-			var fileScope = new FileScope(items3);
+				}
+				writer.EndOfLine();
 
-			return codeGen.WriteFileScope(fileScope);
+				using (writer.Class(className, Access.Public))
+				{
+					writer.LineOfCode("private class ParseResult<T> { public T Node; public PackratState State; }");
+					writer.EndOfLine();
+					writer.LineOfCode("private class EmptyNode { private EmptyNode() { } public static EmptyNode Instance = new EmptyNode(); }");
+					writer.EndOfLine();
+					var firstRule = semanticModel.Rules[0];
+					var firstRuleReturnType = NameGen.TypeString(firstRule.ReturnType);
+					var firstRuleParseMethodName = NameGen.RuleMethodName(firstRule.RuleIdentifier);
+					using (writer.Method(Access.Public, true, firstRuleReturnType, "Parse", new[] {
+						new LocalVarDecl("String", "input"),
+						new LocalVarDecl("IParsnipRuleFactory", "factory"),
+					}))
+					{
+						writer.Assign("var states", "new PackratState[input.Length + 1]");
+						writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states, factory));");
+						writer.Assign("var state", "states[0]");
+						writer.Assign("var result", $"PackratState.{firstRuleParseMethodName}(state, factory)");
+						writer.LineOfCode("if (result == null) return null;");
+						writer.Return("result.Node");
+					}
+					writer.EndOfLine();
+					var packratStateClassName = "PackratState";
+					using (writer.Class(packratStateClassName, Access.Private))
+					{
+						writer.LineOfCode("private readonly string input;");
+						writer.LineOfCode("private readonly int inputPosition;");
+						writer.LineOfCode("private readonly PackratState[] states;");
+						writer.LineOfCode("private readonly IParsnipRuleFactory factory;");
+						writer.EndOfLine();
+						using (writer.Constructor(Access.Public, packratStateClassName, new[] {
+							new LocalVarDecl("String", "input"),
+							new LocalVarDecl("Int32", "inputPosition"),
+							new LocalVarDecl("PackratState[]", "states"),
+							new LocalVarDecl("IParsnipRuleFactory", "factory")
+						}))
+						{
+							writer.Assign("this.input", "input");
+							writer.Assign("this.inputPosition", "inputPosition");
+							writer.Assign("this.states", "states");
+							writer.Assign("this.factory", "factory");
+						}
+
+						var methodAccess = Access.Public;
+						var parameters = new List<LocalVarDecl>
+						{
+							new LocalVarDecl("PackratState", "state"),
+							new LocalVarDecl(interfaceName, "factory")
+						};
+						foreach (var rule in semanticModel.Rules)
+						{
+							writer.EndOfLine();
+							var methodName = NameGen.RuleMethodName(rule.RuleIdentifier);
+							var returnType = $"ParseResult<{NameGen.TypeString(rule.ReturnType)}>";
+							using (writer.Method(methodAccess, false, returnType, methodName, parameters))
+							{
+
+							}
+
+							// Only the first method is public
+							methodAccess = Access.Private;
+						}
+					}
+				}
+				writer.EndOfLine();
+			}
+
+			return writer.GetText();
 		}
 	}
 }

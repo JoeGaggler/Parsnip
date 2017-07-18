@@ -8,5 +8,16 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
 	internal class ParsnipModel
 	{
+		public ParsnipModel()
+		{
+			this.Rules = Enumerable.Empty<Rule>().ToList();
+		}
+
+		public ParsnipModel(IReadOnlyList<Rule> rules)
+		{
+			this.Rules = rules;
+		}
+
+		public IReadOnlyList<Rule> Rules { get; }
 	}
 }
