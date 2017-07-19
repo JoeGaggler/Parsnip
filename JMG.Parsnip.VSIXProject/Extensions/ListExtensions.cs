@@ -28,6 +28,14 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 			return collection.Concat(new[] { item }).ToList();
 		}
 
+		public static Boolean AllEqual<T>(this IReadOnlyList<T> collection) where T : IEquatable<T>
+		{
+			if (collection.Count < 2) return true;
+
+			IEquatable<T> first = collection[0];
+			return collection.All(i => first.Equals(i));
+		}
+
 		public static IReadOnlyList<T> Appending<T>(this IReadOnlyList<T> collection, IReadOnlyList<T> list)
 		{
 			var newList = new List<T>(collection.Count + list.Count);

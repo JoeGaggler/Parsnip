@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JMG.Parsnip.VSIXProject.Extensions;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
@@ -21,7 +22,23 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 		public INodeType FactoryReturnType { get; }
 
-		public INodeType ReturnType => FactoryReturnType ?? new SingleNodeType("IDontKnowYet");
+		public INodeType ReturnType
+		{
+			get
+			{
+				if (FactoryReturnType != null) return FactoryReturnType;
+
+				var optionTypes = this.Steps.Select(i => i.Function.ReturnType).ToList();
+				if (optionTypes.Select(i => NameGen.TypeString(i)).ToList().AllEqual())
+				{
+					return optionTypes[0];
+				}
+				else
+				{
+					return new SingleNodeType("AMBIGUOUS_SELECTION");
+				}
+			}
+		}
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
