@@ -79,6 +79,11 @@ namespace JMG.Parsnip.VSIXProject.CodeWriting
 			LineOfCode("break;");
 		}
 
+		public void Continue()
+		{
+			LineOfCode("continue;");
+		}
+
 		public void Throw<TException>() where TException : Exception
 		{
 			LineOfCode($"throw new {typeof(TException).Name}();");

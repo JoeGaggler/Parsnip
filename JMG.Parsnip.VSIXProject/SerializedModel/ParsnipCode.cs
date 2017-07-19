@@ -23,16 +23,21 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public ParsnipCode()
 		{
-			AddIntrinsic(IntrinsicType.AnyCharacter, "Parse_Intrinsic_AnyCharacter");
-			AddIntrinsic(IntrinsicType.AnyLetter, "Parse_Intrinsic_AnyLetter");
-			AddIntrinsic(IntrinsicType.EndOfLine, "Parse_Intrinsic_EndOfLine");
-			AddIntrinsic(IntrinsicType.EndOfStream, "Parse_Intrinsic_EndOfStream");
-			AddIntrinsic(IntrinsicType.CString, "Parse_Intrinsic_CString");
+			AddIntrinsic(IntrinsicType.AnyCharacter, "ParseIntrinsic_AnyCharacter");
+			AddIntrinsic(IntrinsicType.AnyLetter, "ParseIntrinsic_AnyLetter");
+			AddIntrinsic(IntrinsicType.EndOfLine, "ParseIntrinsic_EndOfLine");
+			AddIntrinsic(IntrinsicType.EndOfStream, "ParseIntrinsic_EndOfStream");
+			AddIntrinsic(IntrinsicType.CString, "ParseIntrinsic_CString");
+
+			// Lexeme
+			var lexemeName = "ParseLexeme";
+			var sig = new Signature(lexemeName, Access.Private, new LiteralString("HACK: PLACEHOLDER"), (s, f) => $"{lexemeName}({s}, {f})");
+			this.methodItems.Add(sig);
 		}
 
 		private void AddIntrinsic(IntrinsicType type, String name)
 		{
-			var sig = new Signature(name, Access.Private, new Intrinsic(IntrinsicType.AnyCharacter), (s, f) => $"{name}({s}, {f})");
+			var sig = new Signature(name, Access.Private, new Intrinsic(type), (s, f) => $"{name}({s}, {f})");
 			this.methodItems.Add(sig);
 			this.intrinsics[type] = sig;
 		}
