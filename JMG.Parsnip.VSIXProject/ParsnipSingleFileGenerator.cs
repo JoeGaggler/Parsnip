@@ -48,8 +48,8 @@ namespace JMG.Parsnip.VSIXProject
 			var semanticModel = SemanticModel.Analyzer.Analyze(syntacticModel);
 
 			// TRANSFORMATIONS
-			semanticModel = SemanticModel.Transformations.AssignRuleFactoryMethods.Go(semanticModel);
 			semanticModel = SemanticModel.Transformations.AssignRuleReferenceTypes.Go(semanticModel);
+			semanticModel = SemanticModel.Transformations.AssignRuleFactoryMethods.Go(semanticModel);
 
 			var writer = new CodeWriter();
 
@@ -76,7 +76,14 @@ namespace JMG.Parsnip.VSIXProject
 				var interfaceName = $"I{className}RuleFactory";
 				using (writer.Interface(interfaceName, Access.Public))
 				{
-
+					foreach (var method in semanticModel.InterfaceMethods)
+					{
+						var returnType = NameGen.TypeString(method.ReturnType);
+						var name = method.Name;
+						var parameterTypes = method.ParameterTypes.Select((i, j) => $"{NameGen.TypeString(i)} t{j}");
+						var parameterTypeList = String.Join(", ", parameterTypes);
+						writer.LineOfCode($"{returnType} {name}({parameterTypeList});");
+					}
 				}
 				writer.EndOfLine();
 

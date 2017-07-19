@@ -83,7 +83,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				foreach (var choice in target.Body.Choices)
 				{
 					var func = VisitChoice(choice);
-					var step = new SelectionStep(func);
+					var step = new SelectionStep(func, interfaceMethod: null);
 					selection = selection.AddingStep(step);
 				}
 
@@ -105,7 +105,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				foreach (var sequence in union.Sequences)
 				{
 					var func = VisitSequence(sequence);
-					var step = new SelectionStep(func);
+					var step = new SelectionStep(func, interfaceMethod: null);
 					selection = selection.AddingStep(step);
 				}
 				return selection;

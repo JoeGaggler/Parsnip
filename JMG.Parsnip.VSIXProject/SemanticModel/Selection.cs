@@ -27,7 +27,14 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			get
 			{
 				if (FactoryReturnType != null) return FactoryReturnType;
+				return StepType;
+			}
+		}
 
+		public INodeType StepType
+		{
+			get
+			{
 				var optionTypes = this.Steps.Select(i => i.Function.ReturnType).ToList();
 				if (optionTypes.Select(i => NameGen.TypeString(i)).ToList().AllEqual())
 				{
@@ -51,11 +58,13 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 	internal class SelectionStep
 	{
-		public SelectionStep(IParseFunction parseFunction)
+		public SelectionStep(IParseFunction parseFunction, InterfaceMethod interfaceMethod)
 		{
 			this.Function = parseFunction;
+			this.InterfaceMethod = interfaceMethod;
 		}
 
 		public IParseFunction Function { get; }
+		public InterfaceMethod InterfaceMethod { get; }
 	}
 }

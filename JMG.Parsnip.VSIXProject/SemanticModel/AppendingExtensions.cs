@@ -9,9 +9,11 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
 	internal static class AppendingExtensions
 	{
-		public static ParsnipModel AddingRule(this ParsnipModel model, Rule rule) => new ParsnipModel(model.Rules.Appending(rule));
+		public static ParsnipModel AddingRule(this ParsnipModel model, Rule rule) => new ParsnipModel(model.Rules.Appending(rule), model.InterfaceMethods);
 
-		public static ParsnipModel ReplacingRule(this ParsnipModel model, Rule oldRule, Rule newRule) => new ParsnipModel(model.Rules.Replacing(oldRule, newRule));
+		public static ParsnipModel ReplacingRule(this ParsnipModel model, Rule oldRule, Rule newRule) => new ParsnipModel(model.Rules.Replacing(oldRule, newRule), model.InterfaceMethods);
+
+		public static ParsnipModel AddingInterfaceMethod(this ParsnipModel model, InterfaceMethod method) => new ParsnipModel(model.Rules, model.InterfaceMethods.Appending(method));
 
 		public static Rule WithParseFunction(this Rule rule, IParseFunction func) => new Rule(rule.RuleIdentifier, rule.ReturnType, func);
 

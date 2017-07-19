@@ -19,7 +19,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 
 		public IParseFunction Visit(Selection target)
 		{
-			var newSteps = target.Steps.Select(i => new SelectionStep(i.Function.ApplyVisitor(this))).ToList();
+			var newSteps = target.Steps.Select(i => new SelectionStep(i.Function.ApplyVisitor(this), i.InterfaceMethod)).ToList();
 			return target.ReplacingSteps(newSteps);
 		}
 

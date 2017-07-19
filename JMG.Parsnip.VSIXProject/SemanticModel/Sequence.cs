@@ -18,7 +18,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		public IReadOnlyList<SequenceStep> Steps { get; }
 
 		public INodeType FactoryReturnType { get; }
-		
+
 		public Boolean IsMemoized { get; }
 
 		public INodeType ReturnType
@@ -27,14 +27,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			{
 				if (FactoryReturnType != null) return FactoryReturnType;
 
-				var list = new List<INodeType>();
-				foreach (var step in this.Steps)
-				{
-					if (!step.IsReturned) continue;
-					var funcType = step.Function.ReturnType;
-					list.Add(funcType);
-				}
-
+				var list = StepTypes;
 				if (list.Count == 0)
 				{
 					return EmptyNodeType.Instance;
@@ -47,6 +40,22 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				{
 					return new TupleNodeType(list);
 				}
+			}
+		}
+
+		public IReadOnlyList<INodeType> StepTypes
+		{
+			get
+			{
+				var list = new List<INodeType>();
+				foreach (var step in this.Steps)
+				{
+					if (!step.IsReturned) continue;
+					var funcType = step.Function.ReturnType;
+					list.Add(funcType);
+				}
+
+				return list;
 			}
 		}
 

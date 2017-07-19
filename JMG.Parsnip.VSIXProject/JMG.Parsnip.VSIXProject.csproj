@@ -69,6 +69,7 @@
     <Compile Include="ParsnipPackage.cs" />
     <Compile Include="SemanticModel\Analyzer.cs" />
     <Compile Include="SemanticModel\AppendingExtensions.cs" />
+    <Compile Include="SemanticModel\InterfaceMethod.cs" />
     <Compile Include="SemanticModel\Intrinsic.cs" />
     <Compile Include="SemanticModel\IParseFunctionWithFactoryType.cs" />
     <Compile Include="SemanticModel\LiteralString.cs" />

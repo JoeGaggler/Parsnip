@@ -33,7 +33,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(Selection target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
+			using (writer.Method(input.Access, true, returnType, input.Name, typicalParams))
 			{
 				int stepIndex = 0;
 				foreach (var step in target.Steps)
@@ -44,7 +44,23 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					var resultName = $"r{stepIndex}";
 
 					writer.VarAssign(resultName, invoker("state", "factory"));
-					writer.LineOfCode($"if ({resultName} != null) return new {returnType}() {{ Node = {resultName}.Node, State = {resultName}.State }};");
+
+					var nodeReference = $"{resultName}.Node";
+					if (target.ReturnType == EmptyNodeType.Instance)
+					{
+						nodeReference = "EmptyNode.Instance";
+					}
+					else if (step.InterfaceMethod is InterfaceMethod method)
+					{
+						var param = nodeReference;
+						if (func.ReturnType == EmptyNodeType.Instance)
+						{
+							param = String.Empty;
+						}
+
+						nodeReference = $"factory.{method.Name}({param})";
+					}
+					writer.LineOfCode($"if ({resultName} != null) return new {returnType}() {{ Node = {nodeReference}, State = {resultName}.State }};");
 				}
 
 				// No choices matched
@@ -55,7 +71,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(Sequence target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
+			using (writer.Method(input.Access, true, returnType, input.Name, typicalParams))
 			{
 				var returnedResults = new List<String>();
 
@@ -72,7 +88,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 					if (step.IsReturned)
 					{
-						returnedResults.Add(resultName);
+						returnedResults.Add(nodeName);
 					}
 
 					writer.VarAssign(resultName, invoker(currentState, "factory"));
@@ -107,7 +123,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(Intrinsic target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
+			using (writer.Method(input.Access, true, returnType, input.Name, typicalParams))
 			{
 				switch (target.Type)
 				{
@@ -161,7 +177,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 						writer.VarAssign("inputPosition", "state.inputPosition");
 						using (writer.If("inputPosition == input.Length"))
 						{
-							writer.Return("new ParseResult<EmptyNode>() { Node = EmptyToken.Instance, State = state }");
+							writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
 						}
 						writer.Return("null");
 						break;
@@ -224,7 +240,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(LiteralString target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, false, returnType, input.Name, new[] { new LocalVarDecl("PackratState", "state"), new LocalVarDecl("String", "lexeme") }))
+			using (writer.Method(input.Access, true, returnType, input.Name, new[] { new LocalVarDecl("PackratState", "state"), new LocalVarDecl("String", "lexeme") }))
 			{
 				writer.VarAssign("lexemeLength", "lexeme.Length");
 				writer.IfTrueReturnNull("state.inputPosition + lexemeLength > state.input.Length");
