@@ -8,7 +8,7 @@ using JMG.Parsnip.VSIXProject.SemanticModel;
 
 namespace JMG.Parsnip.VSIXProject.SerializedModel
 {
-	internal class GenerateSignaturesVisitor : IParseFunctionActionVisitor
+	internal class GenerateSignaturesVisitor : IParseFunctionActionVisitor<Access>
 	{
 		private readonly ParsnipCode parsnipCode;
 		private readonly String baseName;
@@ -19,9 +19,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			this.baseName = baseName;
 		}
 
-		public void Visit(Selection target)
+		public void Visit(Selection target, Access access)
 		{
-			parsnipCode.AddSignature(new Signature(baseName, Access.Private, target, (s, f) => $"{baseName}({s}, {f})"));
+			parsnipCode.AddSignature(new Signature(baseName, access, target, (s, f) => $"{baseName}({s}, {f})"));
 
 			int index = 0;
 			foreach (var step in target.Steps)
@@ -31,13 +31,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				IParseFunction func = step.Function;
 
 				var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName);
-				func.ApplyVisitor(visitor);
+				func.ApplyVisitor(visitor, Access.Private);
 			}
 		}
 
-		public void Visit(Sequence target)
+		public void Visit(Sequence target, Access access)
 		{
-			parsnipCode.AddSignature(new Signature(baseName, Access.Private, target, (s, f) => $"{baseName}({s}, {f})"));
+			parsnipCode.AddSignature(new Signature(baseName, access, target, (s, f) => $"{baseName}({s}, {f})"));
 
 			int index = 0;
 			foreach (var step in target.Steps)
@@ -47,24 +47,25 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				IParseFunction func = step.Function;
 
 				var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName);
-				func.ApplyVisitor(visitor);
+				func.ApplyVisitor(visitor, Access.Private);
 			}
 		}
 
-		public void Visit(Intrinsic target)
+		public void Visit(Intrinsic target, Access access)
 		{
 			// No need to generate method for Intrinsic
 			var methodName = parsnipCode.Intrinsics[target.Type].Name;
 			parsnipCode.MapFunctionInvocation(target, (s, f) => $"{methodName}({s}, {f})");
 		}
 
-		public void Visit(LiteralString target)
+		public void Visit(LiteralString target, Access access)
 		{
+			var expanded = target.Text.Replace("\\", "\\\\");
 			// No need to generate method for LiteralString
-			parsnipCode.MapFunctionInvocation(target, (s, f) => $"TODO_LiteralString(s, f)");
+			parsnipCode.MapFunctionInvocation(target, (s, f) => $"ParseLexeme({s}, \"{expanded}\")");
 		}
 
-		public void Visit(ReferencedRule target)
+		public void Visit(ReferencedRule target, Access access)
 		{
 			// No need to generate method for ReferencedRule
 			var methodName = parsnipCode.RuleMethodNames[target.Identifier];

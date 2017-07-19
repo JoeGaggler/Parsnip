@@ -18,11 +18,38 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 		public Boolean IsMemoized { get; }
 
-		public INodeType ReturnType => new SingleNodeType("IDontKnowYet");
+		public INodeType ReturnType
+		{
+			get
+			{
+				var list = new List<INodeType>();
+				foreach (var step in this.Steps)
+				{
+					if (!step.IsReturned) continue;
+					var funcType = step.Function.ReturnType;
+					list.Add(funcType);
+				}
+
+				if (list.Count == 0)
+				{
+					return EmptyNodeType.Instance;
+				}
+				else if (list.Count == 1)
+				{
+					return list[0];
+				}
+				else
+				{
+					return new TupleNodeType(list);
+				}
+			}
+		}
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
+
+		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 	}
 
 	internal class SequenceStep
@@ -35,5 +62,6 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 		public IParseFunction Function { get; }
 		public MatchAction MatchAction { get; }
+		public Boolean IsReturned => MatchAction == MatchAction.Consume && Function.ReturnType != EmptyNodeType.Instance;
 	}
 }

@@ -17,10 +17,12 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 		public Boolean IsMemoized => false;
 
-		public INodeType ReturnType => throw new NotImplementedException();
+		public INodeType ReturnType => new SingleNodeType("TODO_DerefRule");
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
+
+		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 	}
 }

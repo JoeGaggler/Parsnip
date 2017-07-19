@@ -61,7 +61,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				var methodName = this.RuleMethodNames[rule.RuleIdentifier];
 
 				//this.GenerateMethods(methodName, methodAccess, rule.ParseFunction);
-				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName));
+				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName), methodAccess);
 				foreach (var i in methodItems)
 				{
 					invokers[i.Func] = i.Invoker;
@@ -73,11 +73,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 			//
 			var vis = new GenerateMethodsVisitor(this, writer, interfaceName);
+			var commentVisitor = new CommentParseFunctionVisitor(showHeader: true);
 			foreach (var methodItem in this.methodItems)
 			{
 				writer.EndOfLine();
 
 				var func = methodItem.Func;
+				writer.Comment(func.ApplyVisitor(commentVisitor));
 				func.ApplyVisitor(vis, methodItem);
 			}
 		}

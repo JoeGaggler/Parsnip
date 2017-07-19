@@ -42,6 +42,8 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var returnType = $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
 			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
 			{
+				var returnedResults = new List<String>();
+
 				int stepIndex = 0;
 				var currentState = "state";
 				foreach (var step in target.Steps)
@@ -50,7 +52,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					var func = step.Function;
 					var invoker = this.parsnipCode.Invokers[func];
 					var resultName = $"r{stepIndex}";
+					var nodeName = $"{resultName}.Node";
 					var nextState = $"{resultName}.State";
+
+					if (step.IsReturned)
+					{
+						returnedResults.Add(resultName);
+					}
 
 					// TODO: CALL DEPENDS ON FUNC!
 					writer.VarAssign(resultName, invoker(currentState, "factory"));
@@ -64,7 +72,21 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					}
 				}
 
-				writer.Comment("TODO: Sequence combiner");
+				String combo;
+				if (returnedResults.Count == 0)
+				{
+					combo = "EmptyNode.Instance";
+				}
+				else if (returnedResults.Count == 1)
+				{
+					combo = returnedResults[0];
+				}
+				else
+				{
+					combo = $"({String.Join(", ", returnedResults)})";
+				}
+
+				writer.Return($"new {returnType}() {{ Node = {combo}, State = {currentState} }}");
 			}
 		}
 
@@ -125,7 +147,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 						writer.VarAssign("inputPosition", "state.inputPosition");
 						using (writer.If("inputPosition == input.Length"))
 						{
-							writer.Return("new ParseResult<EmptyToken>() { Node = EmptyToken.Instance, State = state }");
+							writer.Return("new ParseResult<EmptyNode>() { Node = EmptyToken.Instance, State = state }");
 						}
 						writer.Return("null");
 						break;
