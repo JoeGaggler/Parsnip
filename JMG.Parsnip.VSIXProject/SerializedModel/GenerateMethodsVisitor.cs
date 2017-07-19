@@ -28,18 +28,33 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			};
 		}
 
+		private static String GetParseResultTypeString(IParseFunction target) => $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
+
 		public void Visit(Selection target, Signature input)
 		{
-			var returnType = $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
+			var returnType = GetParseResultTypeString(target);
 			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
 			{
-				writer.Comment("TODO: Selection");
+				int stepIndex = 0;
+				foreach (var step in target.Steps)
+				{
+					stepIndex++;
+					var func = step.Function;
+					var invoker = this.parsnipCode.Invokers[func];
+					var resultName = $"r{stepIndex}";
+
+					writer.VarAssign(resultName, invoker("state", "factory"));
+					writer.LineOfCode($"if ({resultName} != null) return new {returnType}() {{ Node = {resultName}.Node, State = {resultName}.State }};");
+				}
+
+				// No choices matched
+				writer.Return("null");
 			}
 		}
 
 		public void Visit(Sequence target, Signature input)
 		{
-			var returnType = $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
+			var returnType = GetParseResultTypeString(target);
 			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
 			{
 				var returnedResults = new List<String>();
@@ -60,7 +75,6 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 						returnedResults.Add(resultName);
 					}
 
-					// TODO: CALL DEPENDS ON FUNC!
 					writer.VarAssign(resultName, invoker(currentState, "factory"));
 
 					switch (step.MatchAction)
@@ -92,7 +106,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(Intrinsic target, Signature input)
 		{
-			var returnType = $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
+			var returnType = GetParseResultTypeString(target);
 			using (writer.Method(input.Access, false, returnType, input.Name, typicalParams))
 			{
 				switch (target.Type)
@@ -209,7 +223,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(LiteralString target, Signature input)
 		{
-			var returnType = $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
+			var returnType = GetParseResultTypeString(target);
 			using (writer.Method(input.Access, false, returnType, input.Name, new[] { new LocalVarDecl("PackratState", "state"), new LocalVarDecl("String", "lexeme") }))
 			{
 				writer.VarAssign("lexemeLength", "lexeme.Length");
