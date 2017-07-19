@@ -6,22 +6,27 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal class Sequence : IParseFunction
+	internal class Sequence : IParseFunction, IParseFunctionWithFactoryType
 	{
-		public Sequence(Boolean isMemoized, IReadOnlyList<SequenceStep> steps)
+		public Sequence(Boolean isMemoized, IReadOnlyList<SequenceStep> steps, INodeType factoryReturnType)
 		{
 			this.IsMemoized = isMemoized;
 			this.Steps = steps;
+			this.FactoryReturnType = factoryReturnType;
 		}
 
 		public IReadOnlyList<SequenceStep> Steps { get; }
 
+		public INodeType FactoryReturnType { get; }
+		
 		public Boolean IsMemoized { get; }
 
 		public INodeType ReturnType
 		{
 			get
 			{
+				if (FactoryReturnType != null) return FactoryReturnType;
+
 				var list = new List<INodeType>();
 				foreach (var step in this.Steps)
 				{
@@ -45,11 +50,14 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			}
 		}
 
+
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
 
 		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
+
+		public TOutput ApplyVisitor<TInput, TOutput>(IParseFunctionFuncVisitor<TInput, TOutput> visitor, TInput input) => visitor.Visit(this, input);
 	}
 
 	internal class SequenceStep

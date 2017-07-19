@@ -18,6 +18,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input);
 
 		TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor);
+
+		TOutput ApplyVisitor<TInput, TOutput>(IParseFunctionFuncVisitor<TInput, TOutput> visitor, TInput input);
 	}
 
 	internal interface IParseFunctionActionVisitor :
@@ -46,6 +48,16 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IFuncVisitor<Intrinsic, TOutput>,
 		IFuncVisitor<LiteralString, TOutput>,
 		IFuncVisitor<ReferencedRule, TOutput>
+	{
+
+	}
+
+	internal interface IParseFunctionFuncVisitor<TInput, TOutput> :
+		IFuncVisitor<Selection, TInput, TOutput>,
+		IFuncVisitor<Sequence, TInput, TOutput>,
+		IFuncVisitor<Intrinsic, TInput, TOutput>,
+		IFuncVisitor<LiteralString, TInput, TOutput>,
+		IFuncVisitor<ReferencedRule, TInput, TOutput>
 	{
 
 	}

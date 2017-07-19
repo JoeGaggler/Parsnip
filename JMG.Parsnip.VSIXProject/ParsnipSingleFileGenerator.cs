@@ -47,6 +47,10 @@ namespace JMG.Parsnip.VSIXProject
 			var syntacticModel = SyntacticModel.Parser.Parse(wszInputFilePath);
 			var semanticModel = SemanticModel.Analyzer.Analyze(syntacticModel);
 
+			// TRANSFORMATIONS
+			semanticModel = SemanticModel.Transformations.AssignRuleFactoryMethods.Go(semanticModel);
+			semanticModel = SemanticModel.Transformations.AssignRuleReferenceTypes.Go(semanticModel);
+
 			var writer = new CodeWriter();
 
 			var versionString = typeof(ParsnipSingleFileGenerator).Assembly

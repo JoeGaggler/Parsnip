@@ -79,7 +79,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			{
 				var oldRule = model.Rules.First(i => i.RuleIdentifier == target.Head.RuleIdentifier.Text);
 
-				var selection = new Selection(false, new SelectionStep[0]);
+				var selection = new Selection(false, new SelectionStep[0], factoryReturnType: null);
 				foreach (var choice in target.Body.Choices)
 				{
 					var func = VisitChoice(choice);
@@ -101,7 +101,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 			internal static Selection VisitUnion(SyntacticModel.Union union)
 			{
-				var selection = new Selection(false, new SelectionStep[0]);
+				var selection = new Selection(false, new SelectionStep[0], factoryReturnType: null);
 				foreach (var sequence in union.Sequences)
 				{
 					var func = VisitSequence(sequence);
@@ -113,7 +113,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 			internal static Sequence VisitSequence(SyntacticModel.Sequence target)
 			{
-				var sequence = new Sequence(false, new SequenceStep[0]);
+				var sequence = new Sequence(false, new SequenceStep[0], factoryReturnType: null);
 				foreach (var segment in target.Segments)
 				{
 					IParseFunction func;
@@ -145,7 +145,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 			private class TokenVisitor : ITokenFuncVisitor<IParseFunction>
 			{
-				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text);
+				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text, ruleNodeType: null);
 
 				public IParseFunction Visit(LiteralStringToken target) => new LiteralString(target.Text);
 
