@@ -54,24 +54,80 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				this.ruleMethodNames[rule.RuleIdentifier] = methodName;
 			}
 
-			//
+			// Generate method signatures
 			var methodAccess = Access.Public;
 			foreach (var rule in semanticModel.Rules)
 			{
 				var methodName = this.RuleMethodNames[rule.RuleIdentifier];
-
-				//this.GenerateMethods(methodName, methodAccess, rule.ParseFunction);
 				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName), methodAccess);
-				foreach (var i in methodItems)
-				{
-					invokers[i.Func] = i.Invoker;
-				}
 
 				// Only the first method is public
 				methodAccess = Access.Private;
 			}
 
-			//
+			// Maybe
+			writer.LineOfCode("");
+			var cardParams = new[] {
+				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl(interfaceName, "factory"),
+				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<T>>", "parseAction")
+			};
+			using (writer.Method(Access.Private, true, "ParseResult<T>", "ParseMaybe<T>", cardParams))
+			{
+				writer.VarAssign("result", "parseAction(state, factory)");
+				using (writer.If("result != null"))
+				{
+					writer.Return("result");
+				}
+				writer.Return("new ParseResult<T> { State = state, Node = default(T) }");
+			}
+
+			// Star
+			writer.LineOfCode("");
+			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseStar<T>", cardParams))
+			{
+				writer.VarAssign("list", "new List<T>()");
+				using (writer.While("true"))
+				{
+					writer.VarAssign("nextResult", "parseAction(state, factory)");
+					using (writer.If("nextResult == null"))
+					{
+						writer.SwitchBreak();
+					}
+					writer.LineOfCode("list.Add(nextResult.Node);");
+					writer.Assign("state", "nextResult.State");
+				}
+				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
+			}
+
+			// Plus
+			writer.LineOfCode("");
+			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParsePlus<T>", cardParams))
+			{
+				writer.VarAssign("list", "new List<T>()");
+
+				writer.VarAssign("firstResult", "parseAction(state, factory)");
+				using (writer.If("firstResult == null"))
+				{
+					writer.Return("null");
+				}
+				writer.LineOfCode("list.Add(firstResult.Node);");
+				writer.Assign("state", "firstResult.State");
+
+				using (writer.While("true"))
+				{
+					writer.VarAssign("nextResult", "parseAction(state, factory)");
+					using (writer.If("nextResult == null"))
+					{
+						writer.SwitchBreak();
+					}
+					writer.LineOfCode("list.Add(nextResult.Node);");
+					writer.Assign("state", "nextResult.State");
+				}
+				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
+			}
+
+			// Generate methods
 			var vis = new GenerateMethodsVisitor(this, writer, interfaceName);
 			var commentVisitor = new CommentParseFunctionVisitor(showHeader: true);
 			foreach (var methodItem in this.methodItems)

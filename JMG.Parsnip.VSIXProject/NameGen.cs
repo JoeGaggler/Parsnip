@@ -27,6 +27,8 @@ namespace JMG.Parsnip.VSIXProject
 			public String Visit(SingleNodeType target) => target.Name;
 
 			public String Visit(TupleNodeType target) => $"({String.Join(", ", target.Types.Select(i => i.ApplyVisitor(this)))})";
+
+			public String Visit(CollectionNodeType target) => $"IReadOnlyList<{target.InnerNodeType.ApplyVisitor(this)}>";
 		}
 	}
 }

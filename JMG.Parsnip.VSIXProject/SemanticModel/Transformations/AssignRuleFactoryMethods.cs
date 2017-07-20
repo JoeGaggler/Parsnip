@@ -48,8 +48,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 					InterfaceMethod interfaceMethod = null;
 					if (input != EmptyNodeType.Instance)
 					{
-						count++;
-						var name = $"{interfaceMethodName}{count}";
+						var name = $"{interfaceMethodName}{++count}";
 
 						if (funcReturnType == EmptyNodeType.Instance)
 						{
@@ -71,7 +70,21 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Sequence target, INodeType input)
 			{
-				return (target.WithFactoryReturnType(input), new InterfaceMethod[0]);
+				var interfaceMethods = new List<InterfaceMethod>();
+
+				var types = target.Steps.Where(i => i.IsReturned).Select(i => i.Function.ReturnType).ToList();
+				if (types.Count > 0)
+				{
+					var name = $"{interfaceMethodName}{++count}";
+					var im = new InterfaceMethod(input, name, types);
+					interfaceMethods.Add(im);
+				}
+				else
+				{
+
+				}
+
+				return (new Sequence(target.IsMemoized, target.Steps, input), interfaceMethods);
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Intrinsic target, INodeType input)
@@ -85,6 +98,11 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(ReferencedRule target, INodeType input)
+			{
+				throw new NotImplementedException();
+			}
+
+			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(CardinalityFunction target, INodeType input)
 			{
 				throw new NotImplementedException();
 			}

@@ -104,5 +104,18 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 			return value;
 		}
+
+		public String Visit(CardinalityFunction target)
+		{
+			var baseString = target.InnerParseFunction.ApplyVisitor(WithoutHeader);
+			switch (target.Cardinality)
+			{
+				case Cardinality.One: return baseString;
+				case Cardinality.Maybe: return $"{baseString}?";
+				case Cardinality.Plus: return $"{baseString}+";
+				case Cardinality.Star: return $"{baseString}*";
+				default: throw new NotImplementedException();
+			}
+		}
 	}
 }

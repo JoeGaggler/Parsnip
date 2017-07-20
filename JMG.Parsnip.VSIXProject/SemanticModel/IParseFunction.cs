@@ -27,7 +27,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IActionVisitor<Sequence>,
 		IActionVisitor<Intrinsic>,
 		IActionVisitor<LiteralString>,
-		IActionVisitor<ReferencedRule>
+		IActionVisitor<ReferencedRule>,
+		IActionVisitor<CardinalityFunction>
 	{
 
 	}
@@ -37,7 +38,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IActionVisitor<Sequence, TInput>,
 		IActionVisitor<Intrinsic, TInput>,
 		IActionVisitor<LiteralString, TInput>,
-		IActionVisitor<ReferencedRule, TInput>
+		IActionVisitor<ReferencedRule, TInput>,
+		IActionVisitor<CardinalityFunction, TInput>
 	{
 
 	}
@@ -47,7 +49,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IFuncVisitor<Sequence, TOutput>,
 		IFuncVisitor<Intrinsic, TOutput>,
 		IFuncVisitor<LiteralString, TOutput>,
-		IFuncVisitor<ReferencedRule, TOutput>
+		IFuncVisitor<ReferencedRule, TOutput>,
+		IFuncVisitor<CardinalityFunction, TOutput>
 	{
 
 	}
@@ -57,7 +60,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IFuncVisitor<Sequence, TInput, TOutput>,
 		IFuncVisitor<Intrinsic, TInput, TOutput>,
 		IFuncVisitor<LiteralString, TInput, TOutput>,
-		IFuncVisitor<ReferencedRule, TInput, TOutput>
+		IFuncVisitor<ReferencedRule, TInput, TOutput>,
+		IFuncVisitor<CardinalityFunction, TInput, TOutput>
 	{
 
 	}

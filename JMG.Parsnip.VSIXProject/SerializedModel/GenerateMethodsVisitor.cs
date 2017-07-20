@@ -102,21 +102,21 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					}
 				}
 
-				String combo;
+				String nodeReference;
 				if (returnedResults.Count == 0)
 				{
-					combo = "EmptyNode.Instance";
+					nodeReference = "EmptyNode.Instance";
 				}
 				else if (returnedResults.Count == 1)
 				{
-					combo = returnedResults[0];
+					nodeReference = returnedResults[0];
 				}
 				else
 				{
-					combo = $"({String.Join(", ", returnedResults)})";
+					nodeReference = $"({String.Join(", ", returnedResults)})";
 				}
 
-				writer.Return($"new {returnType}() {{ Node = {combo}, State = {currentState} }}");
+				writer.Return($"new {returnType}() {{ Node = {nodeReference}, State = {currentState} }}");
 			}
 		}
 
@@ -252,6 +252,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(ReferencedRule target, Signature input)
 		{
 			writer.Comment("TODO: ReferencedRule");
+		}
+
+		public void Visit(CardinalityFunction target, Signature input)
+		{
+			writer.Comment("TODO: CardinalityFunction");
 		}
 	}
 }

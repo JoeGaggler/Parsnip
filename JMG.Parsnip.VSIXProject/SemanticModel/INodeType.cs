@@ -15,7 +15,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 	internal interface INodeTypeFuncVisitor<TOutput> :
 		IFuncVisitor<EmptyNodeType, TOutput>,
 		IFuncVisitor<SingleNodeType, TOutput>,
-		IFuncVisitor<TupleNodeType, TOutput>
+		IFuncVisitor<TupleNodeType, TOutput>,
+		IFuncVisitor<CollectionNodeType, TOutput>		
 	{
 
 	}
@@ -49,6 +50,18 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		}
 
 		public IReadOnlyList<INodeType> Types { get; }
+
+		public TOutput ApplyVisitor<TOutput>(INodeTypeFuncVisitor<TOutput> visitor) => visitor.Visit(this);
+	}
+
+	internal class CollectionNodeType : INodeType
+	{
+		public CollectionNodeType(INodeType innerNodeType)
+		{
+			this.InnerNodeType = innerNodeType;
+		}
+
+		public INodeType InnerNodeType { get; }
 
 		public TOutput ApplyVisitor<TOutput>(INodeTypeFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 	}

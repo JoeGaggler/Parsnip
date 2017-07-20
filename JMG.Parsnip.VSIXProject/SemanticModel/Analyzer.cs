@@ -111,20 +111,24 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				return selection;
 			}
 
+			private static Cardinality Convert(SyntacticModel.Cardinality cardinality)
+			{
+				switch (cardinality)
+				{
+					case SyntacticModel.Cardinality.One: return Cardinality.One;
+					case SyntacticModel.Cardinality.Maybe: return Cardinality.Maybe;
+					case SyntacticModel.Cardinality.Plus: return Cardinality.Plus;
+					case SyntacticModel.Cardinality.Star: return Cardinality.Star;
+					default: throw new InvalidOperationException($"Found unexpected cardinality: {cardinality}");
+				}
+			}
+
 			internal static Sequence VisitSequence(SyntacticModel.Sequence target)
 			{
 				var sequence = new Sequence(false, new SequenceStep[0], factoryReturnType: null);
 				foreach (var segment in target.Segments)
 				{
-					IParseFunction func;
-					switch (segment.Cardinality)
-					{
-						case Cardinality.One: func = VisitToken(segment.Item); break;
-						case Cardinality.Plus: func = VisitToken(segment.Item); break;  // TODO: THESE ARE NOT IMPLEMENTED YET!
-						case Cardinality.Star: func = VisitToken(segment.Item); break;	// TODO: THESE ARE NOT IMPLEMENTED YET!
-						case Cardinality.Maybe: func = VisitToken(segment.Item); break;	// TODO: THESE ARE NOT IMPLEMENTED YET!
-						default: throw new InvalidOperationException();
-					}
+					var func = VisitCardinality(segment.Item, Convert(segment.Cardinality));
 
 					MatchAction action;
 					switch (segment.Action)
@@ -139,6 +143,28 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					sequence = sequence.AddingStep(step);
 				}
 				return sequence;
+			}
+
+			internal static IParseFunction VisitCardinality(IToken item, Cardinality cardinality)
+			{
+				var func = VisitToken(item);
+				switch (cardinality)
+				{
+					case Cardinality.One:
+					{
+						return func;
+					}
+					case Cardinality.Plus:
+					case Cardinality.Star:
+					case Cardinality.Maybe:
+					{
+						return new CardinalityFunction(func, cardinality);
+					}
+					default:
+					{
+						throw new InvalidOperationException();
+					}
+				}
 			}
 
 			internal static IParseFunction VisitToken(IToken item) => item.ApplyVisitor(new TokenVisitor());

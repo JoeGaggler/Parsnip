@@ -21,7 +21,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(Selection target, Access access)
 		{
-			parsnipCode.AddSignature(new Signature(baseName, access, target, (s, f) => $"{baseName}({s}, {f})"));
+			Invoker invoker = (s, f) => $"{baseName}({s}, {f})";
+			parsnipCode.MapFunctionInvocation(target, invoker);
+			parsnipCode.AddSignature(new Signature(baseName, access, target, invoker));
 
 			int index = 0;
 			foreach (var step in target.Steps)
@@ -37,7 +39,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(Sequence target, Access access)
 		{
-			parsnipCode.AddSignature(new Signature(baseName, access, target, (s, f) => $"{baseName}({s}, {f})"));
+			Invoker invoker = (s, f) => $"{baseName}({s}, {f})";
+			parsnipCode.MapFunctionInvocation(target, invoker);
+			parsnipCode.AddSignature(new Signature(baseName, access, target, invoker));
 
 			int index = 0;
 			foreach (var step in target.Steps)
@@ -70,6 +74,25 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			// No need to generate method for ReferencedRule
 			var methodName = parsnipCode.RuleMethodNames[target.Identifier];
 			parsnipCode.MapFunctionInvocation(target, (s, f) => $"{methodName}({s}, {f})");
+		}
+
+		public void Visit(CardinalityFunction target, Access input)
+		{
+			// No need to generate method for CardinalityFunction
+			String methodName;
+			switch (target.Cardinality)
+			{
+				case Cardinality.Maybe: methodName = "ParseMaybe"; break;
+				case Cardinality.Plus: methodName = "ParsePlus"; break;
+				case Cardinality.Star: methodName = "ParseStar"; break;
+				default: throw new InvalidOperationException();
+			}
+
+			var inner = target.InnerParseFunction;
+			inner.ApplyVisitor(this, Access.Private);
+			var innerInvocation = parsnipCode.Invokers[inner]("s", "f");
+
+			parsnipCode.MapFunctionInvocation(target, (s, f) => $"{methodName}({s}, {f}, (s, f) => {innerInvocation})");
 		}
 	}
 }
