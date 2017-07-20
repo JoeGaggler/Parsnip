@@ -17,13 +17,13 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 		public String Identifier { get; }
 
-		public Boolean IsMemoized => false;
-
 		public INodeType ReturnType { get; }
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
+
+		public void ApplyVisitor<TInput1, TInput2>(IParseFunctionActionVisitor<TInput1, TInput2> visitor, TInput1 input1, TInput2 input2) => visitor.Visit(this, input1, input2);
 
 		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 

@@ -36,6 +36,18 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 				this.interfaceMethodName = interfaceMethodName;
 			}
 
+			private IReadOnlyList<INodeType> GetParameterTypesFromReturnType(INodeType funcReturnType)
+			{
+				if (funcReturnType == EmptyNodeType.Instance)
+				{
+					return new INodeType[0];
+				}
+				else
+				{
+					return new[] { funcReturnType };
+				}
+			}
+
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Selection target, INodeType input)
 			{
 				var interfaceMethods = new List<InterfaceMethod>();
@@ -49,15 +61,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 					if (input != EmptyNodeType.Instance)
 					{
 						var name = $"{interfaceMethodName}{++count}";
-
-						if (funcReturnType == EmptyNodeType.Instance)
-						{
-							interfaceMethod = new InterfaceMethod(input, name, new INodeType[0]);
-						}
-						else
-						{
-							interfaceMethod = new InterfaceMethod(input, name, new[] { funcReturnType });
-						}
+						interfaceMethod = new InterfaceMethod(input, name, GetParameterTypesFromReturnType(funcReturnType));
 						interfaceMethods.Add(interfaceMethod);
 					}
 
@@ -65,26 +69,23 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 					newSteps.Add(newStep);
 				}
 
-				return (new Selection(target.IsMemoized, newSteps, input), interfaceMethods);
+				return (new Selection(newSteps), interfaceMethods);
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Sequence target, INodeType input)
 			{
 				var interfaceMethods = new List<InterfaceMethod>();
 
+				InterfaceMethod interfaceMethod = null;
 				var types = target.Steps.Where(i => i.IsReturned).Select(i => i.Function.ReturnType).ToList();
 				if (types.Count > 0)
 				{
 					var name = $"{interfaceMethodName}{++count}";
-					var im = new InterfaceMethod(input, name, types);
-					interfaceMethods.Add(im);
-				}
-				else
-				{
-
+					interfaceMethod = new InterfaceMethod(input, name, types);
+					interfaceMethods.Add(interfaceMethod);
 				}
 
-				return (new Sequence(target.IsMemoized, target.Steps, input), interfaceMethods);
+				return (new Sequence(target.Steps, interfaceMethod), interfaceMethods);
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Intrinsic target, INodeType input)
@@ -104,7 +105,15 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(CardinalityFunction target, INodeType input)
 			{
-				throw new NotImplementedException();
+				var name = $"{interfaceMethodName}{++count}";
+				var parameterTypes = GetParameterTypesFromReturnType(target.ReturnType);
+				if (parameterTypes.Count == 0)
+				{
+					return (target, new InterfaceMethod[0]);
+				}
+
+				var im = new InterfaceMethod(input, name, parameterTypes);
+				return (new CardinalityFunction(target.InnerParseFunction, target.Cardinality, im), new InterfaceMethod[] { im });
 			}
 		}
 	}

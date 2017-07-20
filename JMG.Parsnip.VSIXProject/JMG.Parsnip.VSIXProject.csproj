@@ -72,7 +72,6 @@
     <Compile Include="SemanticModel\CardinalityFunction.cs" />
     <Compile Include="SemanticModel\InterfaceMethod.cs" />
     <Compile Include="SemanticModel\Intrinsic.cs" />
-    <Compile Include="SemanticModel\IParseFunctionWithFactoryType.cs" />
     <Compile Include="SemanticModel\LiteralString.cs" />
     <Compile Include="SemanticModel\MatchAction.cs" />
     <Compile Include="SemanticModel\ReferencedRule.cs" />
@@ -85,6 +84,7 @@
     <Compile Include="SemanticModel\Sequence.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleFactoryMethods.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleReferenceTypes.cs" />
+    <Compile Include="SemanticModel\Transformations\Collapsing.cs" />
     <Compile Include="SemanticModel\Transformations\ReplacingVisitor.cs" />
     <Compile Include="SerializedModel\CommentParseFunctionVisitor.cs" />
     <Compile Include="SerializedModel\GenerateMethodsVisitor.cs" />

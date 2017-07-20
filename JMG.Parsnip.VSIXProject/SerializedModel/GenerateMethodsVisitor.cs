@@ -28,12 +28,81 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			};
 		}
 
+		private static String GetParseResultTypeString(INodeType returnType) => $"ParseResult<{NameGen.TypeString(returnType)}>";
 		private static String GetParseResultTypeString(IParseFunction target) => $"ParseResult<{NameGen.TypeString(target.ReturnType)}>";
+
+		private class Decl
+		{
+			public Decl(INodeType type, String name)
+			{
+				this.Type = type;
+				this.Name = name;
+			}
+
+			public INodeType Type { get; }
+			public String Name { get; }
+		}
+
+		private IDisposable MethodStuff(IParseFunction target, Access access, String name, String stateName, IReadOnlyList<LocalVarDecl> parameters, Boolean isMemoized)
+		{
+			var returnType = GetParseResultTypeString(target);
+			var memName = $"Mem_{name}";
+
+			if (isMemoized)
+			{
+				writer.LineOfCode($"private {returnType} {memName};");
+			}
+
+			var disposable = writer.Method(access, true, returnType, name, parameters);
+
+			if (isMemoized)
+			{
+				writer.LineOfCode($"if ({stateName}.{memName} != null) {{ return {stateName}.{memName}; }}");
+				writer.EndOfLine();
+			}
+
+			return disposable;
+		}
+
+		private String GetReturnStatement(INodeType returnType, IReadOnlyList<Decl> nodes, String stateReference, String factoryName, InterfaceMethod interfaceMethod)
+		{
+			String nodeString;
+			if (returnType == EmptyNodeType.Instance)
+			{
+				nodeString = "EmptyNode.Instance";
+			}
+			else if (interfaceMethod != null)
+			{
+				String param;
+				if (nodes.Count == 1 && nodes[0].Type == EmptyNodeType.Instance)
+				{
+					param = String.Empty;
+				}
+				else
+				{
+					param = String.Join(", ", nodes.Select(i => i.Name));
+				}
+
+				nodeString = $"{factoryName}.{interfaceMethod.Name}({param})";
+			}
+			else if (nodes.Count == 1)
+			{
+				nodeString = nodes[0].Name;
+			}
+			else
+			{
+				// Make a tuple
+				nodeString = $"({String.Join(", ", nodes.Select(i => i.Name))})";
+			}
+
+			var returnTypeString = GetParseResultTypeString(returnType);
+			return ($"return new {returnTypeString}() {{ Node = {nodeString}, State = {stateReference} }};");
+		}
 
 		public void Visit(Selection target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, true, returnType, input.Name, typicalParams))
+			using (MethodStuff(target, input.Access, input.Name, "state", typicalParams, input.IsMemoized))
 			{
 				int stepIndex = 0;
 				foreach (var step in target.Steps)
@@ -45,22 +114,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 					writer.VarAssign(resultName, invoker("state", "factory"));
 
+					var factoryName = "factory";
+					var interfaceMethod = step.InterfaceMethod;
 					var nodeReference = $"{resultName}.Node";
-					if (target.ReturnType == EmptyNodeType.Instance)
-					{
-						nodeReference = "EmptyNode.Instance";
-					}
-					else if (step.InterfaceMethod is InterfaceMethod method)
-					{
-						var param = nodeReference;
-						if (func.ReturnType == EmptyNodeType.Instance)
-						{
-							param = String.Empty;
-						}
 
-						nodeReference = $"factory.{method.Name}({param})";
-					}
-					writer.LineOfCode($"if ({resultName} != null) return new {returnType}() {{ Node = {nodeReference}, State = {resultName}.State }};");
+					var decl = new Decl(func.ReturnType, nodeReference);
+
+					writer.LineOfCode($"if ({resultName} != null) {GetReturnStatement(target.ReturnType, new[] { decl }, $"{resultName}.State", factoryName, interfaceMethod)}");
 				}
 
 				// No choices matched
@@ -71,9 +131,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(Sequence target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, true, returnType, input.Name, typicalParams))
+			using (MethodStuff(target, input.Access, input.Name, "state", typicalParams, input.IsMemoized))
 			{
-				var returnedResults = new List<String>();
+				var returnedResults = new List<Decl>();
 
 				int stepIndex = 0;
 				var currentState = "state";
@@ -81,6 +141,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				{
 					stepIndex++;
 					var func = step.Function;
+					var type = func.ReturnType;
 					var invoker = this.parsnipCode.Invokers[func];
 					var resultName = $"r{stepIndex}";
 					var nodeName = $"{resultName}.Node";
@@ -88,7 +149,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 					if (step.IsReturned)
 					{
-						returnedResults.Add(nodeName);
+						returnedResults.Add(new Decl(type, nodeName));
 					}
 
 					writer.VarAssign(resultName, invoker(currentState, "factory"));
@@ -102,161 +163,64 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					}
 				}
 
-				String nodeReference;
-				if (returnedResults.Count == 0)
-				{
-					nodeReference = "EmptyNode.Instance";
-				}
-				else if (returnedResults.Count == 1)
-				{
-					nodeReference = returnedResults[0];
-				}
-				else
-				{
-					nodeReference = $"({String.Join(", ", returnedResults)})";
-				}
-
-				writer.Return($"new {returnType}() {{ Node = {nodeReference}, State = {currentState} }}");
+				writer.LineOfCode(GetReturnStatement(target.ReturnType, returnedResults, currentState, "factory", target.InterfaceMethod));
 			}
 		}
 
 		public void Visit(Intrinsic target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, true, returnType, input.Name, typicalParams))
+			using (MethodStuff(target, input.Access, input.Name, "state", typicalParams, input.IsMemoized))
 			{
-				switch (target.Type)
-				{
-					case IntrinsicType.AnyCharacter:
-					{
-						writer.VarAssign("input", "state.input");
-						writer.VarAssign("inputPosition", "state.inputPosition");
-						using (writer.If("inputPosition >= input.Length"))
-						{
-							writer.Return("null");
-						}
-						writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] }");
-						break;
-					}
-					case IntrinsicType.AnyLetter:
-					{
-						writer.VarAssign("input", "state.input");
-						writer.VarAssign("inputPosition", "state.inputPosition");
-						using (writer.If("inputPosition >= input.Length"))
-						{
-							writer.Return("null");
-						}
-						using (writer.ElseIf("!Char.IsLetter(input[inputPosition])"))
-						{
-							writer.Return("null");
-
-						}
-						writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] }");
-						break;
-					}
-					case IntrinsicType.EndOfLine:
-					{
-						writer.VarAssign("result1", "ParseLexeme(state, \"\\r\\n\")");
-						using (writer.If("result1 != null"))
-						{
-							writer.Return("new ParseResult<String>() { Node = result1.Node, State = result1.State }");
-						}
-
-						writer.VarAssign("result2", "ParseLexeme(state, \"\\n\")");
-						using (writer.If("result2 != null"))
-						{
-							writer.Return("new ParseResult<String>() { Node = result2.Node, State = result2.State }");
-						}
-
-						writer.Return("null");
-						break;
-					}
-					case IntrinsicType.EndOfStream:
-					{
-						writer.VarAssign("input", "state.input");
-						writer.VarAssign("inputPosition", "state.inputPosition");
-						using (writer.If("inputPosition == input.Length"))
-						{
-							writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
-						}
-						writer.Return("null");
-						break;
-					}
-					case IntrinsicType.CString:
-					{
-						writer.VarAssign("resultStart", "ParseLexeme(state, \"\\\"\")");
-						writer.IfNullReturnNull("resultStart");
-						writer.VarAssign("currentState", "resultStart.State");
-						writer.VarAssign("sb", "new System.Text.StringBuilder()");
-						using (writer.While("true"))
-						{
-							writer.VarAssign("resultEscape", "ParseLexeme(currentState, \"\\\\\")");
-							using (writer.If("resultEscape != null"))
-							{
-								writer.VarAssign("resultToken", "ParseIntrinsic_AnyCharacter(resultEscape.State, factory)");
-								writer.IfNullReturnNull("resultToken");
-								using (writer.Switch("resultToken.Node"))
-								{
-									writer.LineOfCode("case \"\\\\\":");
-									writer.LineOfCode("case \"\\\"\":");
-									writer.LineOfCode("case \"t\":");
-									writer.LineOfCode("case \"r\":");
-									writer.LineOfCode("case \"n\":");
-									using (writer.BraceScope())
-									{
-										writer.LineOfCode("sb.Append(\"\\\\\");");
-										writer.LineOfCode("sb.Append(resultToken.Node);");
-										writer.SwitchBreak();
-									}
-									using (writer.SwitchDefault())
-									{
-										writer.Return("null");
-									}
-								}
-								writer.Assign("currentState", "resultToken.State");
-								writer.Continue();
-							}
-							writer.VarAssign("resultEnd", "ParseLexeme(currentState, \"\\\"\")");
-							using (writer.If("resultEnd != null"))
-							{
-								writer.Return("new ParseResult<String>() { Node = sb.ToString(), State = resultEnd.State }");
-							}
-							writer.VarAssign("resultChar", "ParseIntrinsic_AnyCharacter(currentState, factory)");
-							writer.IfNullReturnNull("resultChar");
-							writer.LineOfCode("sb.Append(resultChar.Node);");
-							writer.Assign("currentState", "resultChar.State");
-						}
-						break;
-					}
-					default:
-					{
-						writer.Comment("TODO: Intrinsic");
-						break;
-					}
-				}
+				writer.Comment("TODO: Intrinsic");
 			}
 		}
 
 		public void Visit(LiteralString target, Signature input)
 		{
 			var returnType = GetParseResultTypeString(target);
-			using (writer.Method(input.Access, true, returnType, input.Name, new[] { new LocalVarDecl("PackratState", "state"), new LocalVarDecl("String", "lexeme") }))
+			using (MethodStuff(target, input.Access, input.Name, "state", typicalParams, input.IsMemoized))
 			{
-				writer.VarAssign("lexemeLength", "lexeme.Length");
-				writer.IfTrueReturnNull("state.inputPosition + lexemeLength > state.input.Length");
-				writer.IfTrueReturnNull("state.input.Substring(state.inputPosition, lexemeLength) != lexeme");
-				writer.Return("new ParseResult<String>() { Node = lexeme, State = state.states[state.inputPosition + lexemeLength] }");
+				writer.Comment("TODO: LiteralString");
 			}
 		}
 
 		public void Visit(ReferencedRule target, Signature input)
 		{
-			writer.Comment("TODO: ReferencedRule");
+			var returnType = GetParseResultTypeString(target);
+			using (MethodStuff(target, input.Access, input.Name, "state", typicalParams, input.IsMemoized))
+			{
+				writer.Comment("TODO: ReferencedRule");
+			}
 		}
 
 		public void Visit(CardinalityFunction target, Signature input)
 		{
-			writer.Comment("TODO: CardinalityFunction");
+			var returnType = GetParseResultTypeString(target);
+			using (MethodStuff(target, input.Access, input.Name, "state", typicalParams, input.IsMemoized))
+			{
+				String methodName;
+				switch (target.Cardinality)
+				{
+					case Cardinality.Maybe: methodName = "ParseMaybe"; break;
+					case Cardinality.Plus: methodName = "ParsePlus"; break;
+					case Cardinality.Star: methodName = "ParseStar"; break;
+					default: throw new InvalidOperationException();
+				}
+
+				var innerFunc = target.InnerParseFunction;
+				var innerInvocation = parsnipCode.Invokers[innerFunc]("s", "f");
+				var invocation = $"{methodName}(state, factory, (s, f) => {innerInvocation})";
+
+				var resultName = "result";
+				writer.VarAssign(resultName, invocation);
+				writer.IfNullReturnNull(resultName);
+
+				var nodeReference = $"{resultName}.Node";
+				var decl = new Decl(innerFunc.ReturnType, nodeReference);
+
+				writer.LineOfCode(GetReturnStatement(target.ReturnType, new[] { decl }, $"{resultName}.State", "factory", target.InterfaceMethod));
+			}
 		}
 	}
 }

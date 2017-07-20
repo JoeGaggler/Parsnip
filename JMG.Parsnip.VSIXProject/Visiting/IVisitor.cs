@@ -16,6 +16,11 @@ namespace JMG.Parsnip.VSIXProject.Visiting
 		void Visit(TVisitee target, TInput input);
 	}
 
+	public interface IActionVisitor<in TVisitee, in TInput1, in TInput2>
+	{
+		void Visit(TVisitee target, TInput1 input1, TInput2 input2);
+	}
+
 	public interface IFuncVisitor<in TVisitee, out TOutput>
 	{
 		TOutput Visit(TVisitee target);

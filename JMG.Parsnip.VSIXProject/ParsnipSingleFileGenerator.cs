@@ -48,6 +48,7 @@ namespace JMG.Parsnip.VSIXProject
 			var semanticModel = SemanticModel.Analyzer.Analyze(syntacticModel);
 
 			// TRANSFORMATIONS
+			semanticModel = SemanticModel.Transformations.Collapsing.Go(semanticModel);
 			semanticModel = SemanticModel.Transformations.AssignRuleReferenceTypes.Go(semanticModel);
 			semanticModel = SemanticModel.Transformations.AssignRuleFactoryMethods.Go(semanticModel);
 

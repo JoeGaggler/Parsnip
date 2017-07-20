@@ -6,26 +6,23 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal class Sequence : IParseFunction, IParseFunctionWithFactoryType
+	internal class Sequence : IParseFunction
 	{
-		public Sequence(Boolean isMemoized, IReadOnlyList<SequenceStep> steps, INodeType factoryReturnType)
+		public Sequence(IReadOnlyList<SequenceStep> steps, InterfaceMethod interfaceMethod)
 		{
-			this.IsMemoized = isMemoized;
 			this.Steps = steps;
-			this.FactoryReturnType = factoryReturnType;
+			this.InterfaceMethod = interfaceMethod;
 		}
 
 		public IReadOnlyList<SequenceStep> Steps { get; }
 
-		public INodeType FactoryReturnType { get; }
-
-		public Boolean IsMemoized { get; }
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public INodeType ReturnType
 		{
 			get
 			{
-				if (FactoryReturnType != null) return FactoryReturnType;
+				if (InterfaceMethod != null) return InterfaceMethod.ReturnType;
 
 				var list = StepTypes;
 				if (list.Count == 0)
@@ -63,6 +60,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
+
+		public void ApplyVisitor<TInput1, TInput2>(IParseFunctionActionVisitor<TInput1, TInput2> visitor, TInput1 input1, TInput2 input2) => visitor.Visit(this, input1, input2);
 
 		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 

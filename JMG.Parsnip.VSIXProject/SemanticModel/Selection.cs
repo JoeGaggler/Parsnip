@@ -7,35 +7,20 @@ using JMG.Parsnip.VSIXProject.Extensions;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal class Selection : IParseFunction, IParseFunctionWithFactoryType
+	internal class Selection : IParseFunction
 	{
-		public Selection(Boolean isMemoized, IReadOnlyList<SelectionStep> steps, INodeType factoryReturnType)
+		public Selection(IReadOnlyList<SelectionStep> steps)
 		{
-			this.IsMemoized = isMemoized;
 			this.Steps = steps;
-			this.FactoryReturnType = factoryReturnType;
 		}
 
 		public IReadOnlyList<SelectionStep> Steps { get; }
-
-		public Boolean IsMemoized { get; }
-
-		public INodeType FactoryReturnType { get; }
 
 		public INodeType ReturnType
 		{
 			get
 			{
-				if (FactoryReturnType != null) return FactoryReturnType;
-				return StepType;
-			}
-		}
-
-		public INodeType StepType
-		{
-			get
-			{
-				var optionTypes = this.Steps.Select(i => i.Function.ReturnType).ToList();
+				var optionTypes = this.Steps.Select(i => i.InterfaceMethod?.ReturnType ?? i.Function.ReturnType).ToList();
 				if (optionTypes.Select(i => NameGen.TypeString(i)).ToList().AllEqual())
 				{
 					return optionTypes[0];
@@ -50,6 +35,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
+
+		public void ApplyVisitor<TInput1, TInput2>(IParseFunctionActionVisitor<TInput1, TInput2> visitor, TInput1 input1, TInput2 input2) => visitor.Visit(this, input1, input2);
 
 		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 

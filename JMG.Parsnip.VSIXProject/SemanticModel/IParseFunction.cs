@@ -9,13 +9,13 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
 	internal interface IParseFunction
 	{
-		Boolean IsMemoized { get; }
-
 		INodeType ReturnType { get; }
 
 		void ApplyVisitor(IParseFunctionActionVisitor visitor);
 
 		void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input);
+
+		void ApplyVisitor<TInput1, TInput2>(IParseFunctionActionVisitor<TInput1, TInput2> visitor, TInput1 input1, TInput2 input2);
 
 		TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor);
 
@@ -40,6 +40,17 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IActionVisitor<LiteralString, TInput>,
 		IActionVisitor<ReferencedRule, TInput>,
 		IActionVisitor<CardinalityFunction, TInput>
+	{
+
+	}
+
+	internal interface IParseFunctionActionVisitor<T0, T1> :
+		IActionVisitor<Selection, T0, T1>,
+		IActionVisitor<Sequence, T0, T1>,
+		IActionVisitor<Intrinsic, T0, T1>,
+		IActionVisitor<LiteralString, T0, T1>,
+		IActionVisitor<ReferencedRule, T0, T1>,
+		IActionVisitor<CardinalityFunction, T0, T1>
 	{
 
 	}

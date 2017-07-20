@@ -27,7 +27,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		public RuleIdentifier RID1(IReadOnlyList<String> t0) => new RuleIdentifier(String.Join("", t0));
 
-		public Rule Rule1((RuleHead, RuleBody) t0) => new Rule(t0.Item1, t0.Item2);
+		public Rule Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 
 		public RuleBody RuleBody1(IReadOnlyList<Choice> t0) => new RuleBody(t0);
 
