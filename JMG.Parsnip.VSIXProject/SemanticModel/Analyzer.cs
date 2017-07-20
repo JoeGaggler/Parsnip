@@ -53,7 +53,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			public ParsnipModel Visit(SyntacticModel.Rule target)
 			{
 				var ruleName = target.Head.RuleIdentifier.Text;
-				var className = target.Head.ClassIdentifier.Text;
+				var className = target.Head.ClassIdentifier?.Text;
 				var returnType = GetNodeType(className);
 				var rule = new Rule(ruleName, returnType, null);
 				model = model.AddingRule(rule);
@@ -180,8 +180,9 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					IntrinsicType type;
 					switch (target.Identifier)
 					{
-						case "EOL": type = IntrinsicType.EndOfLine; break;
+						case "END":
 						case "EOS": type = IntrinsicType.EndOfStream; break;
+						case "EOL": type = IntrinsicType.EndOfLine; break;
 						case ".": type = IntrinsicType.AnyCharacter; break;
 						case "Aa": type = IntrinsicType.AnyLetter; break;
 						case "CSTRING": type = IntrinsicType.CString; break;

@@ -1,0 +1,77 @@
+﻿definition: ParsnipDefinition
+definitionItem+
+
+definitionItem: IParsnipDefinitionItem
+rule
+comment
+`<EOL>
+
+rule: Rule
+ruleHead ruleBody
+
+ruleHead: RuleHead
+ruleHeadPrefix `OHS CID `OHS `<EOL>
+ruleHeadPrefix `OHS `<EOL>
+
+ruleHeadPrefix: RuleHeadPrefix
+RID `OHS `":"
+
+ruleBody: RuleBody
+choice+
+
+choice: Choice
+union `OHS `EOLOS
+
+union: Union
+sequence `OHS `"|" `OHS union
+sequence
+
+sequence: Sequence
+segment `OHS sequence
+segment
+
+segment: Segment
+`"`" segmentCardinality
+`"~" segmentCardinality
+`"&" segmentCardinality
+segmentCardinality
+
+segmentCardinality: TokenCardinality
+token `"+"
+token `"?"
+token `"*"
+token
+
+token: IToken
+`"."
+<CSTRING>
+RID
+`"<" IID `">"
+`"(" union `")"
+
+RID: RuleIdentifier
+<Aa>+
+
+CID: ClassIdentifier
+<Aa>+
+
+IID: String
+<Aa>+
+
+OHS:
+HS?
+
+HS:
+WS HS
+WS
+
+WS:
+" "
+"\t"
+
+EOLOS:
+`<EOL>
+<END>
+
+comment: String
+`"//" (~EOLOS .)* `EOLOS

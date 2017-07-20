@@ -96,6 +96,12 @@
     <Compile Include="SyntacticModel\Choice.cs" />
     <Compile Include="SyntacticModel\ClassIdentifier.cs" />
     <Compile Include="SyntacticModel\Comment.cs" />
+    <Compile Include="SyntacticModel\Generated\Parsnip.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Parsnip.parsnip</DependentUpon>
+    </Compile>
+    <Compile Include="SyntacticModel\Generated\ParsnipRuleFactory.cs" />
     <Compile Include="SyntacticModel\IntrinsicToken.cs" />
     <Compile Include="SyntacticModel\IParsnipDefinitionItem.cs" />
     <Compile Include="SyntacticModel\LiteralStringToken.cs" />
@@ -112,7 +118,6 @@
     <Compile Include="SyntacticModel\SyntaxExtensions.cs" />
     <Compile Include="SyntacticModel\Parser.cs" />
     <Compile Include="SyntacticModel\ParsnipDefinition.cs" />
-    <Compile Include="SyntacticModel\SyntaxFactory.cs" />
     <Compile Include="SyntacticModel\TokenCardinality.cs" />
     <Compile Include="SyntacticModel\Union.cs" />
     <Compile Include="SyntacticModel\UnionToken.cs" />
@@ -124,6 +129,10 @@
     <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="SyntacticModel\Generated\Parsnip.parsnip">
+      <Generator>Parsnip</Generator>
+      <LastGenOutput>Parsnip.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
