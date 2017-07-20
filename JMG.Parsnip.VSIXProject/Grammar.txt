@@ -1,0 +1,72 @@
+﻿// This file contains the initial grammar definition that the first version will support.
+
+definition : ParsnipDefinition
+definitionItem+
+
+definitionItem : ParsnipDefinitionItem
+rule
+COMMENT
+`<EOL>
+
+rule : Rule
+ruleHead ruleBody
+
+ruleHead : RuleHead
+ruleHeadPrefix `OHS ID `OHS `<EOL>
+ruleHeadPrefix `OHS `<EOL>
+
+ruleHeadPrefix : RuleHeadPrefix
+ID `OHS `":"
+
+ruleBody : RuleBody
+choice+
+
+choice : RuleSequenceUnion
+union OHS EOLOS
+
+union : RuleSequenceUnion
+sequence OHS `"|" OHS union
+sequence
+
+sequence : RuleSegmentItemSequence
+segment `" " sequence
+segment
+
+segment : RuleSegment
+`"`" segmentCardinality
+`"~" segmentCardinality
+`"&" segmentCardinality
+segmentCardinality
+
+segmentCardinality : RuleSegmentItemCardinality
+segmentItem `"+"
+segmentItem `"?"
+segmentItem `"*"
+segmentItem
+
+segmentItem : RuleSegmentItem
+`"."
+<CSTRING>
+ID
+`"<" ID `">"
+`"(" union `")"
+
+// TODO: C# Identifier
+ID : String
+<Aa>+
+
+OHS:
+HS?
+
+HS:
+WS HS
+WS
+
+WS:
+" " | "\t"
+
+EOLOS: 
+`<EOL> | <END>
+
+COMMENT : String
+`"//" (~EOLOS .)* `EOLOS
