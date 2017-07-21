@@ -100,9 +100,9 @@ namespace JMG.Parsnip.VSIXProject
 						var firstRuleReturnType = NameGen.TypeString(firstRule.ReturnType);
 						var firstRuleParseMethodName = NameGen.ParseFunctionMethodName(firstRule.RuleIdentifier);
 						using (writer.Method(Access.Public, true, firstRuleReturnType, "Parse", new[] {
-						new LocalVarDecl("String", "input"),
-						new LocalVarDecl(interfaceName, "factory"),
-					}))
+							new LocalVarDecl("String", "input"),
+							new LocalVarDecl(interfaceName, "factory"),
+						}))
 						{
 							writer.Assign("var states", "new PackratState[input.Length + 1]");
 							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states, factory));");
