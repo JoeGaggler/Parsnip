@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal enum MatchAction
+	public enum MatchAction
 	{
 		Consume,
 		Ignore,

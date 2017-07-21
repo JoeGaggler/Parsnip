@@ -10,24 +10,24 @@ rule: Rule
 ruleHead ruleBody
 
 ruleHead: RuleHead
-ruleHeadPrefix `OHS CID `OHS `<EOL>
-ruleHeadPrefix `OHS `<EOL>
+ruleHeadPrefix `-- CID `-- `<EOL>
+ruleHeadPrefix `-- `<EOL>
 
 ruleHeadPrefix: RuleHeadPrefix
-RID `OHS `":"
+RID `-- `":"
 
 ruleBody: RuleBody
 choice+
 
 choice: Choice
-union `OHS `EOLOS
+union `-- `EOLOS
 
 union: Union
-sequence `OHS `"|" `OHS union
+sequence `-- `"|" `-- union
 sequence
 
 sequence: Sequence
-segment `OHS sequence
+segment `-- sequence
 segment
 
 segment: Segment
@@ -46,7 +46,7 @@ token: IToken
 `"."
 <CSTRING>
 RID
-`"<" IID `">"
+`"<" IID `">" | "--"
 `"(" union `")"
 
 RID: RuleIdentifier
@@ -57,17 +57,6 @@ CID: ClassIdentifier
 
 IID: String
 <Aa>+
-
-OHS:
-HS?
-
-HS:
-WS HS
-WS
-
-WS:
-" "
-"\t"
 
 EOLOS:
 `<EOL>

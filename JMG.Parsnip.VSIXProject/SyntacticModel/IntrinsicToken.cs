@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class IntrinsicToken : IToken
+	public class IntrinsicToken : IToken
 	{
 		public IntrinsicToken(String identifier)
 		{

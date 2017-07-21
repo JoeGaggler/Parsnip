@@ -157,7 +157,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					switch (step.MatchAction)
 					{
 						case MatchAction.Consume: writer.IfNullReturnNull(resultName); currentState = nextState; break;
-						case MatchAction.Fail: writer.IfNotNullReturnNull(resultName); currentState = nextState; break;
+						case MatchAction.Fail: writer.IfNotNullReturnNull(resultName); break;
 						case MatchAction.Rewind: writer.IfNullReturnNull(resultName); break;
 						case MatchAction.Ignore: writer.IfNullReturnNull(resultName); currentState = nextState; break;
 					}

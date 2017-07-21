@@ -7,7 +7,7 @@ using JMG.Parsnip.VSIXProject.Visiting;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class Comment : IParsnipDefinitionItem
+	public class Comment : IParsnipDefinitionItem
 	{
 		public void ApplyVisitor(IParsnipDefinitionItemVisitor visitor) => visitor.Visit(this);
 		public TOutput ApplyVisitor<TOutput>(IParsnipDefinitionItemFuncVisitor<TOutput> visitor) => visitor.Visit(this);

@@ -187,15 +187,30 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				public IParseFunction Visit(IntrinsicToken target)
 				{
 					IntrinsicType type;
-					switch (target.Identifier)
+					switch (target.Identifier) // Check symbolic and case-sensitive identifiers first
 					{
-						case "END":
-						case "EOS": type = IntrinsicType.EndOfStream; break;
-						case "EOL": type = IntrinsicType.EndOfLine; break;
 						case ".": type = IntrinsicType.AnyCharacter; break;
+						case "--": type = IntrinsicType.OptionalHorizontalWhitespace; break;
 						case "Aa": type = IntrinsicType.AnyLetter; break;
-						case "CSTRING": type = IntrinsicType.CString; break;
-						default: throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
+						default:
+						{
+							switch (target.Identifier.ToUpperInvariant()) // Case-insensitive identifiers
+							{
+								case "END":
+								case "EOS": type = IntrinsicType.EndOfStream; break;
+								case "EOL": type = IntrinsicType.EndOfLine; break;
+								case "CSTRING": type = IntrinsicType.CString; break;
+								case "TAB": return new LiteralString("\t");
+								case "SP":
+								case "SPACE": return new LiteralString(" ");
+								default:
+								{
+
+									throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
+								}
+							}
+							break;
+						}
 					}
 
 					return new Intrinsic(type);

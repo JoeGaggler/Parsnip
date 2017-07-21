@@ -13,6 +13,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		AnyCharacter,
 		AnyLetter,
 		CString,
+		OptionalHorizontalWhitespace,
 	}
 
 	internal class Intrinsic : IParseFunction
@@ -34,6 +35,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					case IntrinsicType.AnyCharacter:
 					case IntrinsicType.CString:
 					case IntrinsicType.EndOfLine:
+					case IntrinsicType.OptionalHorizontalWhitespace:
 					return new SingleNodeType("String");
 
 					case IntrinsicType.EndOfStream: return EmptyNodeType.Instance;

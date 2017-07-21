@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class ClassIdentifier
+	public class ClassIdentifier
 	{
 		public ClassIdentifier(String text)
 		{

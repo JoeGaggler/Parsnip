@@ -7,21 +7,21 @@ using JMG.Parsnip.VSIXProject.Visiting;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal interface IParsnipDefinitionItem
+	public interface IParsnipDefinitionItem
 	{
 		void ApplyVisitor(IParsnipDefinitionItemVisitor visitor);
 
 		TOutput ApplyVisitor<TOutput>(IParsnipDefinitionItemFuncVisitor<TOutput> visitor);
 	}
 
-	internal interface IParsnipDefinitionItemVisitor :
+	public interface IParsnipDefinitionItemVisitor :
 		IActionVisitor<Rule>,
 		IActionVisitor<Comment>
 	{
 
 	}
 
-	internal interface IParsnipDefinitionItemFuncVisitor<TOutput> :
+	public interface IParsnipDefinitionItemFuncVisitor<TOutput> :
 		IFuncVisitor<Rule, TOutput>,
 		IFuncVisitor<Comment, TOutput>
 	{

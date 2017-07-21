@@ -28,12 +28,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			this.intrinsics[IntrinsicType.EndOfLine] = "ParseIntrinsic_EndOfLine";
 			this.intrinsics[IntrinsicType.EndOfStream] = "ParseIntrinsic_EndOfStream";
 			this.intrinsics[IntrinsicType.CString] = "ParseIntrinsic_CString";
+			this.intrinsics[IntrinsicType.OptionalHorizontalWhitespace] = "ParseIntrinsic_OptionalHorizontalWhitespace";
 		}
 
 		private void AddIntrinsic(IntrinsicType type, String name)
 		{
 			var sig = new Signature(name, Access.Private, new Intrinsic(type), (s, f) => $"{name}({s}, {f})", isMemoized: false);
-			this.methodItems.Add(sig);			
+			this.methodItems.Add(sig);
 		}
 
 		public void AddSignature(Signature signature) => this.methodItems.Add(signature);
@@ -259,6 +260,30 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					writer.LineOfCode("sb.Append(resultChar.Node);");
 					writer.Assign("currentState", "resultChar.State");
 				}
+			}
+
+			// Optional Horizontal Whitespace
+			writer.LineOfCode("");
+			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", typicalParams))
+			{
+				writer.VarAssign("input", "state.input");
+				writer.VarAssign("inputPosition", "state.inputPosition");
+				using (writer.If("inputPosition >= input.Length"))
+				{
+					writer.Return("new ParseResult<String>() { Node = String.Empty, State = state }");
+				}
+				writer.VarAssign("sb", "new System.Text.StringBuilder()");
+				writer.VarAssign("nextInputPosition", "inputPosition");
+				using (writer.While("nextInputPosition < input.Length"))
+				{
+					writer.VarAssign("ch", "input[nextInputPosition]");
+					using (writer.If("ch != \' \' && ch != \'\\t\'"))
+					{
+						writer.LineOfCode("break;");
+					}
+					writer.LineOfCode("nextInputPosition++;");
+				}
+				writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, nextInputPosition - inputPosition), State = state.states[nextInputPosition] }");
 			}
 		}
 

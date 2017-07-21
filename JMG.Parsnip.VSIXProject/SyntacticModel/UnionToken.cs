@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class UnionToken : IToken
+	public class UnionToken : IToken
 	{
 		public UnionToken(Union union)
 		{

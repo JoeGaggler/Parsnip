@@ -11,7 +11,16 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 		public static ParsnipModel Go(ParsnipModel model)
 		{
 			var vis = new ReplacingVisitor(model);
-			vis.ReferencedRule = old => new ReferencedRule(old.Identifier, model.Rules.First(i => i.RuleIdentifier == old.Identifier).ReturnType);
+
+			vis.ReferencedRule = old =>
+			{
+				var rule = model.Rules.FirstOrDefault(i => i.RuleIdentifier == old.Identifier);
+				if (rule == null)
+				{
+					throw new InvalidOperationException($"No such rule: {old.Identifier}");
+				}
+				return new ReferencedRule(old.Identifier, rule.ReturnType);
+			};
 
 			var oldRules = model.Rules;
 			foreach (var oldRule in oldRules)
