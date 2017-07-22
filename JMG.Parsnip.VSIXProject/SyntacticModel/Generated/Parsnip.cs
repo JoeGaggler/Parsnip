@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.4.0.0
+// Version: 1.5.0.0
 // File: Parsnip.parsnip
-// Date: 2017-07-22 17:08:08
+// Date: 2017-07-22 17:34:01
 
 using System;
 using System.Linq;
@@ -198,15 +198,15 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 							case "t":
 							case "r":
 							case "n":
-								{
-									sb.Append("\\");
-									sb.Append(resultToken.Node);
-									break;
-								}
+							{
+								sb.Append("\\");
+								sb.Append(resultToken.Node);
+								break;
+							}
 							default:
-								{
-									return null;
-								}
+							{
+								return null;
+							}
 						}
 						currentState = resultToken.State;
 						continue;
@@ -287,7 +287,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r1.State };
 			}
 
-			// Sequence: ruleHead ruleBody
+			// Sequence: rule-head rule-body
 			private ParseResult<Rule> Mem_Rule;
 			private static ParseResult<Rule> Rule(PackratState state, IParsnipRuleFactory factory)
 			{
@@ -300,7 +300,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<Rule>() { Node = factory.Rule1(r1.Node, r2.Node), State = r2.State };
 			}
 
-			// Selection: (ruleHeadPrefix `-- CID `-- `<EOL>) | (ruleHeadPrefix `-- `<EOL>)
+			// Selection: (rule-head-prefix `-- CID `-- `<EOL>) | (rule-head-prefix `-- `<EOL>)
 			private ParseResult<RuleHead> Mem_RuleHead;
 			private static ParseResult<RuleHead> RuleHead(PackratState state, IParsnipRuleFactory factory)
 			{
@@ -313,7 +313,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return null;
 			}
 
-			// Sequence: ruleHeadPrefix `-- CID `-- `<EOL>
+			// Sequence: rule-head-prefix `-- CID `-- `<EOL>
 			private static ParseResult<(RuleHeadPrefix, ClassIdentifier)> RuleHead_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = RuleHeadPrefix(state, factory);
@@ -329,7 +329,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<(RuleHeadPrefix, ClassIdentifier)>() { Node = (r1.Node, r3.Node), State = r5.State };
 			}
 
-			// Sequence: ruleHeadPrefix `-- `<EOL>
+			// Sequence: rule-head-prefix `-- `<EOL>
 			private static ParseResult<RuleHeadPrefix> RuleHead_C2(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = RuleHeadPrefix(state, factory);

@@ -7,16 +7,16 @@ comment
 `<EOL>
 
 rule: Rule
-ruleHead ruleBody
+rule-head rule-body
 
-ruleHead: RuleHead
-ruleHeadPrefix `-- CID `-- `<EOL>
-ruleHeadPrefix `-- `<EOL>
+rule-head: RuleHead
+rule-head-prefix `-- CID `-- `<EOL>
+rule-head-prefix `-- `<EOL>
 
-ruleHeadPrefix: RuleHeadPrefix
+rule-head-prefix: RuleHeadPrefix
 RID `-- `":"
 
-ruleBody: RuleBody
+rule-body: RuleBody
 choice+
 
 choice: Choice
