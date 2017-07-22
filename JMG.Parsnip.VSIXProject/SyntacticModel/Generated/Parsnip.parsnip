@@ -1,7 +1,7 @@
 ﻿definition: ParsnipDefinition
-definitionItem+
+definition-item+
 
-definitionItem: IParsnipDefinitionItem
+definition-item: IParsnipDefinitionItem
 rule
 comment
 `<EOL>
@@ -31,12 +31,12 @@ segment `-- sequence
 segment
 
 segment: Segment
-`"`" segmentCardinality
-`"~" segmentCardinality
-`"&" segmentCardinality
-segmentCardinality
+`"`" cardinality
+`"~" cardinality
+`"&" cardinality
+cardinality
 
-segmentCardinality: TokenCardinality
+cardinality: TokenCardinality
 token `"+"
 token `"?"
 token `"*"
@@ -50,7 +50,7 @@ RID
 `"(" union `")"
 
 RID: RuleIdentifier
-<Aa>+
+<Aa> (<Aa> | "-")*
 
 CID: ClassIdentifier
 <Aa>+

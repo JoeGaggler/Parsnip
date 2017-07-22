@@ -89,6 +89,7 @@
     <Compile Include="SerializedModel\CommentParseFunctionVisitor.cs" />
     <Compile Include="SerializedModel\GenerateMethodsVisitor.cs" />
     <Compile Include="SerializedModel\GenerateSignaturesVisitor.cs" />
+    <Compile Include="SerializedModel\NodeTypeExtensions.cs" />
     <Compile Include="SerializedModel\Signature.cs" />
     <Compile Include="SerializedModel\ParsnipCode.cs" />
     <Compile Include="SyntacticModel\AnyCharacterToken.cs" />
@@ -116,7 +117,6 @@
     <Compile Include="SyntacticModel\IToken.cs" />
     <Compile Include="SyntacticModel\Sequence.cs" />
     <Compile Include="SyntacticModel\SyntaxExtensions.cs" />
-    <Compile Include="SyntacticModel\Parser.cs" />
     <Compile Include="SyntacticModel\ParsnipDefinition.cs" />
     <Compile Include="SyntacticModel\TokenCardinality.cs" />
     <Compile Include="SyntacticModel\Union.cs" />

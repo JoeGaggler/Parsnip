@@ -45,8 +45,9 @@ namespace JMG.Parsnip.VSIXProject
 				var fileName = Path.GetFileName(wszInputFilePath);
 				var fileBaseName = Path.GetFileNameWithoutExtension(wszInputFilePath);
 				var className = NameGen.ClassName(fileBaseName);
+				var inputString = System.IO.File.ReadAllText(wszInputFilePath);
 
-				var syntacticModel = SyntacticModel.Parser.Parse(wszInputFilePath);
+				var syntacticModel = SyntacticModel.Generated.Parsnip.Parse(inputString, new SyntacticModel.Generated.ParsnipRuleFactory());
 				var semanticModel = SemanticModel.Analyzer.Analyze(syntacticModel);
 
 				// TRANSFORMATIONS

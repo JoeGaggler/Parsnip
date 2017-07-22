@@ -38,7 +38,29 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		}
 
 		public void AddSignature(Signature signature) => this.methodItems.Add(signature);
+
 		public void MapFunctionInvocation(IParseFunction function, Invoker invoker) => this.invokers[function] = invoker;
+
+		private IDisposable WriteMethodSignature(CodeWriter writer, IParseFunction target, Access access, String name, String stateName, IReadOnlyList<LocalVarDecl> parameters, Boolean isMemoized)
+		{
+			var returnType = target.ReturnType.GetParseResultTypeString();
+			var memName = $"Mem_{name}";
+
+			if (isMemoized)
+			{
+				writer.LineOfCode($"private {returnType} {memName};");
+			}
+
+			var disposable = writer.Method(access, true, returnType, name, parameters);
+
+			if (isMemoized)
+			{
+				writer.LineOfCode($"if ({stateName}.{memName} != null) {{ return {stateName}.{memName}; }}");
+				writer.EndOfLine();
+			}
+
+			return disposable;
+		}
 
 		public void WriteMethods(CodeWriter writer, String interfaceName, ParsnipModel semanticModel)
 		{
@@ -60,12 +82,18 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				methodAccess = Access.Private;
 			}
 
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			WriteCardinalityMethods(writer, interfaceName);
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			WriteIntrinsics(writer, interfaceName);
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			WriteLexeme(writer);
+
+			var typicalParams = new List<LocalVarDecl>
+			{
+				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl(interfaceName, "factory")
+			};
 
 			// Generate methods
 			var generateMethods = new GenerateMethodsVisitor(this, writer, interfaceName);
@@ -74,9 +102,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			{
 				writer.EndOfLine();
 
-				var func = methodItem.Func;
-				writer.Comment(func.ApplyVisitor(commentVisitor));
-				func.ApplyVisitor(generateMethods, methodItem);
+				var target = methodItem.Func;
+				writer.Comment(target.ApplyVisitor(commentVisitor));
+				var returnType = target.ReturnType.GetParseResultTypeString();
+				using (WriteMethodSignature(writer, target, methodItem.Access, methodItem.Name, "state", typicalParams, methodItem.IsMemoized))
+				{
+					target.ApplyVisitor(generateMethods, methodItem);
+				}
 			}
 		}
 
@@ -99,7 +131,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// Star
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseStar<T>", cardParams))
 			{
 				writer.VarAssign("list", "new List<T>()");
@@ -117,7 +149,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// Plus
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParsePlus<T>", cardParams))
 			{
 				writer.VarAssign("list", "new List<T>()");
@@ -165,7 +197,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// Any Letter
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyLetter", typicalParams))
 			{
 				writer.VarAssign("input", "state.input");
@@ -183,7 +215,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// End of Line
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_EndOfLine", typicalParams))
 			{
 				writer.VarAssign("result1", "ParseLexeme(state, \"\\r\\n\")");
@@ -202,7 +234,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// End of Stream
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfStream", typicalParams))
 			{
 				writer.VarAssign("input", "state.input");
@@ -215,7 +247,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// C-String
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_CString", typicalParams))
 			{
 				writer.VarAssign("resultStart", "ParseLexeme(state, \"\\\"\")");
@@ -263,7 +295,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// Optional Horizontal Whitespace
-			writer.LineOfCode("");
+			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", typicalParams))
 			{
 				writer.VarAssign("input", "state.input");

@@ -52,10 +52,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 			public ParsnipModel Visit(SyntacticModel.Rule target)
 			{
-				var ruleName = target.Head.RuleIdentifier.Text;
+				var ruleID = target.Head.RuleIdentifier.Text;
 				var className = target.Head.ClassIdentifier?.Text;
 				var returnType = GetNodeType(className);
-				var rule = new Rule(ruleName, returnType, null);
+				var rule = new Rule(ruleID, returnType, null);
 				model = model.AddingRule(rule);
 				return model;
 			}
