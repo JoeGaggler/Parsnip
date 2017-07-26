@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.5.0.0
+// Version: 1.6.0.0
 // File: Parsnip.parsnip
-// Date: 2017-07-22 17:34:01
+// Date: 2017-07-26 16:51:59
 
 using System;
 using System.Linq;
@@ -43,6 +43,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 		RuleIdentifier RID1(String t0, IReadOnlyList<String> t1);
 		ClassIdentifier CID1(IReadOnlyList<String> t0);
 		String IID1(IReadOnlyList<String> t0);
+		String IID2(String t0);
 		String Comment1(IReadOnlyList<String> t0);
 	}
 
@@ -146,6 +147,21 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 					return null;
 				}
 				else if (!Char.IsLetter(input[inputPosition]))
+				{
+					return null;
+				}
+				return new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] };
+			}
+
+			private static ParseResult<String> ParseIntrinsic_AnyDigit(PackratState state, IParsnipRuleFactory factory)
+			{
+				var input = state.input;
+				var inputPosition = state.inputPosition;
+				if (inputPosition >= input.Length)
+				{
+					return null;
+				}
+				else if (!Char.IsDigit(input[inputPosition]))
 				{
 					return null;
 				}
@@ -633,15 +649,25 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<ClassIdentifier>() { Node = factory.CID1(result.Node), State = result.State };
 			}
 
-			// Cardinality: <Aa>+
+			// Selection: <Aa>+ | "#"
 			private ParseResult<String> Mem_IID;
 			private static ParseResult<String> IID(PackratState state, IParsnipRuleFactory factory)
 			{
 				if (state.Mem_IID != null) { return state.Mem_IID; }
 
+				var r1 = IID_C1(state, factory);
+				if (r1 != null) return new ParseResult<String>() { Node = factory.IID1(r1.Node), State = r1.State };
+				var r2 = ParseLexeme(state, "#");
+				if (r2 != null) return new ParseResult<String>() { Node = factory.IID2(r2.Node), State = r2.State };
+				return null;
+			}
+
+			// Cardinality: <Aa>+
+			private static ParseResult<IReadOnlyList<String>> IID_C1(PackratState state, IParsnipRuleFactory factory)
+			{
 				var result = ParsePlus(state, factory, (s, f) => ParseIntrinsic_AnyLetter(s, f));
 				if (result == null) return null;
-				return new ParseResult<String>() { Node = factory.IID1(result.Node), State = result.State };
+				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
 			}
 
 			// Selection: (`<EOL>) | <EOS>

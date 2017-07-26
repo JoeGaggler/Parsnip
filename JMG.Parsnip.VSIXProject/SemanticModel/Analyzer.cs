@@ -191,6 +191,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					{
 						case ".": type = IntrinsicType.AnyCharacter; break;
 						case "--": type = IntrinsicType.OptionalHorizontalWhitespace; break;
+						case "#": type = IntrinsicType.AnyDigit; break;
 						case "Aa": type = IntrinsicType.AnyLetter; break;
 						default:
 						{
