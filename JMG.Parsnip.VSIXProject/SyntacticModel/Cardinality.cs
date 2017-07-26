@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal enum Cardinality
+	public enum Cardinality
 	{
 		One,
 		Star,

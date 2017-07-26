@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class Union
+	public class Union
 	{
 		public Union(IReadOnlyList<Sequence> sequences)
 		{

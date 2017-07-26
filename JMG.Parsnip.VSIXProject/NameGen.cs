@@ -16,7 +16,22 @@ namespace JMG.Parsnip.VSIXProject
 		/// <returns>C# class identifier</returns>
 		public static String ClassName(String identifier) => identifier[0].ToString().ToUpperInvariant() + identifier.Substring(1);
 
-		public static String ParseFunctionMethodName(String ruleIdentifier) => ruleIdentifier[0].ToString().ToUpperInvariant() + ruleIdentifier.Substring(1);
+		public static String ParseFunctionMethodName(String ruleIdentifier)
+		{
+			var result = String.Empty;
+			foreach (var segment in ruleIdentifier.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries))
+			{
+				if (segment.Length == 1)
+				{
+					result += segment.ToUpperInvariant();
+				}
+				else
+				{
+					result += segment[0].ToString().ToUpperInvariant() + segment.Substring(1);
+				}
+			}
+			return result;
+		}
 
 		public static String TypeString(INodeType returnType) => returnType.ApplyVisitor(new TypeStringNodeTypeVisitor());
 

@@ -38,7 +38,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 		public IParseFunction Visit(CardinalityFunction target)
 		{
 			var inner = target.InnerParseFunction.ApplyVisitor(this);
-			return new CardinalityFunction(inner, target.Cardinality);
+			return new CardinalityFunction(inner, target.Cardinality, target.InterfaceMethod);
 		}
 	}
 }

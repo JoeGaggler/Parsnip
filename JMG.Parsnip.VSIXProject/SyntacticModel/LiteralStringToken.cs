@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class LiteralStringToken : IToken
+	public class LiteralStringToken : IToken
 	{
 		public LiteralStringToken(String text)
 		{

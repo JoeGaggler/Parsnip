@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class Sequence
+	public class Sequence
 	{
 		public Sequence(IReadOnlyList<Segment> segments)
 		{

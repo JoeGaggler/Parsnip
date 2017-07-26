@@ -72,7 +72,6 @@
     <Compile Include="SemanticModel\CardinalityFunction.cs" />
     <Compile Include="SemanticModel\InterfaceMethod.cs" />
     <Compile Include="SemanticModel\Intrinsic.cs" />
-    <Compile Include="SemanticModel\IParseFunctionWithFactoryType.cs" />
     <Compile Include="SemanticModel\LiteralString.cs" />
     <Compile Include="SemanticModel\MatchAction.cs" />
     <Compile Include="SemanticModel\ReferencedRule.cs" />
@@ -85,10 +84,12 @@
     <Compile Include="SemanticModel\Sequence.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleFactoryMethods.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleReferenceTypes.cs" />
+    <Compile Include="SemanticModel\Transformations\Collapsing.cs" />
     <Compile Include="SemanticModel\Transformations\ReplacingVisitor.cs" />
     <Compile Include="SerializedModel\CommentParseFunctionVisitor.cs" />
     <Compile Include="SerializedModel\GenerateMethodsVisitor.cs" />
     <Compile Include="SerializedModel\GenerateSignaturesVisitor.cs" />
+    <Compile Include="SerializedModel\NodeTypeExtensions.cs" />
     <Compile Include="SerializedModel\Signature.cs" />
     <Compile Include="SerializedModel\ParsnipCode.cs" />
     <Compile Include="SyntacticModel\AnyCharacterToken.cs" />
@@ -116,7 +117,6 @@
     <Compile Include="SyntacticModel\IToken.cs" />
     <Compile Include="SyntacticModel\Sequence.cs" />
     <Compile Include="SyntacticModel\SyntaxExtensions.cs" />
-    <Compile Include="SyntacticModel\Parser.cs" />
     <Compile Include="SyntacticModel\ParsnipDefinition.cs" />
     <Compile Include="SyntacticModel\TokenCardinality.cs" />
     <Compile Include="SyntacticModel\Union.cs" />

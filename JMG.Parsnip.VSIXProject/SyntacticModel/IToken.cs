@@ -7,14 +7,14 @@ using JMG.Parsnip.VSIXProject.Visiting;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal interface IToken
+	public interface IToken
 	{
 		void ApplyVisitor(ITokenActionVisitor visitor);
 
 		TOutput ApplyVisitor<TOutput>(ITokenFuncVisitor<TOutput> visitor);
 	}
 
-	internal interface ITokenActionVisitor :
+	public interface ITokenActionVisitor :
 		IActionVisitor<RuleIdentifierToken>,
 		IActionVisitor<LiteralStringToken>,
 		IActionVisitor<IntrinsicToken>,
@@ -24,7 +24,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 
 	}
 
-	internal interface ITokenFuncVisitor<TOutput> :
+	public interface ITokenFuncVisitor<TOutput> :
 		IFuncVisitor<RuleIdentifierToken, TOutput>,
 		IFuncVisitor<LiteralStringToken, TOutput>,
 		IFuncVisitor<IntrinsicToken, TOutput>,

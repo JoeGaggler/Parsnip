@@ -7,7 +7,7 @@ using JMG.Parsnip.VSIXProject.Visiting;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class Rule : IParsnipDefinitionItem
+	public class Rule : IParsnipDefinitionItem
 	{
 		public Rule(RuleHead head, RuleBody body)
 		{

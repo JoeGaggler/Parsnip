@@ -25,9 +25,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		public String IID1(IReadOnlyList<String> t0) => String.Join("", t0);
 
-		public RuleIdentifier RID1(IReadOnlyList<String> t0) => new RuleIdentifier(String.Join("", t0));
+		public RuleIdentifier RID1(String t0, IReadOnlyList<String> t1) => new RuleIdentifier(t0 + String.Join("", t1));
 
-		public Rule Rule1((RuleHead, RuleBody) t0) => new Rule(t0.Item1, t0.Item2);
+		public Rule Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 
 		public RuleBody RuleBody1(IReadOnlyList<Choice> t0) => new RuleBody(t0);
 
@@ -45,13 +45,13 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		public Segment Segment4(TokenCardinality t0) => new Segment(MatchAction.Consume, t0.Item, t0.Cardinality);
 
-		public TokenCardinality SegmentCardinality1(IToken t0) => new TokenCardinality(t0, Cardinality.Plus);
+		public TokenCardinality Cardinality1(IToken t0) => new TokenCardinality(t0, Cardinality.Plus);
 
-		public TokenCardinality SegmentCardinality2(IToken t0) => new TokenCardinality(t0, Cardinality.Maybe);
+		public TokenCardinality Cardinality2(IToken t0) => new TokenCardinality(t0, Cardinality.Maybe);
 
-		public TokenCardinality SegmentCardinality3(IToken t0) => new TokenCardinality(t0, Cardinality.Star);
+		public TokenCardinality Cardinality3(IToken t0) => new TokenCardinality(t0, Cardinality.Star);
 
-		public TokenCardinality SegmentCardinality4(IToken t0) => new TokenCardinality(t0, Cardinality.One);
+		public TokenCardinality Cardinality4(IToken t0) => new TokenCardinality(t0, Cardinality.One);
 
 		public Sequence Sequence1((Segment, Sequence) t0) => new Sequence(t0.Item2.Segments.Prepending(t0.Item1));
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class Choice
+	public class Choice
 	{
 		public Choice(Union union)
 		{

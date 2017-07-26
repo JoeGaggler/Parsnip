@@ -23,7 +23,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			}
 
 			// Populate parse functions
-			var visitor2 = new CreateParseFunctionVisitor(model);
+			var visitor2 = new CreateParseFunctionVisitor(model, isMemoized: true);
 			foreach (var i in syntacticModel.Items)
 			{
 				model = i.ApplyVisitor(visitor2);
@@ -52,10 +52,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 			public ParsnipModel Visit(SyntacticModel.Rule target)
 			{
-				var ruleName = target.Head.RuleIdentifier.Text;
+				var ruleID = target.Head.RuleIdentifier.Text;
 				var className = target.Head.ClassIdentifier?.Text;
 				var returnType = GetNodeType(className);
-				var rule = new Rule(ruleName, returnType, null);
+				var rule = new Rule(ruleID, returnType, null);
 				model = model.AddingRule(rule);
 				return model;
 			}
@@ -69,20 +69,22 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		private class CreateParseFunctionVisitor : IParsnipDefinitionItemFuncVisitor<ParsnipModel>
 		{
 			private ParsnipModel model;
+			private readonly Boolean isMemoized;
 
-			public CreateParseFunctionVisitor(ParsnipModel model)
+			public CreateParseFunctionVisitor(ParsnipModel model, Boolean isMemoized = false)
 			{
 				this.model = model;
+				this.isMemoized = isMemoized;
 			}
 
 			public ParsnipModel Visit(SyntacticModel.Rule target)
 			{
 				var oldRule = model.Rules.First(i => i.RuleIdentifier == target.Head.RuleIdentifier.Text);
 
-				var selection = new Selection(false, new SelectionStep[0], factoryReturnType: null);
+				var selection = new Selection(new SelectionStep[0]);
 				foreach (var choice in target.Body.Choices)
 				{
-					var func = VisitChoice(choice);
+					var func = VisitChoice(choice, false);
 					var step = new SelectionStep(func, interfaceMethod: null);
 					selection = selection.AddingStep(step);
 				}
@@ -97,14 +99,14 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				return model;
 			}
 
-			internal static Selection VisitChoice(SyntacticModel.Choice target) => VisitUnion(target.Union);
+			internal static Selection VisitChoice(SyntacticModel.Choice target, Boolean isMemoized) => VisitUnion(target.Union, isMemoized);
 
-			internal static Selection VisitUnion(SyntacticModel.Union union)
+			internal static Selection VisitUnion(SyntacticModel.Union union, Boolean isMemoized)
 			{
-				var selection = new Selection(false, new SelectionStep[0], factoryReturnType: null);
+				var selection = new Selection(new SelectionStep[0]);
 				foreach (var sequence in union.Sequences)
 				{
-					var func = VisitSequence(sequence);
+					var func = VisitSequence(sequence, false);
 					var step = new SelectionStep(func, interfaceMethod: null);
 					selection = selection.AddingStep(step);
 				}
@@ -123,12 +125,12 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				}
 			}
 
-			internal static Sequence VisitSequence(SyntacticModel.Sequence target)
+			internal static Sequence VisitSequence(SyntacticModel.Sequence target, Boolean isMemoized)
 			{
-				var sequence = new Sequence(false, new SequenceStep[0], factoryReturnType: null);
+				var sequence = new Sequence(new SequenceStep[0], interfaceMethod: null);
 				foreach (var segment in target.Segments)
 				{
-					var func = VisitCardinality(segment.Item, Convert(segment.Cardinality));
+					var func = VisitCardinality(segment.Item, Convert(segment.Cardinality), false);
 
 					MatchAction action;
 					switch (segment.Action)
@@ -145,9 +147,9 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				return sequence;
 			}
 
-			internal static IParseFunction VisitCardinality(IToken item, Cardinality cardinality)
+			internal static IParseFunction VisitCardinality(IToken item, Cardinality cardinality, Boolean isMemoized)
 			{
-				var func = VisitToken(item);
+				var func = VisitToken(item, false);
 				switch (cardinality)
 				{
 					case Cardinality.One:
@@ -158,7 +160,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					case Cardinality.Star:
 					case Cardinality.Maybe:
 					{
-						return new CardinalityFunction(func, cardinality);
+						return new CardinalityFunction(func, cardinality, interfaceMethod: null);
 					}
 					default:
 					{
@@ -167,10 +169,17 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				}
 			}
 
-			internal static IParseFunction VisitToken(IToken item) => item.ApplyVisitor(new TokenVisitor());
+			internal static IParseFunction VisitToken(IToken item, Boolean isMemoized) => item.ApplyVisitor(new TokenVisitor(isMemoized));
 
 			private class TokenVisitor : ITokenFuncVisitor<IParseFunction>
 			{
+				private readonly Boolean isMemoized;
+
+				public TokenVisitor(Boolean isMemoized)
+				{
+					this.isMemoized = isMemoized;
+				}
+
 				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text, ruleNodeType: null);
 
 				public IParseFunction Visit(LiteralStringToken target) => new LiteralString(target.Text);
@@ -178,15 +187,30 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				public IParseFunction Visit(IntrinsicToken target)
 				{
 					IntrinsicType type;
-					switch (target.Identifier)
+					switch (target.Identifier) // Check symbolic and case-sensitive identifiers first
 					{
-						case "END":
-						case "EOS": type = IntrinsicType.EndOfStream; break;
-						case "EOL": type = IntrinsicType.EndOfLine; break;
 						case ".": type = IntrinsicType.AnyCharacter; break;
+						case "--": type = IntrinsicType.OptionalHorizontalWhitespace; break;
 						case "Aa": type = IntrinsicType.AnyLetter; break;
-						case "CSTRING": type = IntrinsicType.CString; break;
-						default: throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
+						default:
+						{
+							switch (target.Identifier.ToUpperInvariant()) // Case-insensitive identifiers
+							{
+								case "END":
+								case "EOS": type = IntrinsicType.EndOfStream; break;
+								case "EOL": type = IntrinsicType.EndOfLine; break;
+								case "CSTRING": type = IntrinsicType.CString; break;
+								case "TAB": return new LiteralString("\t");
+								case "SP":
+								case "SPACE": return new LiteralString(" ");
+								default:
+								{
+
+									throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
+								}
+							}
+							break;
+						}
 					}
 
 					return new Intrinsic(type);
@@ -194,7 +218,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 				public IParseFunction Visit(AnyToken target) => new Intrinsic(IntrinsicType.AnyCharacter);
 
-				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union);
+				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union, isMemoized);
 			}
 		}
 	}

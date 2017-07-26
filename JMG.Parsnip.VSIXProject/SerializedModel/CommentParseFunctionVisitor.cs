@@ -76,6 +76,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				case IntrinsicType.CString: value = "<CSTRING>"; break;
 				case IntrinsicType.EndOfLine: value = "<EOL>"; break;
 				case IntrinsicType.EndOfStream: value = "<EOS>"; break;
+				case IntrinsicType.OptionalHorizontalWhitespace: value = "--"; break;
 				default: value = "<UNKNOWN_INTRINSIC>"; break;
 			}
 			if (this.ShowHeader)
@@ -108,14 +109,23 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public String Visit(CardinalityFunction target)
 		{
 			var baseString = target.InnerParseFunction.ApplyVisitor(WithoutHeader);
+
+			String value;
 			switch (target.Cardinality)
 			{
-				case Cardinality.One: return baseString;
-				case Cardinality.Maybe: return $"{baseString}?";
-				case Cardinality.Plus: return $"{baseString}+";
-				case Cardinality.Star: return $"{baseString}*";
+				case Cardinality.One: value = baseString; break;
+				case Cardinality.Maybe: value = $"{baseString}?"; break;
+				case Cardinality.Plus: value = $"{baseString}+"; break;
+				case Cardinality.Star: value = $"{baseString}*"; break;
 				default: throw new NotImplementedException();
 			}
+
+			if (this.ShowHeader)
+			{
+				value = $"Cardinality: {value}";
+			}
+
+			return value;
 		}
 	}
 }

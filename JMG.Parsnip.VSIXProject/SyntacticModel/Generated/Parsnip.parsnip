@@ -1,42 +1,42 @@
 ﻿definition: ParsnipDefinition
-definitionItem+
+definition-item+
 
-definitionItem: IParsnipDefinitionItem
+definition-item: IParsnipDefinitionItem
 rule
 comment
 `<EOL>
 
 rule: Rule
-ruleHead ruleBody
+rule-head rule-body
 
-ruleHead: RuleHead
-ruleHeadPrefix `OHS CID `OHS `<EOL>
-ruleHeadPrefix `OHS `<EOL>
+rule-head: RuleHead
+rule-head-prefix `-- CID `-- `<EOL>
+rule-head-prefix `-- `<EOL>
 
-ruleHeadPrefix: RuleHeadPrefix
-RID `OHS `":"
+rule-head-prefix: RuleHeadPrefix
+RID `-- `":"
 
-ruleBody: RuleBody
+rule-body: RuleBody
 choice+
 
 choice: Choice
-union `OHS `EOLOS
+union `-- `EOLOS
 
 union: Union
-sequence `OHS `"|" `OHS union
+sequence `-- `"|" `-- union
 sequence
 
 sequence: Sequence
-segment `OHS sequence
+segment `-- sequence
 segment
 
 segment: Segment
-`"`" segmentCardinality
-`"~" segmentCardinality
-`"&" segmentCardinality
-segmentCardinality
+`"`" cardinality
+`"~" cardinality
+`"&" cardinality
+cardinality
 
-segmentCardinality: TokenCardinality
+cardinality: TokenCardinality
 token `"+"
 token `"?"
 token `"*"
@@ -46,28 +46,17 @@ token: IToken
 `"."
 <CSTRING>
 RID
-`"<" IID `">"
+`"<" IID `">" | "--"
 `"(" union `")"
 
 RID: RuleIdentifier
-<Aa>+
+<Aa> (<Aa> | "-")*
 
 CID: ClassIdentifier
 <Aa>+
 
 IID: String
 <Aa>+
-
-OHS:
-HS?
-
-HS:
-WS HS
-WS
-
-WS:
-" "
-"\t"
 
 EOLOS:
 `<EOL>

@@ -16,22 +16,25 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 	internal class CardinalityFunction : IParseFunction
 	{
-		public CardinalityFunction(IParseFunction innerParseFunction, Cardinality cardinality)
+		public CardinalityFunction(IParseFunction innerParseFunction, Cardinality cardinality, InterfaceMethod interfaceMethod)
 		{
 			this.InnerParseFunction = innerParseFunction;
 			this.Cardinality = cardinality;
+			this.InterfaceMethod = interfaceMethod;
 		}
 
 		public IParseFunction InnerParseFunction { get; }
 
 		public Cardinality Cardinality { get; }
 
-		public Boolean IsMemoized => false;
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public INodeType ReturnType
 		{
 			get
 			{
+				if (InterfaceMethod != null) return InterfaceMethod.ReturnType;
+
 				var innerType = InnerParseFunction.ReturnType;
 				switch (Cardinality)
 				{
@@ -47,6 +50,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 
 		public void ApplyVisitor<TInput>(IParseFunctionActionVisitor<TInput> visitor, TInput input) => visitor.Visit(this, input);
+
+		public void ApplyVisitor<TInput1, TInput2>(IParseFunctionActionVisitor<TInput1, TInput2> visitor, TInput1 input1, TInput2 input2) => visitor.Visit(this, input1, input2);
 
 		public TOutput ApplyVisitor<TOutput>(IParseFunctionFuncVisitor<TOutput> visitor) => visitor.Visit(this);
 

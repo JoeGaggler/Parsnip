@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SyntacticModel
 {
-	internal class RuleHead
+	public class RuleHead
 	{
 		public RuleHead(RuleIdentifier ruleIdentifier, ClassIdentifier classIdentifier)
 		{
