@@ -25,16 +25,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		{
 			this.intrinsics[IntrinsicType.AnyCharacter] = "ParseIntrinsic_AnyCharacter";
 			this.intrinsics[IntrinsicType.AnyLetter] = "ParseIntrinsic_AnyLetter";
+			this.intrinsics[IntrinsicType.AnyDigit] = "ParseIntrinsic_AnyDigit";
 			this.intrinsics[IntrinsicType.EndOfLine] = "ParseIntrinsic_EndOfLine";
 			this.intrinsics[IntrinsicType.EndOfStream] = "ParseIntrinsic_EndOfStream";
 			this.intrinsics[IntrinsicType.CString] = "ParseIntrinsic_CString";
 			this.intrinsics[IntrinsicType.OptionalHorizontalWhitespace] = "ParseIntrinsic_OptionalHorizontalWhitespace";
-		}
-
-		private void AddIntrinsic(IntrinsicType type, String name)
-		{
-			var sig = new Signature(name, Access.Private, new Intrinsic(type), (s, f) => $"{name}({s}, {f})", isMemoized: false);
-			this.methodItems.Add(sig);
 		}
 
 		public void AddSignature(Signature signature) => this.methodItems.Add(signature);
@@ -207,6 +202,25 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					writer.Return("null");
 				}
 				using (writer.ElseIf("!Char.IsLetter(input[inputPosition])"))
+				{
+					writer.Return("null");
+
+				}
+				writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] }");
+			}
+
+			
+			// Any Digit
+			writer.EndOfLine();
+			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyDigit", typicalParams))
+			{
+				writer.VarAssign("input", "state.input");
+				writer.VarAssign("inputPosition", "state.inputPosition");
+				using (writer.If("inputPosition >= input.Length"))
+				{
+					writer.Return("null");
+				}
+				using (writer.ElseIf("!Char.IsDigit(input[inputPosition])"))
 				{
 					writer.Return("null");
 

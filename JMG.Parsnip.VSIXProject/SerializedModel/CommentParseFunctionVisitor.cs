@@ -72,6 +72,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			switch (target.Type)
 			{
 				case IntrinsicType.AnyCharacter: value = "."; break;
+				case IntrinsicType.AnyDigit: value = "<#>"; break;
 				case IntrinsicType.AnyLetter: value = "<Aa>"; break;
 				case IntrinsicType.CString: value = "<CSTRING>"; break;
 				case IntrinsicType.EndOfLine: value = "<EOL>"; break;

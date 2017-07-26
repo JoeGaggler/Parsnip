@@ -56,7 +56,7 @@ CID: ClassIdentifier
 <Aa>+
 
 IID: String
-<Aa>+
+<Aa>+ | "#"
 
 EOLOS:
 `<EOL>

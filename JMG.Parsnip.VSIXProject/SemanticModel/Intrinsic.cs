@@ -14,6 +14,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		AnyLetter,
 		CString,
 		OptionalHorizontalWhitespace,
+		AnyDigit
 	}
 
 	internal class Intrinsic : IParseFunction
@@ -31,6 +32,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			{
 				switch (Type)
 				{
+					case IntrinsicType.AnyDigit:
 					case IntrinsicType.AnyLetter:
 					case IntrinsicType.AnyCharacter:
 					case IntrinsicType.CString:
