@@ -42,6 +42,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 				{
 					return new INodeType[0];
 				}
+				else if (funcReturnType is TupleNodeType tupleNodeType)
+				{
+					return tupleNodeType.Types;
+				}
 				else
 				{
 					return new[] { funcReturnType };

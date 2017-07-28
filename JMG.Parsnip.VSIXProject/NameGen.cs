@@ -33,10 +33,9 @@ namespace JMG.Parsnip.VSIXProject
 			return result;
 		}
 
-		public static String ParseFunctionMethodName(String ruleIdentifier)
-		{
-			return "ParseRule_" + InterfaceMethodName(ruleIdentifier);
-		}
+		public static String ParseFunctionMethodName(String ruleIdentifier) => "ParseRule_" + InterfaceMethodName(ruleIdentifier);
+
+		public static String MemoizedFieldName(String name) => $"Mem_{name}";
 
 		public static String TypeString(INodeType returnType) => returnType.ApplyVisitor(new TypeStringNodeTypeVisitor());
 
@@ -50,5 +49,6 @@ namespace JMG.Parsnip.VSIXProject
 
 			public String Visit(CollectionNodeType target) => $"IReadOnlyList<{target.InnerNodeType.ApplyVisitor(this)}>";
 		}
+
 	}
 }

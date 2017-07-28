@@ -40,7 +40,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			public String Name { get; }
 		}
 
-		private String GetReturnStatement(INodeType returnType, IReadOnlyList<Decl> nodes, String stateReference, String factoryName, InterfaceMethod interfaceMethod)
+		private String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String stateReference, String factoryName, InterfaceMethod interfaceMethod)
 		{
 			String nodeString;
 			if (returnType == EmptyNodeType.Instance)
@@ -72,18 +72,26 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			var returnTypeString = returnType.GetParseResultTypeString();
-			return ($"return new {returnTypeString}() {{ Node = {nodeString}, State = {stateReference} }};");
+			return ($"new {returnTypeString}() {{ Node = {nodeString}, State = {stateReference} }}");
 		}
 
-		private void BasicTargetWithInterfaceMethod(IParseFunction target, InterfaceMethod interfaceMethod)
+		private void BasicTargetWithInterfaceMethod(IParseFunction target, InterfaceMethod interfaceMethod, Signature signature)
 		{
 			var resultName = "r";
 			var nodeName = $"{resultName}.Node";
+			var stateName = $"{resultName}.State";
 			var invoker = this.parsnipCode.Invokers[target];
 			writer.VarAssign(resultName, invoker("state", "factory"));
 
 			var decl = new Decl(target.ReturnType, nodeName);
-			writer.LineOfCode(GetReturnStatement(target.ReturnType, new[] { decl }, "state", "factory", interfaceMethod));
+
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, stateName, "factory", interfaceMethod);
+			if (signature.IsMemoized)
+			{
+				var memField = NameGen.MemoizedFieldName(signature.Name);
+				returnExpression = $"state.{memField} = {returnExpression}";
+			}
+			writer.Return(returnExpression);
 		}
 
 		public void Visit(Selection target, Signature input)
@@ -102,9 +110,23 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				var interfaceMethod = step.InterfaceMethod;
 				var nodeReference = $"{resultName}.Node";
 
-				var decl = new Decl(func.ReturnType, nodeReference);
+				IReadOnlyList<Decl> nodes;
+				if (func.ReturnType is TupleNodeType tupleNodeType)
+				{
+					nodes = tupleNodeType.Types.Select((i, j) => new Decl(i, $"{nodeReference}.Item{j + 1}")).ToList();
+				}
+				else
+				{
+					nodes = new[] { new Decl(func.ReturnType, nodeReference) };
+				}
 
-				writer.LineOfCode($"if ({resultName} != null) {GetReturnStatement(target.ReturnType, new[] { decl }, $"{resultName}.State", factoryName, interfaceMethod)}");
+				var returnExpression = GetReturnExpression(target.ReturnType, nodes, $"{resultName}.State", factoryName, interfaceMethod);
+				if (input.IsMemoized)
+				{
+					var memField = NameGen.MemoizedFieldName(input.Name);
+					returnExpression = $"state.{memField} = {returnExpression}";
+				}
+				writer.LineOfCode($"if ({resultName} != null) return {returnExpression};");
 			}
 
 			// No choices matched
@@ -143,22 +165,28 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				}
 			}
 
-			writer.LineOfCode(GetReturnStatement(target.ReturnType, returnedResults, currentState, "factory", target.InterfaceMethod));
+			var returnExpression = GetReturnExpression(target.ReturnType, returnedResults, currentState, "factory", target.InterfaceMethod);
+			if (input.IsMemoized)
+			{
+				var memField = NameGen.MemoizedFieldName(input.Name);
+				returnExpression = $"state.{memField} = {returnExpression}";
+			}
+			writer.Return(returnExpression);
 		}
 
 		public void Visit(Intrinsic target, Signature input)
 		{
-			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod);
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
 		}
 
 		public void Visit(LiteralString target, Signature input)
 		{
-			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod);
-		}		
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
+		}
 
 		public void Visit(ReferencedRule target, Signature input)
 		{
-			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod);
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
 		}
 
 		public void Visit(CardinalityFunction target, Signature input)
@@ -183,7 +211,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var nodeReference = $"{resultName}.Node";
 			var decl = new Decl(innerFunc.ReturnType, nodeReference);
 
-			writer.LineOfCode(GetReturnStatement(target.ReturnType, new[] { decl }, $"{resultName}.State", "factory", target.InterfaceMethod));
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.State", "factory", target.InterfaceMethod);
+			if (input.IsMemoized)
+			{
+				var memField = NameGen.MemoizedFieldName(input.Name);
+				returnExpression = $"state.{memField} = {returnExpression}";
+			}
+			writer.Return(returnExpression);
 		}
 	}
 }

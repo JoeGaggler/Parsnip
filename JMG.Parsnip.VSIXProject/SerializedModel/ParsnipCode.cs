@@ -39,7 +39,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		private IDisposable WriteMethodSignature(CodeWriter writer, IParseFunction target, Access access, String name, String stateName, IReadOnlyList<LocalVarDecl> parameters, Boolean isMemoized)
 		{
 			var returnType = target.ReturnType.GetParseResultTypeString();
-			var memName = $"Mem_{name}";
+			var memName = NameGen.MemoizedFieldName(name);
 
 			if (isMemoized)
 			{
