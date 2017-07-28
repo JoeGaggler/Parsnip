@@ -33,7 +33,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		RuleBody IParsnipRuleFactory.RuleBody1(IReadOnlyList<Choice> t0) => new RuleBody(t0);
 
-		RuleHead IParsnipRuleFactory.RuleHead1((RuleHeadPrefix, ClassIdentifier) t0) => new RuleHead(t0.Item1.Id, t0.Item2);
+		RuleHead IParsnipRuleFactory.RuleHead1(RuleHeadPrefix t0, ClassIdentifier t1) => new RuleHead(t0.Id, t1);
 
 		RuleHead IParsnipRuleFactory.RuleHead2(RuleHeadPrefix t0) => new RuleHead(t0.Id, null);
 
@@ -57,7 +57,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		TokenCardinality IParsnipRuleFactory.Cardinality4(IToken t0) => new TokenCardinality(t0, Cardinality.One);
 
-		Sequence IParsnipRuleFactory.Sequence1((Segment, Sequence) t0) => new Sequence(t0.Item2.Segments.Prepending(t0.Item1));
+		Sequence IParsnipRuleFactory.Sequence1(Segment t0, Sequence t1) => new Sequence(t1.Segments.Prepending(t0));
 
 		Sequence IParsnipRuleFactory.Sequence2(Segment t0) => new Sequence(new[] { t0 });
 
@@ -71,7 +71,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		IToken IParsnipRuleFactory.Token5(Union t0) => new UnionToken(t0);
 
-		Union IParsnipRuleFactory.Union1((Sequence, Union) t0) => new Union(t0.Item2.Sequences.Prepending(t0.Item1));
+		Union IParsnipRuleFactory.Union1(Sequence t0, Union t1) => new Union(t1.Sequences.Prepending(t0));
 
 		Union IParsnipRuleFactory.Union2(Sequence t0) => new Union(new[] { t0 });
 	}
