@@ -180,9 +180,9 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					this.isMemoized = isMemoized;
 				}
 
-				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text, ruleNodeType: null);
+				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text, ruleNodeType: null, interfaceMethod: null);
 
-				public IParseFunction Visit(LiteralStringToken target) => new LiteralString(target.Text);
+				public IParseFunction Visit(LiteralStringToken target) => new LiteralString(target.Text, interfaceMethod: null);
 
 				public IParseFunction Visit(IntrinsicToken target)
 				{
@@ -201,9 +201,9 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 								case "EOS": type = IntrinsicType.EndOfStream; break;
 								case "EOL": type = IntrinsicType.EndOfLine; break;
 								case "CSTRING": type = IntrinsicType.CString; break;
-								case "TAB": return new LiteralString("\t");
+								case "TAB": return new LiteralString("\t", interfaceMethod: null);
 								case "SP":
-								case "SPACE": return new LiteralString(" ");
+								case "SPACE": return new LiteralString(" ", interfaceMethod: null);
 								default:
 								{
 
@@ -214,10 +214,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 						}
 					}
 
-					return new Intrinsic(type);
+					return new Intrinsic(type, interfaceMethod: null);
 				}
 
-				public IParseFunction Visit(AnyToken target) => new Intrinsic(IntrinsicType.AnyCharacter);
+				public IParseFunction Visit(AnyToken target) => new Intrinsic(IntrinsicType.AnyCharacter, interfaceMethod: null);
 
 				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union, isMemoized);
 			}

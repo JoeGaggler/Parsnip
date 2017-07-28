@@ -8,16 +8,28 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
 	internal class ReferencedRule : IParseFunction
 	{
-		public ReferencedRule(String identifier, INodeType ruleNodeType)
+		public ReferencedRule(String identifier, INodeType ruleNodeType, InterfaceMethod interfaceMethod)
 		{
-			this.Identifier = identifier;
-			
-			this.ReturnType = ruleNodeType ?? new SingleNodeType("UNRESOLVED_RULE");
+			this.Identifier = identifier;			
+			this.RuleNodeType = ruleNodeType ?? new SingleNodeType("UNRESOLVED_RULE");
+			this.InterfaceMethod = interfaceMethod;
 		}
+
+		public INodeType RuleNodeType { get; }
 
 		public String Identifier { get; }
 
-		public INodeType ReturnType { get; }
+		public INodeType ReturnType
+		{
+			get
+			{
+				if (InterfaceMethod != null) return InterfaceMethod.ReturnType;
+
+				return RuleNodeType;
+			}
+		}
+
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 

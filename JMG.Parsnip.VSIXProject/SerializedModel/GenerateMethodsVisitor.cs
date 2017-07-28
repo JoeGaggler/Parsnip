@@ -75,6 +75,17 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			return ($"return new {returnTypeString}() {{ Node = {nodeString}, State = {stateReference} }};");
 		}
 
+		private void BasicTargetWithInterfaceMethod(IParseFunction target, InterfaceMethod interfaceMethod)
+		{
+			var resultName = "r";
+			var nodeName = $"{resultName}.Node";
+			var invoker = this.parsnipCode.Invokers[target];
+			writer.VarAssign(resultName, invoker("state", "factory"));
+
+			var decl = new Decl(target.ReturnType, nodeName);
+			writer.LineOfCode(GetReturnStatement(target.ReturnType, new[] { decl }, "state", "factory", interfaceMethod));
+		}
+
 		public void Visit(Selection target, Signature input)
 		{
 			int stepIndex = 0;
@@ -137,17 +148,17 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(Intrinsic target, Signature input)
 		{
-			writer.Comment("TODO: Intrinsic");
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod);
 		}
 
 		public void Visit(LiteralString target, Signature input)
 		{
-			writer.Comment("TODO: LiteralString");
-		}
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod);
+		}		
 
 		public void Visit(ReferencedRule target, Signature input)
 		{
-			writer.Comment("TODO: ReferencedRule");
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod);
 		}
 
 		public void Visit(CardinalityFunction target, Signature input)

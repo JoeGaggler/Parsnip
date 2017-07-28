@@ -19,10 +19,13 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 	internal class Intrinsic : IParseFunction
 	{
-		public Intrinsic(IntrinsicType type)
+		public Intrinsic(IntrinsicType type, InterfaceMethod interfaceMethod)
 		{
 			this.Type = type;
+			this.InterfaceMethod = interfaceMethod;
 		}
+
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public IntrinsicType Type { get; }
 
@@ -46,7 +49,6 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 
 			}
 		}
-
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 

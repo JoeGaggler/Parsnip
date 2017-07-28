@@ -71,7 +71,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			foreach (var rule in semanticModel.Rules)
 			{
 				var methodName = this.RuleMethodNames[rule.RuleIdentifier];
-				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName, isMemoized: true), methodAccess);
+				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName, isMemoized: true, mustAddSignature: true), methodAccess);
 
 				// Only the first method is public
 				methodAccess = Access.Private;

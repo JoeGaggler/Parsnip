@@ -92,7 +92,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var value = $"\"{target.Text}\"";
 			if (this.ShowHeader)
 			{
-				value = $"Intrinsic: {value}";
+				value = $"Lexeme: {value}";
 			}
 			return value;
 		}

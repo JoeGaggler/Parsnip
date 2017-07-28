@@ -13,7 +13,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 			var oldRules = model.Rules;
 			foreach (var oldRule in oldRules)
 			{
-				var interfaceMethodName = NameGen.ParseFunctionMethodName(oldRule.RuleIdentifier);
+				var interfaceMethodName = NameGen.InterfaceMethodName(oldRule.RuleIdentifier);
 				var vis = new Visitor(interfaceMethodName);
 				(var newFunc, var newMethods) = oldRule.ParseFunction.ApplyVisitor(vis, oldRule.ReturnType);
 				var newRule = oldRule.WithParseFunction(newFunc);
@@ -46,6 +46,18 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 				{
 					return new[] { funcReturnType };
 				}
+			}
+
+			private InterfaceMethod GenerateInterfaceMethod(INodeType inputType, INodeType outputType)
+			{
+				var name = $"{interfaceMethodName}{++count}";
+				var parameterTypes = GetParameterTypesFromReturnType(inputType);
+				if (parameterTypes.Count == 0)
+				{
+					return null;
+				}
+
+				return new InterfaceMethod(outputType, name, parameterTypes);
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Selection target, INodeType input)
@@ -90,30 +102,42 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Intrinsic target, INodeType input)
 			{
-				throw new NotImplementedException();
+				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
+				if (interfaceMethod == null)
+				{
+					return (target, new InterfaceMethod[0]);
+				}
+				return (new Intrinsic(target.Type, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(LiteralString target, INodeType input)
 			{
-				throw new NotImplementedException();
+				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
+				if (interfaceMethod == null)
+				{
+					return (target, new InterfaceMethod[0]);
+				}
+				return (new LiteralString(target.Text, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(ReferencedRule target, INodeType input)
 			{
-				throw new NotImplementedException();
+				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
+				if (interfaceMethod == null)
+				{
+					return (target, new InterfaceMethod[0]);
+				}
+				return (new ReferencedRule(target.Identifier, target.ReturnType, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(CardinalityFunction target, INodeType input)
 			{
-				var name = $"{interfaceMethodName}{++count}";
-				var parameterTypes = GetParameterTypesFromReturnType(target.ReturnType);
-				if (parameterTypes.Count == 0)
+				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
+				if (interfaceMethod == null)
 				{
 					return (target, new InterfaceMethod[0]);
 				}
-
-				var im = new InterfaceMethod(input, name, parameterTypes);
-				return (new CardinalityFunction(target.InnerParseFunction, target.Cardinality, im), new InterfaceMethod[] { im });
+				return (new CardinalityFunction(target.InnerParseFunction, target.Cardinality, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
 		}
 	}

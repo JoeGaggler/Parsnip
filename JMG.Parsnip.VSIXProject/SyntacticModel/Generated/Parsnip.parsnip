@@ -10,11 +10,11 @@ rule: Rule
 rule-head rule-body
 
 rule-head: RuleHead
-rule-head-prefix `-- CID `-- `<EOL>
+rule-head-prefix `-- class-identifier `-- `<EOL>
 rule-head-prefix `-- `<EOL>
 
 rule-head-prefix: RuleHeadPrefix
-RID `-- `":"
+rule-identifier `-- `":"
 
 rule-body: RuleBody
 choice+
@@ -45,15 +45,18 @@ token
 token: IToken
 `"."
 <CSTRING>
-RID
+rule-identifier
 `"<" IID `">" | "--"
 `"(" union `")"
 
-RID: RuleIdentifier
+rule-identifier: RuleIdentifier
 <Aa> (<Aa> | "-")*
 
-CID: ClassIdentifier
-<Aa>+
+class-identifier: ClassIdentifier
+csharp-identifier (`"." csharp-identifier)*
+
+csharp-identifier: String
+<Aa> (<Aa> | <#>)*
 
 IID: String
 <Aa>+ | "#"
