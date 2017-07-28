@@ -8,10 +8,13 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
 	internal class LiteralString : IParseFunction
 	{
-		public LiteralString(String text)
+		public LiteralString(String text, InterfaceMethod interfaceMethod)
 		{
 			this.Text = text;
+			this.InterfaceMethod = interfaceMethod;
 		}
+
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public String Text { get; }
 

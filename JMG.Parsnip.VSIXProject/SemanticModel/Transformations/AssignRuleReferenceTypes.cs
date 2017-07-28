@@ -19,7 +19,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 				{
 					throw new InvalidOperationException($"No such rule: {old.Identifier}");
 				}
-				return new ReferencedRule(old.Identifier, rule.ReturnType);
+				return new ReferencedRule(old.Identifier, rule.ReturnType, interfaceMethod: null);
 			};
 
 			var oldRules = model.Rules;

@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.6.0.0
+// Version: 1.7.0.0
 // File: Parsnip.parsnip
-// Date: 2017-07-26 16:51:59
+// Date: 2017-07-28 11:25:45
 
 using System;
 using System.Linq;
@@ -40,8 +40,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 		IToken Token3(RuleIdentifier t0);
 		IToken Token4(String t0);
 		IToken Token5(Union t0);
-		RuleIdentifier RID1(String t0, IReadOnlyList<String> t1);
-		ClassIdentifier CID1(IReadOnlyList<String> t0);
+		RuleIdentifier RuleIdentifier1(String t0, IReadOnlyList<String> t1);
+		ClassIdentifier ClassIdentifier1(String t0, IReadOnlyList<String> t1);
+		String CsharpIdentifier1(String t0, IReadOnlyList<String> t1);
 		String IID1(IReadOnlyList<String> t0);
 		String IID2(String t0);
 		String Comment1(IReadOnlyList<String> t0);
@@ -58,7 +59,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			var states = new PackratState[input.Length + 1];
 			Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states, factory));
 			var state = states[0];
-			var result = PackratState.Definition(state, factory);
+			var result = PackratState.ParseRule_Definition(state, factory);
 			if (result == null) return null;
 			return result.Node;
 		}
@@ -270,33 +271,33 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Cardinality: definition-item+
-			private ParseResult<ParsnipDefinition> Mem_Definition;
-			public static ParseResult<ParsnipDefinition> Definition(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<ParsnipDefinition> Mem_ParseRule_Definition;
+			public static ParseResult<ParsnipDefinition> ParseRule_Definition(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Definition != null) { return state.Mem_Definition; }
+				if (state.Mem_ParseRule_Definition != null) { return state.Mem_ParseRule_Definition; }
 
-				var result = ParsePlus(state, factory, (s, f) => DefinitionItem(s, f));
+				var result = ParsePlus(state, factory, (s, f) => ParseRule_DefinitionItem(s, f));
 				if (result == null) return null;
 				return new ParseResult<ParsnipDefinition>() { Node = factory.Definition1(result.Node), State = result.State };
 			}
 
 			// Selection: rule | comment | (`<EOL>)
-			private ParseResult<IParsnipDefinitionItem> Mem_DefinitionItem;
-			private static ParseResult<IParsnipDefinitionItem> DefinitionItem(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<IParsnipDefinitionItem> Mem_ParseRule_DefinitionItem;
+			private static ParseResult<IParsnipDefinitionItem> ParseRule_DefinitionItem(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_DefinitionItem != null) { return state.Mem_DefinitionItem; }
+				if (state.Mem_ParseRule_DefinitionItem != null) { return state.Mem_ParseRule_DefinitionItem; }
 
-				var r1 = Rule(state, factory);
+				var r1 = ParseRule_Rule(state, factory);
 				if (r1 != null) return new ParseResult<IParsnipDefinitionItem>() { Node = factory.DefinitionItem1(r1.Node), State = r1.State };
-				var r2 = Comment(state, factory);
+				var r2 = ParseRule_Comment(state, factory);
 				if (r2 != null) return new ParseResult<IParsnipDefinitionItem>() { Node = factory.DefinitionItem2(r2.Node), State = r2.State };
-				var r3 = DefinitionItem_C3(state, factory);
+				var r3 = ParseRule_DefinitionItem_C3(state, factory);
 				if (r3 != null) return new ParseResult<IParsnipDefinitionItem>() { Node = factory.DefinitionItem3(), State = r3.State };
 				return null;
 			}
 
 			// Sequence: `<EOL>
-			private static ParseResult<EmptyNode> DefinitionItem_C3(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<EmptyNode> ParseRule_DefinitionItem_C3(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseIntrinsic_EndOfLine(state, factory);
 				if (r1 == null) return null;
@@ -304,39 +305,39 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: rule-head rule-body
-			private ParseResult<Rule> Mem_Rule;
-			private static ParseResult<Rule> Rule(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<Rule> Mem_ParseRule_Rule;
+			private static ParseResult<Rule> ParseRule_Rule(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Rule != null) { return state.Mem_Rule; }
+				if (state.Mem_ParseRule_Rule != null) { return state.Mem_ParseRule_Rule; }
 
-				var r1 = RuleHead(state, factory);
+				var r1 = ParseRule_RuleHead(state, factory);
 				if (r1 == null) return null;
-				var r2 = RuleBody(r1.State, factory);
+				var r2 = ParseRule_RuleBody(r1.State, factory);
 				if (r2 == null) return null;
 				return new ParseResult<Rule>() { Node = factory.Rule1(r1.Node, r2.Node), State = r2.State };
 			}
 
-			// Selection: (rule-head-prefix `-- CID `-- `<EOL>) | (rule-head-prefix `-- `<EOL>)
-			private ParseResult<RuleHead> Mem_RuleHead;
-			private static ParseResult<RuleHead> RuleHead(PackratState state, IParsnipRuleFactory factory)
+			// Selection: (rule-head-prefix `-- class-identifier `-- `<EOL>) | (rule-head-prefix `-- `<EOL>)
+			private ParseResult<RuleHead> Mem_ParseRule_RuleHead;
+			private static ParseResult<RuleHead> ParseRule_RuleHead(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_RuleHead != null) { return state.Mem_RuleHead; }
+				if (state.Mem_ParseRule_RuleHead != null) { return state.Mem_ParseRule_RuleHead; }
 
-				var r1 = RuleHead_C1(state, factory);
+				var r1 = ParseRule_RuleHead_C1(state, factory);
 				if (r1 != null) return new ParseResult<RuleHead>() { Node = factory.RuleHead1(r1.Node), State = r1.State };
-				var r2 = RuleHead_C2(state, factory);
+				var r2 = ParseRule_RuleHead_C2(state, factory);
 				if (r2 != null) return new ParseResult<RuleHead>() { Node = factory.RuleHead2(r2.Node), State = r2.State };
 				return null;
 			}
 
-			// Sequence: rule-head-prefix `-- CID `-- `<EOL>
-			private static ParseResult<(RuleHeadPrefix, ClassIdentifier)> RuleHead_C1(PackratState state, IParsnipRuleFactory factory)
+			// Sequence: rule-head-prefix `-- class-identifier `-- `<EOL>
+			private static ParseResult<(RuleHeadPrefix, ClassIdentifier)> ParseRule_RuleHead_C1(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = RuleHeadPrefix(state, factory);
+				var r1 = ParseRule_RuleHeadPrefix(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
-				var r3 = CID(r2.State, factory);
+				var r3 = ParseRule_ClassIdentifier(r2.State, factory);
 				if (r3 == null) return null;
 				var r4 = ParseIntrinsic_OptionalHorizontalWhitespace(r3.State, factory);
 				if (r4 == null) return null;
@@ -346,9 +347,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: rule-head-prefix `-- `<EOL>
-			private static ParseResult<RuleHeadPrefix> RuleHead_C2(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<RuleHeadPrefix> ParseRule_RuleHead_C2(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = RuleHeadPrefix(state, factory);
+				var r1 = ParseRule_RuleHeadPrefix(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
@@ -357,13 +358,13 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<RuleHeadPrefix>() { Node = r1.Node, State = r3.State };
 			}
 
-			// Sequence: RID `-- `":"
-			private ParseResult<RuleHeadPrefix> Mem_RuleHeadPrefix;
-			private static ParseResult<RuleHeadPrefix> RuleHeadPrefix(PackratState state, IParsnipRuleFactory factory)
+			// Sequence: rule-identifier `-- `":"
+			private ParseResult<RuleHeadPrefix> Mem_ParseRule_RuleHeadPrefix;
+			private static ParseResult<RuleHeadPrefix> ParseRule_RuleHeadPrefix(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_RuleHeadPrefix != null) { return state.Mem_RuleHeadPrefix; }
+				if (state.Mem_ParseRule_RuleHeadPrefix != null) { return state.Mem_ParseRule_RuleHeadPrefix; }
 
-				var r1 = RID(state, factory);
+				var r1 = ParseRule_RuleIdentifier(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
@@ -373,48 +374,48 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Cardinality: choice+
-			private ParseResult<RuleBody> Mem_RuleBody;
-			private static ParseResult<RuleBody> RuleBody(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<RuleBody> Mem_ParseRule_RuleBody;
+			private static ParseResult<RuleBody> ParseRule_RuleBody(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_RuleBody != null) { return state.Mem_RuleBody; }
+				if (state.Mem_ParseRule_RuleBody != null) { return state.Mem_ParseRule_RuleBody; }
 
-				var result = ParsePlus(state, factory, (s, f) => Choice(s, f));
+				var result = ParsePlus(state, factory, (s, f) => ParseRule_Choice(s, f));
 				if (result == null) return null;
 				return new ParseResult<RuleBody>() { Node = factory.RuleBody1(result.Node), State = result.State };
 			}
 
 			// Sequence: union `-- `EOLOS
-			private ParseResult<Choice> Mem_Choice;
-			private static ParseResult<Choice> Choice(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<Choice> Mem_ParseRule_Choice;
+			private static ParseResult<Choice> ParseRule_Choice(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Choice != null) { return state.Mem_Choice; }
+				if (state.Mem_ParseRule_Choice != null) { return state.Mem_ParseRule_Choice; }
 
-				var r1 = Union(state, factory);
+				var r1 = ParseRule_Union(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
-				var r3 = EOLOS(r2.State, factory);
+				var r3 = ParseRule_EOLOS(r2.State, factory);
 				if (r3 == null) return null;
 				return new ParseResult<Choice>() { Node = factory.Choice1(r1.Node), State = r3.State };
 			}
 
 			// Selection: (sequence `-- `"|" `-- union) | sequence
-			private ParseResult<Union> Mem_Union;
-			private static ParseResult<Union> Union(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<Union> Mem_ParseRule_Union;
+			private static ParseResult<Union> ParseRule_Union(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Union != null) { return state.Mem_Union; }
+				if (state.Mem_ParseRule_Union != null) { return state.Mem_ParseRule_Union; }
 
-				var r1 = Union_C1(state, factory);
+				var r1 = ParseRule_Union_C1(state, factory);
 				if (r1 != null) return new ParseResult<Union>() { Node = factory.Union1(r1.Node), State = r1.State };
-				var r2 = Sequence(state, factory);
+				var r2 = ParseRule_Sequence(state, factory);
 				if (r2 != null) return new ParseResult<Union>() { Node = factory.Union2(r2.Node), State = r2.State };
 				return null;
 			}
 
 			// Sequence: sequence `-- `"|" `-- union
-			private static ParseResult<(Sequence, Union)> Union_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<(Sequence, Union)> ParseRule_Union_C1(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = Sequence(state, factory);
+				var r1 = ParseRule_Sequence(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
@@ -422,104 +423,104 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				if (r3 == null) return null;
 				var r4 = ParseIntrinsic_OptionalHorizontalWhitespace(r3.State, factory);
 				if (r4 == null) return null;
-				var r5 = Union(r4.State, factory);
+				var r5 = ParseRule_Union(r4.State, factory);
 				if (r5 == null) return null;
 				return new ParseResult<(Sequence, Union)>() { Node = (r1.Node, r5.Node), State = r5.State };
 			}
 
 			// Selection: (segment `-- sequence) | segment
-			private ParseResult<Sequence> Mem_Sequence;
-			private static ParseResult<Sequence> Sequence(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<Sequence> Mem_ParseRule_Sequence;
+			private static ParseResult<Sequence> ParseRule_Sequence(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Sequence != null) { return state.Mem_Sequence; }
+				if (state.Mem_ParseRule_Sequence != null) { return state.Mem_ParseRule_Sequence; }
 
-				var r1 = Sequence_C1(state, factory);
+				var r1 = ParseRule_Sequence_C1(state, factory);
 				if (r1 != null) return new ParseResult<Sequence>() { Node = factory.Sequence1(r1.Node), State = r1.State };
-				var r2 = Segment(state, factory);
+				var r2 = ParseRule_Segment(state, factory);
 				if (r2 != null) return new ParseResult<Sequence>() { Node = factory.Sequence2(r2.Node), State = r2.State };
 				return null;
 			}
 
 			// Sequence: segment `-- sequence
-			private static ParseResult<(Segment, Sequence)> Sequence_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<(Segment, Sequence)> ParseRule_Sequence_C1(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = Segment(state, factory);
+				var r1 = ParseRule_Segment(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
-				var r3 = Sequence(r2.State, factory);
+				var r3 = ParseRule_Sequence(r2.State, factory);
 				if (r3 == null) return null;
 				return new ParseResult<(Segment, Sequence)>() { Node = (r1.Node, r3.Node), State = r3.State };
 			}
 
 			// Selection: (`"`" cardinality) | (`"~" cardinality) | (`"&" cardinality) | cardinality
-			private ParseResult<Segment> Mem_Segment;
-			private static ParseResult<Segment> Segment(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<Segment> Mem_ParseRule_Segment;
+			private static ParseResult<Segment> ParseRule_Segment(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Segment != null) { return state.Mem_Segment; }
+				if (state.Mem_ParseRule_Segment != null) { return state.Mem_ParseRule_Segment; }
 
-				var r1 = Segment_C1(state, factory);
+				var r1 = ParseRule_Segment_C1(state, factory);
 				if (r1 != null) return new ParseResult<Segment>() { Node = factory.Segment1(r1.Node), State = r1.State };
-				var r2 = Segment_C2(state, factory);
+				var r2 = ParseRule_Segment_C2(state, factory);
 				if (r2 != null) return new ParseResult<Segment>() { Node = factory.Segment2(r2.Node), State = r2.State };
-				var r3 = Segment_C3(state, factory);
+				var r3 = ParseRule_Segment_C3(state, factory);
 				if (r3 != null) return new ParseResult<Segment>() { Node = factory.Segment3(r3.Node), State = r3.State };
-				var r4 = Cardinality(state, factory);
+				var r4 = ParseRule_Cardinality(state, factory);
 				if (r4 != null) return new ParseResult<Segment>() { Node = factory.Segment4(r4.Node), State = r4.State };
 				return null;
 			}
 
 			// Sequence: `"`" cardinality
-			private static ParseResult<TokenCardinality> Segment_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<TokenCardinality> ParseRule_Segment_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, "`");
 				if (r1 == null) return null;
-				var r2 = Cardinality(r1.State, factory);
+				var r2 = ParseRule_Cardinality(r1.State, factory);
 				if (r2 == null) return null;
 				return new ParseResult<TokenCardinality>() { Node = r2.Node, State = r2.State };
 			}
 
 			// Sequence: `"~" cardinality
-			private static ParseResult<TokenCardinality> Segment_C2(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<TokenCardinality> ParseRule_Segment_C2(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, "~");
 				if (r1 == null) return null;
-				var r2 = Cardinality(r1.State, factory);
+				var r2 = ParseRule_Cardinality(r1.State, factory);
 				if (r2 == null) return null;
 				return new ParseResult<TokenCardinality>() { Node = r2.Node, State = r2.State };
 			}
 
 			// Sequence: `"&" cardinality
-			private static ParseResult<TokenCardinality> Segment_C3(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<TokenCardinality> ParseRule_Segment_C3(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, "&");
 				if (r1 == null) return null;
-				var r2 = Cardinality(r1.State, factory);
+				var r2 = ParseRule_Cardinality(r1.State, factory);
 				if (r2 == null) return null;
 				return new ParseResult<TokenCardinality>() { Node = r2.Node, State = r2.State };
 			}
 
 			// Selection: (token `"+") | (token `"?") | (token `"*") | token
-			private ParseResult<TokenCardinality> Mem_Cardinality;
-			private static ParseResult<TokenCardinality> Cardinality(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<TokenCardinality> Mem_ParseRule_Cardinality;
+			private static ParseResult<TokenCardinality> ParseRule_Cardinality(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Cardinality != null) { return state.Mem_Cardinality; }
+				if (state.Mem_ParseRule_Cardinality != null) { return state.Mem_ParseRule_Cardinality; }
 
-				var r1 = Cardinality_C1(state, factory);
+				var r1 = ParseRule_Cardinality_C1(state, factory);
 				if (r1 != null) return new ParseResult<TokenCardinality>() { Node = factory.Cardinality1(r1.Node), State = r1.State };
-				var r2 = Cardinality_C2(state, factory);
+				var r2 = ParseRule_Cardinality_C2(state, factory);
 				if (r2 != null) return new ParseResult<TokenCardinality>() { Node = factory.Cardinality2(r2.Node), State = r2.State };
-				var r3 = Cardinality_C3(state, factory);
+				var r3 = ParseRule_Cardinality_C3(state, factory);
 				if (r3 != null) return new ParseResult<TokenCardinality>() { Node = factory.Cardinality3(r3.Node), State = r3.State };
-				var r4 = Token(state, factory);
+				var r4 = ParseRule_Token(state, factory);
 				if (r4 != null) return new ParseResult<TokenCardinality>() { Node = factory.Cardinality4(r4.Node), State = r4.State };
 				return null;
 			}
 
 			// Sequence: token `"+"
-			private static ParseResult<IToken> Cardinality_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IToken> ParseRule_Cardinality_C1(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = Token(state, factory);
+				var r1 = ParseRule_Token(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseLexeme(r1.State, "+");
 				if (r2 == null) return null;
@@ -527,9 +528,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: token `"?"
-			private static ParseResult<IToken> Cardinality_C2(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IToken> ParseRule_Cardinality_C2(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = Token(state, factory);
+				var r1 = ParseRule_Token(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseLexeme(r1.State, "?");
 				if (r2 == null) return null;
@@ -537,36 +538,36 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: token `"*"
-			private static ParseResult<IToken> Cardinality_C3(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IToken> ParseRule_Cardinality_C3(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = Token(state, factory);
+				var r1 = ParseRule_Token(state, factory);
 				if (r1 == null) return null;
 				var r2 = ParseLexeme(r1.State, "*");
 				if (r2 == null) return null;
 				return new ParseResult<IToken>() { Node = r1.Node, State = r2.State };
 			}
 
-			// Selection: (`".") | <CSTRING> | RID | ((`"<" IID `">") | "--") | (`"(" union `")")
-			private ParseResult<IToken> Mem_Token;
-			private static ParseResult<IToken> Token(PackratState state, IParsnipRuleFactory factory)
+			// Selection: (`".") | <CSTRING> | rule-identifier | ((`"<" IID `">") | "--") | (`"(" union `")")
+			private ParseResult<IToken> Mem_ParseRule_Token;
+			private static ParseResult<IToken> ParseRule_Token(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Token != null) { return state.Mem_Token; }
+				if (state.Mem_ParseRule_Token != null) { return state.Mem_ParseRule_Token; }
 
-				var r1 = Token_C1(state, factory);
+				var r1 = ParseRule_Token_C1(state, factory);
 				if (r1 != null) return new ParseResult<IToken>() { Node = factory.Token1(), State = r1.State };
 				var r2 = ParseIntrinsic_CString(state, factory);
 				if (r2 != null) return new ParseResult<IToken>() { Node = factory.Token2(r2.Node), State = r2.State };
-				var r3 = RID(state, factory);
+				var r3 = ParseRule_RuleIdentifier(state, factory);
 				if (r3 != null) return new ParseResult<IToken>() { Node = factory.Token3(r3.Node), State = r3.State };
-				var r4 = Token_C4(state, factory);
+				var r4 = ParseRule_Token_C4(state, factory);
 				if (r4 != null) return new ParseResult<IToken>() { Node = factory.Token4(r4.Node), State = r4.State };
-				var r5 = Token_C5(state, factory);
+				var r5 = ParseRule_Token_C5(state, factory);
 				if (r5 != null) return new ParseResult<IToken>() { Node = factory.Token5(r5.Node), State = r5.State };
 				return null;
 			}
 
 			// Sequence: `"."
-			private static ParseResult<EmptyNode> Token_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<EmptyNode> ParseRule_Token_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, ".");
 				if (r1 == null) return null;
@@ -574,9 +575,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Selection: (`"<" IID `">") | "--"
-			private static ParseResult<String> Token_C4(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<String> ParseRule_Token_C4(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = Token_C4_C1(state, factory);
+				var r1 = ParseRule_Token_C4_C1(state, factory);
 				if (r1 != null) return new ParseResult<String>() { Node = r1.Node, State = r1.State };
 				var r2 = ParseLexeme(state, "--");
 				if (r2 != null) return new ParseResult<String>() { Node = r2.Node, State = r2.State };
@@ -584,11 +585,11 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: `"<" IID `">"
-			private static ParseResult<String> Token_C4_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<String> ParseRule_Token_C4_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, "<");
 				if (r1 == null) return null;
-				var r2 = IID(r1.State, factory);
+				var r2 = ParseRule_IID(r1.State, factory);
 				if (r2 == null) return null;
 				var r3 = ParseLexeme(r2.State, ">");
 				if (r3 == null) return null;
@@ -596,11 +597,11 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: `"(" union `")"
-			private static ParseResult<Union> Token_C5(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<Union> ParseRule_Token_C5(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, "(");
 				if (r1 == null) return null;
-				var r2 = Union(r1.State, factory);
+				var r2 = ParseRule_Union(r1.State, factory);
 				if (r2 == null) return null;
 				var r3 = ParseLexeme(r2.State, ")");
 				if (r3 == null) return null;
@@ -608,28 +609,28 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: <Aa> (<Aa> | "-")*
-			private ParseResult<RuleIdentifier> Mem_RID;
-			private static ParseResult<RuleIdentifier> RID(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<RuleIdentifier> Mem_ParseRule_RuleIdentifier;
+			private static ParseResult<RuleIdentifier> ParseRule_RuleIdentifier(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_RID != null) { return state.Mem_RID; }
+				if (state.Mem_ParseRule_RuleIdentifier != null) { return state.Mem_ParseRule_RuleIdentifier; }
 
 				var r1 = ParseIntrinsic_AnyLetter(state, factory);
 				if (r1 == null) return null;
-				var r2 = RID_S2(r1.State, factory);
+				var r2 = ParseRule_RuleIdentifier_S2(r1.State, factory);
 				if (r2 == null) return null;
-				return new ParseResult<RuleIdentifier>() { Node = factory.RID1(r1.Node, r2.Node), State = r2.State };
+				return new ParseResult<RuleIdentifier>() { Node = factory.RuleIdentifier1(r1.Node, r2.Node), State = r2.State };
 			}
 
 			// Cardinality: (<Aa> | "-")*
-			private static ParseResult<IReadOnlyList<String>> RID_S2(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IReadOnlyList<String>> ParseRule_RuleIdentifier_S2(PackratState state, IParsnipRuleFactory factory)
 			{
-				var result = ParseStar(state, factory, (s, f) => RID_S2_M(s, f));
+				var result = ParseStar(state, factory, (s, f) => ParseRule_RuleIdentifier_S2_M(s, f));
 				if (result == null) return null;
 				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
 			}
 
 			// Selection: <Aa> | "-"
-			private static ParseResult<String> RID_S2_M(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<String> ParseRule_RuleIdentifier_S2_M(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseIntrinsic_AnyLetter(state, factory);
 				if (r1 != null) return new ParseResult<String>() { Node = r1.Node, State = r1.State };
@@ -638,24 +639,75 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return null;
 			}
 
-			// Cardinality: <Aa>+
-			private ParseResult<ClassIdentifier> Mem_CID;
-			private static ParseResult<ClassIdentifier> CID(PackratState state, IParsnipRuleFactory factory)
+			// Sequence: csharp-identifier (`"." csharp-identifier)*
+			private ParseResult<ClassIdentifier> Mem_ParseRule_ClassIdentifier;
+			private static ParseResult<ClassIdentifier> ParseRule_ClassIdentifier(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_CID != null) { return state.Mem_CID; }
+				if (state.Mem_ParseRule_ClassIdentifier != null) { return state.Mem_ParseRule_ClassIdentifier; }
 
-				var result = ParsePlus(state, factory, (s, f) => ParseIntrinsic_AnyLetter(s, f));
+				var r1 = ParseRule_CsharpIdentifier(state, factory);
+				if (r1 == null) return null;
+				var r2 = ParseRule_ClassIdentifier_S2(r1.State, factory);
+				if (r2 == null) return null;
+				return new ParseResult<ClassIdentifier>() { Node = factory.ClassIdentifier1(r1.Node, r2.Node), State = r2.State };
+			}
+
+			// Cardinality: (`"." csharp-identifier)*
+			private static ParseResult<IReadOnlyList<String>> ParseRule_ClassIdentifier_S2(PackratState state, IParsnipRuleFactory factory)
+			{
+				var result = ParseStar(state, factory, (s, f) => ParseRule_ClassIdentifier_S2_M(s, f));
 				if (result == null) return null;
-				return new ParseResult<ClassIdentifier>() { Node = factory.CID1(result.Node), State = result.State };
+				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
+			}
+
+			// Sequence: `"." csharp-identifier
+			private static ParseResult<String> ParseRule_ClassIdentifier_S2_M(PackratState state, IParsnipRuleFactory factory)
+			{
+				var r1 = ParseLexeme(state, ".");
+				if (r1 == null) return null;
+				var r2 = ParseRule_CsharpIdentifier(r1.State, factory);
+				if (r2 == null) return null;
+				return new ParseResult<String>() { Node = r2.Node, State = r2.State };
+			}
+
+			// Sequence: <Aa> (<Aa> | <#>)*
+			private ParseResult<String> Mem_ParseRule_CsharpIdentifier;
+			private static ParseResult<String> ParseRule_CsharpIdentifier(PackratState state, IParsnipRuleFactory factory)
+			{
+				if (state.Mem_ParseRule_CsharpIdentifier != null) { return state.Mem_ParseRule_CsharpIdentifier; }
+
+				var r1 = ParseIntrinsic_AnyLetter(state, factory);
+				if (r1 == null) return null;
+				var r2 = ParseRule_CsharpIdentifier_S2(r1.State, factory);
+				if (r2 == null) return null;
+				return new ParseResult<String>() { Node = factory.CsharpIdentifier1(r1.Node, r2.Node), State = r2.State };
+			}
+
+			// Cardinality: (<Aa> | <#>)*
+			private static ParseResult<IReadOnlyList<String>> ParseRule_CsharpIdentifier_S2(PackratState state, IParsnipRuleFactory factory)
+			{
+				var result = ParseStar(state, factory, (s, f) => ParseRule_CsharpIdentifier_S2_M(s, f));
+				if (result == null) return null;
+				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
+			}
+
+			// Selection: <Aa> | <#>
+			private static ParseResult<String> ParseRule_CsharpIdentifier_S2_M(PackratState state, IParsnipRuleFactory factory)
+			{
+				var r1 = ParseIntrinsic_AnyLetter(state, factory);
+				if (r1 != null) return new ParseResult<String>() { Node = r1.Node, State = r1.State };
+				var r2 = ParseIntrinsic_AnyDigit(state, factory);
+				if (r2 != null) return new ParseResult<String>() { Node = r2.Node, State = r2.State };
+				return null;
 			}
 
 			// Selection: <Aa>+ | "#"
-			private ParseResult<String> Mem_IID;
-			private static ParseResult<String> IID(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<String> Mem_ParseRule_IID;
+			private static ParseResult<String> ParseRule_IID(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_IID != null) { return state.Mem_IID; }
+				if (state.Mem_ParseRule_IID != null) { return state.Mem_ParseRule_IID; }
 
-				var r1 = IID_C1(state, factory);
+				var r1 = ParseRule_IID_C1(state, factory);
 				if (r1 != null) return new ParseResult<String>() { Node = factory.IID1(r1.Node), State = r1.State };
 				var r2 = ParseLexeme(state, "#");
 				if (r2 != null) return new ParseResult<String>() { Node = factory.IID2(r2.Node), State = r2.State };
@@ -663,7 +715,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Cardinality: <Aa>+
-			private static ParseResult<IReadOnlyList<String>> IID_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IReadOnlyList<String>> ParseRule_IID_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var result = ParsePlus(state, factory, (s, f) => ParseIntrinsic_AnyLetter(s, f));
 				if (result == null) return null;
@@ -671,12 +723,12 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Selection: (`<EOL>) | <EOS>
-			private ParseResult<EmptyNode> Mem_EOLOS;
-			private static ParseResult<EmptyNode> EOLOS(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<EmptyNode> Mem_ParseRule_EOLOS;
+			private static ParseResult<EmptyNode> ParseRule_EOLOS(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_EOLOS != null) { return state.Mem_EOLOS; }
+				if (state.Mem_ParseRule_EOLOS != null) { return state.Mem_ParseRule_EOLOS; }
 
-				var r1 = EOLOS_C1(state, factory);
+				var r1 = ParseRule_EOLOS_C1(state, factory);
 				if (r1 != null) return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r1.State };
 				var r2 = ParseIntrinsic_EndOfStream(state, factory);
 				if (r2 != null) return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r2.State };
@@ -684,7 +736,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: `<EOL>
-			private static ParseResult<EmptyNode> EOLOS_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<EmptyNode> ParseRule_EOLOS_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseIntrinsic_EndOfLine(state, factory);
 				if (r1 == null) return null;
@@ -692,32 +744,32 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Sequence: `"//" (~EOLOS .)* `EOLOS
-			private ParseResult<String> Mem_Comment;
-			private static ParseResult<String> Comment(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<String> Mem_ParseRule_Comment;
+			private static ParseResult<String> ParseRule_Comment(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_Comment != null) { return state.Mem_Comment; }
+				if (state.Mem_ParseRule_Comment != null) { return state.Mem_ParseRule_Comment; }
 
 				var r1 = ParseLexeme(state, "//");
 				if (r1 == null) return null;
-				var r2 = Comment_S2(r1.State, factory);
+				var r2 = ParseRule_Comment_S2(r1.State, factory);
 				if (r2 == null) return null;
-				var r3 = EOLOS(r2.State, factory);
+				var r3 = ParseRule_EOLOS(r2.State, factory);
 				if (r3 == null) return null;
 				return new ParseResult<String>() { Node = factory.Comment1(r2.Node), State = r3.State };
 			}
 
 			// Cardinality: (~EOLOS .)*
-			private static ParseResult<IReadOnlyList<String>> Comment_S2(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IReadOnlyList<String>> ParseRule_Comment_S2(PackratState state, IParsnipRuleFactory factory)
 			{
-				var result = ParseStar(state, factory, (s, f) => Comment_S2_M(s, f));
+				var result = ParseStar(state, factory, (s, f) => ParseRule_Comment_S2_M(s, f));
 				if (result == null) return null;
 				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
 			}
 
 			// Sequence: ~EOLOS .
-			private static ParseResult<String> Comment_S2_M(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<String> ParseRule_Comment_S2_M(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = EOLOS(state, factory);
+				var r1 = ParseRule_EOLOS(state, factory);
 				if (r1 != null) return null;
 				var r2 = ParseIntrinsic_AnyCharacter(state, factory);
 				if (r2 == null) return null;
