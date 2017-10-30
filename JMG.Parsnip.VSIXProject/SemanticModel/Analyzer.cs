@@ -23,10 +23,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 			}
 
 			// Populate parse functions
-			var visitor2 = new CreateParseFunctionVisitor(model, isMemoized: true);
+			var funcVisitor = new CreateParseFunctionVisitor(model, isMemoized: true);
 			foreach (var i in syntacticModel.Items)
 			{
-				model = i.ApplyVisitor(visitor2);
+				model = i.ApplyVisitor(funcVisitor);
 			}
 
 			return model;

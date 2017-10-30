@@ -35,39 +35,31 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(Selection target, Access access)
 		{
-			var invoker = CreateInvoker(baseName);
-			AddSignature(target, access, invoker);
-
-			int index = 0;
-			foreach (var step in target.Steps)
-			{
-				index++;
-				String stepBaseName = $"{baseName}_C{index}";
-				IParseFunction func = step.Function;
-
-				var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName, isMemoized: false, mustAddSignature: false);
-				func.ApplyVisitor(visitor, Access.Private);
-			}
-		}
+            VisitFunctionWithSteps(target, access, "C", t => t.Steps.Select(i => i.Function).ToArray());
+        }
 
 		public void Visit(Sequence target, Access access)
-		{
-			var invoker = CreateInvoker(baseName);
-			AddSignature(target, access, invoker);
+        {
+            VisitFunctionWithSteps(target, access, "S", t => t.Steps.Select(i => i.Function).ToArray());
+        }
 
-			int index = 0;
-			foreach (var step in target.Steps)
-			{
-				index++;
-				String stepBaseName = $"{baseName}_S{index}";
-				IParseFunction func = step.Function;
+        private void VisitFunctionWithSteps<T>(T target, Access access, String letter, Func<T, IReadOnlyList<IParseFunction>> stepsFunctions) where T : IParseFunction
+        {
+            var invoker = CreateInvoker(baseName);
+            AddSignature(target, access, invoker);
 
-				var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName, isMemoized: false, mustAddSignature: false);
-				func.ApplyVisitor(visitor, Access.Private);
-			}
-		}
+            int index = 0;
+            foreach (var func in stepsFunctions(target))
+            {
+                index++;
+                String stepBaseName = $"{baseName}_{letter}{index}";
 
-		public void Visit(Intrinsic target, Access access)
+                var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName, isMemoized: false, mustAddSignature: false);
+                func.ApplyVisitor(visitor, Access.Private);
+            }
+        }
+
+        public void Visit(Intrinsic target, Access access)
 		{
 			var methodName = parsnipCode.Intrinsics[target.Type];
 			Invoker invoker = (s, f) => $"{methodName}({s}, {f})";
