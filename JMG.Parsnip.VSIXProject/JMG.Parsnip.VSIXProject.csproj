@@ -79,7 +79,6 @@
     <Compile Include="SemanticModel\INodeType.cs" />
     <Compile Include="SemanticModel\IParseFunction.cs" />
     <Compile Include="SemanticModel\Rule.cs" />
-    <Compile Include="SemanticModel\SemanticExtensions.cs" />
     <Compile Include="SemanticModel\ParsnipModel.cs" />
     <Compile Include="SemanticModel\Sequence.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleFactoryMethods.cs" />

@@ -82,6 +82,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var stateName = $"{resultName}.State";
 			var invoker = this.parsnipCode.Invokers[target];
 			writer.VarAssign(resultName, invoker("state", "factory"));
+			writer.IfNullReturnNull(resultName);
 
 			var decl = new Decl(target.ReturnType, nodeName);
 

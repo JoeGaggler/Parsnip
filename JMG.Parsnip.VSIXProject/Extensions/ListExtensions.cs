@@ -8,10 +8,7 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 {
 	public static class ListExtensions
 	{
-		public static IReadOnlyList<T> Empty<T>()
-		{
-			return new List<T>();
-		}
+		public static IReadOnlyList<T> Empty<T>() => new List<T>();
 
 		public static IReadOnlyList<TOutput> SelectReadOnlyList<T, TOutput>(this IReadOnlyList<T> list, Func<T, TOutput> func)
 		{
@@ -23,10 +20,7 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 			return newList;
 		}
 
-		public static IReadOnlyList<T> Appending<T>(this IReadOnlyList<T> collection, T item)
-		{
-			return collection.Concat(new[] { item }).ToList();
-		}
+		public static IReadOnlyList<T> Appending<T>(this IReadOnlyList<T> collection, T item) => collection.Concat(new[] { item }).ToList();
 
 		public static Boolean AllEqual<T>(this IReadOnlyList<T> collection) where T : IEquatable<T>
 		{
@@ -44,10 +38,7 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 			return newList;
 		}
 
-		public static IReadOnlyList<T> Prepending<T>(this IReadOnlyList<T> collection, T item)
-		{
-			return (new[] { item }).Concat(collection).ToList();
-		}
+		public static IReadOnlyList<T> Prepending<T>(this IReadOnlyList<T> collection, T item) => (new[] { item }).Concat(collection).ToList();
 
 		public static IReadOnlyList<T> Replacing<T>(this IReadOnlyList<T> collection, T oldItem, T newItem) where T : class
 		{

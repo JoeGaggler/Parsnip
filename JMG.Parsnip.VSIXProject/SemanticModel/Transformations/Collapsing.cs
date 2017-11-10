@@ -33,7 +33,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 				// Unable to propogate interface methods. Keep this transformation ahead of <AssignRuleReferenceTypes>
 				if (steps.Count > 1 || firstStep.InterfaceMethod != null)
 				{
-					var newSteps = steps.Select(i => new SelectionStep(i.Function.ApplyVisitor(this), null)).ToList();
+					var newSteps = steps.Select(i => new SelectionStep(i.Function.ApplyVisitor(this), interfaceMethod: null)).ToList();
 					return new Selection(newSteps);
 				}
 
