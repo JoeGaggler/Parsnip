@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.12.0.0
+// Version: 1.13.0.0
 // File: Parsnip.parsnip
-// Date: 2017-07-28 12:47:57
+// Date: 2018-04-03 17:06:23
 
 using System;
 using System.Linq;
@@ -195,6 +195,27 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return null;
 			}
 
+			private static ParseResult<EmptyNode> ParseIntrinsic_EndOfLineOrStream(PackratState state, IParsnipRuleFactory factory)
+			{
+				var input = state.input;
+				var inputPosition = state.inputPosition;
+				if (inputPosition == input.Length)
+				{
+					return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state };
+				}
+				var result1 = ParseLexeme(state, "\r\n");
+				if (result1 != null)
+				{
+					return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result1.State };
+				}
+				var result2 = ParseLexeme(state, "\n");
+				if (result2 != null)
+				{
+					return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result2.State };
+				}
+				return null;
+			}
+
 			private static ParseResult<String> ParseIntrinsic_CString(PackratState state, IParsnipRuleFactory factory)
 			{
 				var resultStart = ParseLexeme(state, "\"");
@@ -384,7 +405,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return state.Mem_ParseRule_RuleBody = new ParseResult<RuleBody>() { Node = factory.RuleBody1(result.Node), State = result.State };
 			}
 
-			// Sequence: union `-- `EOLOS
+			// Sequence: union `-- `<EOLOS>
 			private ParseResult<Choice> Mem_ParseRule_Choice;
 			private static ParseResult<Choice> ParseRule_Choice(PackratState state, IParsnipRuleFactory factory)
 			{
@@ -394,7 +415,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				if (r1 == null) return null;
 				var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(r1.State, factory);
 				if (r2 == null) return null;
-				var r3 = ParseRule_EOLOS(r2.State, factory);
+				var r3 = ParseIntrinsic_EndOfLineOrStream(r2.State, factory);
 				if (r3 == null) return null;
 				return state.Mem_ParseRule_Choice = new ParseResult<Choice>() { Node = factory.Choice1(r1.Node), State = r3.State };
 			}
@@ -722,28 +743,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
 			}
 
-			// Selection: (`<EOL>) | <EOS>
-			private ParseResult<EmptyNode> Mem_ParseRule_EOLOS;
-			private static ParseResult<EmptyNode> ParseRule_EOLOS(PackratState state, IParsnipRuleFactory factory)
-			{
-				if (state.Mem_ParseRule_EOLOS != null) { return state.Mem_ParseRule_EOLOS; }
-
-				var r1 = ParseRule_EOLOS_C1(state, factory);
-				if (r1 != null) return state.Mem_ParseRule_EOLOS = new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r1.State };
-				var r2 = ParseIntrinsic_EndOfStream(state, factory);
-				if (r2 != null) return state.Mem_ParseRule_EOLOS = new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r2.State };
-				return null;
-			}
-
-			// Sequence: `<EOL>
-			private static ParseResult<EmptyNode> ParseRule_EOLOS_C1(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseIntrinsic_EndOfLine(state, factory);
-				if (r1 == null) return null;
-				return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r1.State };
-			}
-
-			// Sequence: `"//" (~EOLOS .)* `EOLOS
+			// Sequence: `"//" (~<EOLOS> .)* `<EOLOS>
 			private ParseResult<String> Mem_ParseRule_Comment;
 			private static ParseResult<String> ParseRule_Comment(PackratState state, IParsnipRuleFactory factory)
 			{
@@ -753,12 +753,12 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				if (r1 == null) return null;
 				var r2 = ParseRule_Comment_S2(r1.State, factory);
 				if (r2 == null) return null;
-				var r3 = ParseRule_EOLOS(r2.State, factory);
+				var r3 = ParseIntrinsic_EndOfLineOrStream(r2.State, factory);
 				if (r3 == null) return null;
 				return state.Mem_ParseRule_Comment = new ParseResult<String>() { Node = factory.Comment1(r2.Node), State = r3.State };
 			}
 
-			// Cardinality: (~EOLOS .)*
+			// Cardinality: (~<EOLOS> .)*
 			private static ParseResult<IReadOnlyList<String>> ParseRule_Comment_S2(PackratState state, IParsnipRuleFactory factory)
 			{
 				var result = ParseStar(state, factory, (s, f) => ParseRule_Comment_S2_M(s, f));
@@ -766,10 +766,10 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<IReadOnlyList<String>>() { Node = result.Node, State = result.State };
 			}
 
-			// Sequence: ~EOLOS .
+			// Sequence: ~<EOLOS> .
 			private static ParseResult<String> ParseRule_Comment_S2_M(PackratState state, IParsnipRuleFactory factory)
 			{
-				var r1 = ParseRule_EOLOS(state, factory);
+				var r1 = ParseIntrinsic_EndOfLineOrStream(state, factory);
 				if (r1 != null) return null;
 				var r2 = ParseIntrinsic_AnyCharacter(state, factory);
 				if (r2 == null) return null;

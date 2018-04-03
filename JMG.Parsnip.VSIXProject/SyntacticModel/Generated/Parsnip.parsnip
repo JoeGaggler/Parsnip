@@ -20,7 +20,7 @@ rule-body: RuleBody
 choice+
 
 choice: Choice
-union `-- `EOLOS
+union `-- `<EOLOS>
 
 union: Union
 sequence `-- `"|" `-- union
@@ -61,9 +61,5 @@ csharp-identifier: String
 IID: String
 <Aa>+ | "#"
 
-EOLOS:
-`<EOL>
-<END>
-
 comment: String
-`"//" (~EOLOS .)* `EOLOS
+`"//" (~<EOLOS> .)* `<EOLOS>

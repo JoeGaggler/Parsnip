@@ -200,6 +200,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 								case "END":
 								case "EOS": type = IntrinsicType.EndOfStream; break;
 								case "EOL": type = IntrinsicType.EndOfLine; break;
+								case "EOLOS": type = IntrinsicType.EndOfLineOrStream; break;
 								case "CSTRING": type = IntrinsicType.CString; break;
 								case "TAB": return new LiteralString("\t", interfaceMethod: null);
 								case "SP":

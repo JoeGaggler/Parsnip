@@ -28,6 +28,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			this.intrinsics[IntrinsicType.AnyDigit] = "ParseIntrinsic_AnyDigit";
 			this.intrinsics[IntrinsicType.EndOfLine] = "ParseIntrinsic_EndOfLine";
 			this.intrinsics[IntrinsicType.EndOfStream] = "ParseIntrinsic_EndOfStream";
+			this.intrinsics[IntrinsicType.EndOfLineOrStream] = "ParseIntrinsic_EndOfLineOrStream";
 			this.intrinsics[IntrinsicType.CString] = "ParseIntrinsic_CString";
 			this.intrinsics[IntrinsicType.OptionalHorizontalWhitespace] = "ParseIntrinsic_OptionalHorizontalWhitespace";
 		}
@@ -257,6 +258,32 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				{
 					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
 				}
+				writer.Return("null");
+			}
+
+			// End of Line Or Stream
+			writer.EndOfLine();
+			using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
+			{
+				writer.VarAssign("input", "state.input");
+				writer.VarAssign("inputPosition", "state.inputPosition");
+				using (writer.If("inputPosition == input.Length"))
+				{
+					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
+				}
+
+				writer.VarAssign("result1", "ParseLexeme(state, \"\\r\\n\")");
+				using (writer.If("result1 != null"))
+				{
+					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result1.State }");
+				}
+
+				writer.VarAssign("result2", "ParseLexeme(state, \"\\n\")");
+				using (writer.If("result2 != null"))
+				{
+					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result2.State }");
+				}
+
 				writer.Return("null");
 			}
 

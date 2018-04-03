@@ -10,6 +10,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 	{
 		EndOfStream,
 		EndOfLine,
+		EndOfLineOrStream,
 		AnyCharacter,
 		AnyLetter,
 		CString,
@@ -43,7 +44,10 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					case IntrinsicType.OptionalHorizontalWhitespace:
 					return new SingleNodeType("String");
 
-					case IntrinsicType.EndOfStream: return EmptyNodeType.Instance;
+					case IntrinsicType.EndOfStream:
+					case IntrinsicType.EndOfLineOrStream:
+					return EmptyNodeType.Instance;
+
 					default: throw new NotImplementedException();
 				}
 
