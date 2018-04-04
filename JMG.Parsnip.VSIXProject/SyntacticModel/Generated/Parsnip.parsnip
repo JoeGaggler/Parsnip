@@ -46,7 +46,7 @@ token: IToken
 `"."
 <CSTRING>
 rule-identifier
-`"<" IID `">" | "--"
+`"<" intrinsic-identifier `">" | "--"
 `"(" union `")"
 
 rule-identifier: RuleIdentifier
@@ -58,7 +58,7 @@ csharp-identifier (`"." csharp-identifier)*
 csharp-identifier: String
 <Aa> (<Aa> | <#>)*
 
-IID: String
+intrinsic-identifier: String
 <Aa>+ | "#"
 
 comment: String

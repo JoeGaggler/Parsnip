@@ -25,9 +25,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3() => null;
 
-		String IParsnipRuleFactory.IID1(IReadOnlyList<String> t0) => String.Join("", t0);
+		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => String.Join("", t0);
 
-		String IParsnipRuleFactory.IID2(String t0) => t0;
+		String IParsnipRuleFactory.IntrinsicIdentifier2(String t0) => t0;
 
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 

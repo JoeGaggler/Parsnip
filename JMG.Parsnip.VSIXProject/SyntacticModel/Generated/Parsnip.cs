@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.13.0.0
 // File: Parsnip.parsnip
-// Date: 2018-04-03 17:06:23
+// Date: 2018-04-04 10:26:28
 
 using System;
 using System.Linq;
@@ -43,8 +43,8 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 		RuleIdentifier RuleIdentifier1(String t0, IReadOnlyList<String> t1);
 		ClassIdentifier ClassIdentifier1(String t0, IReadOnlyList<String> t1);
 		String CsharpIdentifier1(String t0, IReadOnlyList<String> t1);
-		String IID1(IReadOnlyList<String> t0);
-		String IID2(String t0);
+		String IntrinsicIdentifier1(IReadOnlyList<String> t0);
+		String IntrinsicIdentifier2(String t0);
 		String Comment1(IReadOnlyList<String> t0);
 	}
 
@@ -568,7 +568,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<IToken>() { Node = r1.Node, State = r2.State };
 			}
 
-			// Selection: (`".") | <CSTRING> | rule-identifier | ((`"<" IID `">") | "--") | (`"(" union `")")
+			// Selection: (`".") | <CSTRING> | rule-identifier | ((`"<" intrinsic-identifier `">") | "--") | (`"(" union `")")
 			private ParseResult<IToken> Mem_ParseRule_Token;
 			private static ParseResult<IToken> ParseRule_Token(PackratState state, IParsnipRuleFactory factory)
 			{
@@ -595,7 +595,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = r1.State };
 			}
 
-			// Selection: (`"<" IID `">") | "--"
+			// Selection: (`"<" intrinsic-identifier `">") | "--"
 			private static ParseResult<String> ParseRule_Token_C4(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseRule_Token_C4_C1(state, factory);
@@ -605,12 +605,12 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return null;
 			}
 
-			// Sequence: `"<" IID `">"
+			// Sequence: `"<" intrinsic-identifier `">"
 			private static ParseResult<String> ParseRule_Token_C4_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var r1 = ParseLexeme(state, "<");
 				if (r1 == null) return null;
-				var r2 = ParseRule_IID(r1.State, factory);
+				var r2 = ParseRule_IntrinsicIdentifier(r1.State, factory);
 				if (r2 == null) return null;
 				var r3 = ParseLexeme(r2.State, ">");
 				if (r3 == null) return null;
@@ -723,20 +723,20 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 
 			// Selection: <Aa>+ | "#"
-			private ParseResult<String> Mem_ParseRule_IID;
-			private static ParseResult<String> ParseRule_IID(PackratState state, IParsnipRuleFactory factory)
+			private ParseResult<String> Mem_ParseRule_IntrinsicIdentifier;
+			private static ParseResult<String> ParseRule_IntrinsicIdentifier(PackratState state, IParsnipRuleFactory factory)
 			{
-				if (state.Mem_ParseRule_IID != null) { return state.Mem_ParseRule_IID; }
+				if (state.Mem_ParseRule_IntrinsicIdentifier != null) { return state.Mem_ParseRule_IntrinsicIdentifier; }
 
-				var r1 = ParseRule_IID_C1(state, factory);
-				if (r1 != null) return state.Mem_ParseRule_IID = new ParseResult<String>() { Node = factory.IID1(r1.Node), State = r1.State };
+				var r1 = ParseRule_IntrinsicIdentifier_C1(state, factory);
+				if (r1 != null) return state.Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>() { Node = factory.IntrinsicIdentifier1(r1.Node), State = r1.State };
 				var r2 = ParseLexeme(state, "#");
-				if (r2 != null) return state.Mem_ParseRule_IID = new ParseResult<String>() { Node = factory.IID2(r2.Node), State = r2.State };
+				if (r2 != null) return state.Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>() { Node = factory.IntrinsicIdentifier2(r2.Node), State = r2.State };
 				return null;
 			}
 
 			// Cardinality: <Aa>+
-			private static ParseResult<IReadOnlyList<String>> ParseRule_IID_C1(PackratState state, IParsnipRuleFactory factory)
+			private static ParseResult<IReadOnlyList<String>> ParseRule_IntrinsicIdentifier_C1(PackratState state, IParsnipRuleFactory factory)
 			{
 				var result = ParsePlus(state, factory, (s, f) => ParseIntrinsic_AnyLetter(s, f));
 				if (result == null) return null;
