@@ -28,6 +28,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			this.intrinsics[IntrinsicType.AnyDigit] = "ParseIntrinsic_AnyDigit";
 			this.intrinsics[IntrinsicType.EndOfLine] = "ParseIntrinsic_EndOfLine";
 			this.intrinsics[IntrinsicType.EndOfStream] = "ParseIntrinsic_EndOfStream";
+			this.intrinsics[IntrinsicType.EndOfLineOrStream] = "ParseIntrinsic_EndOfLineOrStream";
 			this.intrinsics[IntrinsicType.CString] = "ParseIntrinsic_CString";
 			this.intrinsics[IntrinsicType.OptionalHorizontalWhitespace] = "ParseIntrinsic_OptionalHorizontalWhitespace";
 		}
@@ -80,6 +81,8 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			WriteCardinalityMethods(writer, interfaceName);
 			writer.EndOfLine();
+			WriteDelimiterMethod(writer, interfaceName);
+			writer.EndOfLine();
 			WriteIntrinsics(writer, interfaceName);
 			writer.EndOfLine();
 			WriteLexeme(writer);
@@ -104,6 +107,49 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				{
 					target.ApplyVisitor(generateMethods, methodItem);
 				}
+			}
+		}
+
+		private static void WriteDelimiterMethod(CodeWriter writer, String interfaceName)
+		{
+			// Delimited
+			var delimParams = new[] {
+				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl(interfaceName, "factory"),
+				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<T>>", "parseAction"),
+				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<D>>", "parseDelimiterAction")
+			};
+
+			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseSeries<T, D>", delimParams))
+			{
+				writer.VarAssign("list", "new List<T>()");
+
+				writer.VarAssign("firstResult", "parseAction(state, factory)");
+				using (writer.If("firstResult == null"))
+				{
+					writer.Return("null");
+				}
+				writer.LineOfCode("list.Add(firstResult.Node);");
+				writer.Assign("state", "firstResult.State");
+
+				using (writer.While("true"))
+				{
+					writer.VarAssign("delimResult", "parseDelimiterAction(state, factory)");
+					using (writer.If("delimResult == null"))
+					{
+						writer.SwitchBreak();
+					}
+
+					writer.VarAssign("nextResult", "parseAction(delimResult.State, factory)");
+					using (writer.If("nextResult == null"))
+					{
+						writer.SwitchBreak();
+					}
+
+					writer.LineOfCode("list.Add(nextResult.Node);");
+					writer.Assign("state", "nextResult.State");
+				}
+				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
 			}
 		}
 
@@ -168,7 +214,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					writer.Assign("state", "nextResult.State");
 				}
 				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
-			}
+			}			
 		}
 
 		private static void WriteIntrinsics(CodeWriter writer, String interfaceName)
@@ -257,6 +303,32 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				{
 					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
 				}
+				writer.Return("null");
+			}
+
+			// End of Line Or Stream
+			writer.EndOfLine();
+			using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
+			{
+				writer.VarAssign("input", "state.input");
+				writer.VarAssign("inputPosition", "state.inputPosition");
+				using (writer.If("inputPosition == input.Length"))
+				{
+					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
+				}
+
+				writer.VarAssign("result1", "ParseLexeme(state, \"\\r\\n\")");
+				using (writer.If("result1 != null"))
+				{
+					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result1.State }");
+				}
+
+				writer.VarAssign("result2", "ParseLexeme(state, \"\\n\")");
+				using (writer.If("result2 != null"))
+				{
+					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result2.State }");
+				}
+
 				writer.Return("null");
 			}
 

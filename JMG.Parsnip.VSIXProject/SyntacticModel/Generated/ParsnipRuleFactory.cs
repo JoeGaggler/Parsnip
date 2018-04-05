@@ -11,7 +11,7 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 	{
 		Choice IParsnipRuleFactory.Choice1(Union t0) => new Choice(t0);
 
-		ClassIdentifier IParsnipRuleFactory.ClassIdentifier1(String t0, IReadOnlyList<String> t1) => new ClassIdentifier(t0 + String.Join("", t1));
+		ClassIdentifier IParsnipRuleFactory.ClassIdentifier1(IReadOnlyList<String> t0) => new ClassIdentifier(String.Join("", t0));
 
 		String IParsnipRuleFactory.Comment1(IReadOnlyList<String> t0) => String.Join("", t0);
 
@@ -25,9 +25,9 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3() => null;
 
-		String IParsnipRuleFactory.IID1(IReadOnlyList<String> t0) => String.Join("", t0);
+		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => String.Join("", t0);
 
-		String IParsnipRuleFactory.IID2(String t0) => t0;
+		String IParsnipRuleFactory.IntrinsicIdentifier2(String t0) => t0;
 
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 
@@ -57,9 +57,11 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		TokenCardinality IParsnipRuleFactory.Cardinality4(IToken t0) => new TokenCardinality(t0, Cardinality.One);
 
-		Sequence IParsnipRuleFactory.Sequence1(Segment t0, Sequence t1) => new Sequence(t1.Segments.Prepending(t0));
+		Sequence IParsnipRuleFactory.Sequence1(IReadOnlyList<Segment> t0) => new Sequence(t0);
 
-		Sequence IParsnipRuleFactory.Sequence2(Segment t0) => new Sequence(new[] { t0 });
+		Segment IParsnipRuleFactory.Special1(IToken t0, IToken t1) => new Segment(MatchAction.Consume, new SeriesToken(t0, t1), Cardinality.One);
+
+		Segment IParsnipRuleFactory.Special2(Segment t0) => t0;
 
 		IToken IParsnipRuleFactory.Token1() => new IntrinsicToken(".");
 
@@ -71,8 +73,6 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		IToken IParsnipRuleFactory.Token5(Union t0) => new UnionToken(t0);
 
-		Union IParsnipRuleFactory.Union1(Sequence t0, Union t1) => new Union(t1.Sequences.Prepending(t0));
-
-		Union IParsnipRuleFactory.Union2(Sequence t0) => new Union(new[] { t0 });
+		Union IParsnipRuleFactory.Union1(IReadOnlyList<Sequence> t0) => new Union(t0);
 	}
 }

@@ -6,53 +6,29 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal enum IntrinsicType
+	internal class Series : IParseFunction
 	{
-		EndOfStream,
-		EndOfLine,
-		EndOfLineOrStream,
-		AnyCharacter,
-		AnyLetter,
-		CString,
-		OptionalHorizontalWhitespace,
-		AnyDigit
-	}
-
-	internal class Intrinsic : IParseFunction
-	{
-		public Intrinsic(IntrinsicType type, InterfaceMethod interfaceMethod)
+		public Series(IParseFunction repeatedToken, IParseFunction delimiterToken, InterfaceMethod interfaceMethod)
 		{
-			this.Type = type;
+			this.RepeatedToken = repeatedToken;
+			this.DelimiterToken = delimiterToken;
 			this.InterfaceMethod = interfaceMethod;
 		}
 
-		public InterfaceMethod InterfaceMethod { get; }
-
-		public IntrinsicType Type { get; }
+		public IParseFunction RepeatedToken { get; }
+		public IParseFunction DelimiterToken { get; }
 
 		public INodeType ReturnType
 		{
 			get
 			{
-				switch (Type)
-				{
-					case IntrinsicType.AnyDigit:
-					case IntrinsicType.AnyLetter:
-					case IntrinsicType.AnyCharacter:
-					case IntrinsicType.CString:
-					case IntrinsicType.EndOfLine:
-					case IntrinsicType.OptionalHorizontalWhitespace:
-					return new SingleNodeType("String");
+				if (InterfaceMethod != null) return InterfaceMethod.ReturnType;
 
-					case IntrinsicType.EndOfStream:
-					case IntrinsicType.EndOfLineOrStream:
-					return EmptyNodeType.Instance;
-
-					default: throw new NotImplementedException();
-				}
-
+				return new CollectionNodeType(RepeatedToken.ReturnType);
 			}
 		}
+
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 

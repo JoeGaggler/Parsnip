@@ -69,7 +69,7 @@
     <Compile Include="ParsnipPackage.cs" />
     <Compile Include="SemanticModel\Analyzer.cs" />
     <Compile Include="SemanticModel\AppendingExtensions.cs" />
-    <Compile Include="SemanticModel\CardinalityFunction.cs" />
+    <Compile Include="SemanticModel\Repetition.cs" />
     <Compile Include="SemanticModel\InterfaceMethod.cs" />
     <Compile Include="SemanticModel\Intrinsic.cs" />
     <Compile Include="SemanticModel\LiteralString.cs" />
@@ -81,6 +81,7 @@
     <Compile Include="SemanticModel\Rule.cs" />
     <Compile Include="SemanticModel\ParsnipModel.cs" />
     <Compile Include="SemanticModel\Sequence.cs" />
+    <Compile Include="SemanticModel\SeriesFunction.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleFactoryMethods.cs" />
     <Compile Include="SemanticModel\Transformations\AssignRuleReferenceTypes.cs" />
     <Compile Include="SemanticModel\Transformations\Collapsing.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="SyntacticModel\Segment.cs" />
     <Compile Include="SyntacticModel\IToken.cs" />
     <Compile Include="SyntacticModel\Sequence.cs" />
+    <Compile Include="SyntacticModel\SeriesToken.cs" />
     <Compile Include="SyntacticModel\SyntaxExtensions.cs" />
     <Compile Include="SyntacticModel\ParsnipDefinition.cs" />
     <Compile Include="SyntacticModel\TokenCardinality.cs" />

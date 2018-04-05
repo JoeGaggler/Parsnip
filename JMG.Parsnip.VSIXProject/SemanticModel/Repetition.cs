@@ -6,51 +6,44 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal enum IntrinsicType
+	internal enum Cardinality
 	{
-		EndOfStream,
-		EndOfLine,
-		EndOfLineOrStream,
-		AnyCharacter,
-		AnyLetter,
-		CString,
-		OptionalHorizontalWhitespace,
-		AnyDigit
+		One,
+		Star,
+		Plus,
+		Maybe
 	}
 
-	internal class Intrinsic : IParseFunction
+	internal class Repetition : IParseFunction
 	{
-		public Intrinsic(IntrinsicType type, InterfaceMethod interfaceMethod)
+		public Repetition(IParseFunction innerParseFunction, Cardinality cardinality, InterfaceMethod interfaceMethod)
 		{
-			this.Type = type;
+			this.InnerParseFunction = innerParseFunction;
+			this.Cardinality = cardinality;
 			this.InterfaceMethod = interfaceMethod;
 		}
 
-		public InterfaceMethod InterfaceMethod { get; }
+		public IParseFunction InnerParseFunction { get; }
 
-		public IntrinsicType Type { get; }
+		public Cardinality Cardinality { get; }
+
+		public InterfaceMethod InterfaceMethod { get; }
 
 		public INodeType ReturnType
 		{
 			get
 			{
-				switch (Type)
+				if (InterfaceMethod != null) return InterfaceMethod.ReturnType;
+
+				var innerType = InnerParseFunction.ReturnType;
+				switch (Cardinality)
 				{
-					case IntrinsicType.AnyDigit:
-					case IntrinsicType.AnyLetter:
-					case IntrinsicType.AnyCharacter:
-					case IntrinsicType.CString:
-					case IntrinsicType.EndOfLine:
-					case IntrinsicType.OptionalHorizontalWhitespace:
-					return new SingleNodeType("String");
-
-					case IntrinsicType.EndOfStream:
-					case IntrinsicType.EndOfLineOrStream:
-					return EmptyNodeType.Instance;
-
-					default: throw new NotImplementedException();
+					case Cardinality.One: return innerType;
+					case Cardinality.Maybe: return innerType;
+					case Cardinality.Star: return new CollectionNodeType(innerType);
+					case Cardinality.Plus: return new CollectionNodeType(innerType);
+					default: throw new InvalidOperationException($"Found unexpected cardinality: {Cardinality}");
 				}
-
 			}
 		}
 

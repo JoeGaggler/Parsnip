@@ -20,14 +20,16 @@ rule-body: RuleBody
 choice+
 
 choice: Choice
-union `-- `EOLOS
+union `-- `<EOLOS>
 
 union: Union
-sequence `-- `"|" `-- union
-sequence
+sequence/(-- "|" --)
 
 sequence: Sequence
-segment `-- sequence
+special/--
+
+special: Segment
+token `"/" token
 segment
 
 segment: Segment
@@ -46,24 +48,20 @@ token: IToken
 `"."
 <CSTRING>
 rule-identifier
-`"<" IID `">" | "--"
+`"<" intrinsic-identifier `">" | "--"
 `"(" union `")"
 
 rule-identifier: RuleIdentifier
 <Aa> (<Aa> | "-")*
 
 class-identifier: ClassIdentifier
-csharp-identifier (`"." csharp-identifier)*
+csharp-identifier/"."
 
 csharp-identifier: String
 <Aa> (<Aa> | <#>)*
 
-IID: String
+intrinsic-identifier: String
 <Aa>+ | "#"
 
-EOLOS:
-`<EOL>
-<END>
-
 comment: String
-`"//" (~EOLOS .)* `EOLOS
+`"//" (~<EOLOS> .)* `<EOLOS>

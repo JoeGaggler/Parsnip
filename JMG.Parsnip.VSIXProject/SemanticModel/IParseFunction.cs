@@ -9,6 +9,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
 	internal interface IParseFunction
 	{
+		InterfaceMethod InterfaceMethod { get; }
+
 		INodeType ReturnType { get; }
 
 		void ApplyVisitor(IParseFunctionActionVisitor visitor);
@@ -28,7 +30,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IActionVisitor<Intrinsic>,
 		IActionVisitor<LiteralString>,
 		IActionVisitor<ReferencedRule>,
-		IActionVisitor<CardinalityFunction>
+		IActionVisitor<Repetition>,
+		IActionVisitor<Series>
 	{
 
 	}
@@ -39,7 +42,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IActionVisitor<Intrinsic, TInput>,
 		IActionVisitor<LiteralString, TInput>,
 		IActionVisitor<ReferencedRule, TInput>,
-		IActionVisitor<CardinalityFunction, TInput>
+		IActionVisitor<Repetition, TInput>,
+		IActionVisitor<Series, TInput>
 	{
 
 	}
@@ -50,7 +54,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IActionVisitor<Intrinsic, T0, T1>,
 		IActionVisitor<LiteralString, T0, T1>,
 		IActionVisitor<ReferencedRule, T0, T1>,
-		IActionVisitor<CardinalityFunction, T0, T1>
+		IActionVisitor<Repetition, T0, T1>,
+		IActionVisitor<Series, T0, T1>
 	{
 
 	}
@@ -61,7 +66,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IFuncVisitor<Intrinsic, TOutput>,
 		IFuncVisitor<LiteralString, TOutput>,
 		IFuncVisitor<ReferencedRule, TOutput>,
-		IFuncVisitor<CardinalityFunction, TOutput>
+		IFuncVisitor<Repetition, TOutput>,
+		IFuncVisitor<Series, TOutput>
 	{
 
 	}
@@ -72,7 +78,8 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		IFuncVisitor<Intrinsic, TInput, TOutput>,
 		IFuncVisitor<LiteralString, TInput, TOutput>,
 		IFuncVisitor<ReferencedRule, TInput, TOutput>,
-		IFuncVisitor<CardinalityFunction, TInput, TOutput>
+		IFuncVisitor<Repetition, TInput, TOutput>,
+		IFuncVisitor<Series, TInput, TOutput>
 	{
 
 	}
