@@ -17,7 +17,6 @@ namespace JMG.Parsnip.VSIXProject
 	internal class ParsnipSingleFileGenerator : IVsSingleFileGenerator
 	{
 		public static String GUID_STRING_BRACES = "{381F20E9-2A4C-4F5B-8355-58A76B23DDCA}";
-		private CodeWriter codeGen;
 
 		Int32 IVsSingleFileGenerator.DefaultExtension(out String pbstrDefaultExtension)
 		{
@@ -138,7 +137,6 @@ namespace JMG.Parsnip.VSIXProject
 							parsnipCode.WriteMethods(writer, interfaceName, semanticModel);
 						}
 					}
-					writer.EndOfLine();
 				}
 
 				return writer.GetText();

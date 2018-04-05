@@ -134,14 +134,24 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 				return (new ReferencedRule(target.Identifier, target.ReturnType, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
 
-			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(CardinalityFunction target, INodeType input)
+			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Repetition target, INodeType input)
 			{
 				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
 				if (interfaceMethod == null)
 				{
 					return (target, new InterfaceMethod[0]);
 				}
-				return (new CardinalityFunction(target.InnerParseFunction, target.Cardinality, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
+				return (new Repetition(target.InnerParseFunction, target.Cardinality, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
+			}
+
+			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(Series target, INodeType input)
+			{
+				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
+				if (interfaceMethod == null)
+				{
+					return (target, new InterfaceMethod[0]);
+				}
+				return (new Series(target.RepeatedToken, target.DelimiterToken, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
 		}
 	}

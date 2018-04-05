@@ -81,6 +81,8 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			WriteCardinalityMethods(writer, interfaceName);
 			writer.EndOfLine();
+			WriteDelimiterMethod(writer, interfaceName);
+			writer.EndOfLine();
 			WriteIntrinsics(writer, interfaceName);
 			writer.EndOfLine();
 			WriteLexeme(writer);
@@ -105,6 +107,49 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				{
 					target.ApplyVisitor(generateMethods, methodItem);
 				}
+			}
+		}
+
+		private static void WriteDelimiterMethod(CodeWriter writer, String interfaceName)
+		{
+			// Delimited
+			var delimParams = new[] {
+				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl(interfaceName, "factory"),
+				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<T>>", "parseAction"),
+				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<D>>", "parseDelimiterAction")
+			};
+
+			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseSeries<T, D>", delimParams))
+			{
+				writer.VarAssign("list", "new List<T>()");
+
+				writer.VarAssign("firstResult", "parseAction(state, factory)");
+				using (writer.If("firstResult == null"))
+				{
+					writer.Return("null");
+				}
+				writer.LineOfCode("list.Add(firstResult.Node);");
+				writer.Assign("state", "firstResult.State");
+
+				using (writer.While("true"))
+				{
+					writer.VarAssign("delimResult", "parseDelimiterAction(state, factory)");
+					using (writer.If("delimResult == null"))
+					{
+						writer.SwitchBreak();
+					}
+
+					writer.VarAssign("nextResult", "parseAction(delimResult.State, factory)");
+					using (writer.If("nextResult == null"))
+					{
+						writer.SwitchBreak();
+					}
+
+					writer.LineOfCode("list.Add(nextResult.Node);");
+					writer.Assign("state", "nextResult.State");
+				}
+				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
 			}
 		}
 
@@ -169,7 +214,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					writer.Assign("state", "nextResult.State");
 				}
 				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
-			}
+			}			
 		}
 
 		private static void WriteIntrinsics(CodeWriter writer, String interfaceName)

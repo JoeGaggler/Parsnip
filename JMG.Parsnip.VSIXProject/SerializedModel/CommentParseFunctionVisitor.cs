@@ -108,7 +108,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			return value;
 		}
 
-		public String Visit(CardinalityFunction target)
+		public String Visit(Repetition target)
 		{
 			var baseString = target.InnerParseFunction.ApplyVisitor(WithoutHeader);
 
@@ -124,10 +124,17 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 			if (this.ShowHeader)
 			{
-				value = $"Cardinality: {value}";
+				value = $"Repetition: {value}";
 			}
 
 			return value;
+		}
+
+		public String Visit(Series target)
+		{
+			var value1 = target.RepeatedToken.ApplyVisitor(WithoutHeader);
+			var value2 = target.DelimiterToken.ApplyVisitor(WithoutHeader);
+			return $"Series: {value1}/{value2}";
 		}
 	}
 }

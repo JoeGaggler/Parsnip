@@ -23,11 +23,13 @@ choice: Choice
 union `-- `<EOLOS>
 
 union: Union
-sequence `-- `"|" `-- union
-sequence
+sequence/(-- "|" --)
 
 sequence: Sequence
-segment `-- sequence
+special/--
+
+special: Segment
+token `"/" token
 segment
 
 segment: Segment
@@ -53,7 +55,7 @@ rule-identifier: RuleIdentifier
 <Aa> (<Aa> | "-")*
 
 class-identifier: ClassIdentifier
-csharp-identifier (`"." csharp-identifier)*
+csharp-identifier/"."
 
 csharp-identifier: String
 <Aa> (<Aa> | <#>)*

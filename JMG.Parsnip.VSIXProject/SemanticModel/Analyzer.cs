@@ -160,7 +160,7 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					case Cardinality.Star:
 					case Cardinality.Maybe:
 					{
-						return new CardinalityFunction(func, cardinality, interfaceMethod: null);
+						return new Repetition(func, cardinality, interfaceMethod: null);
 					}
 					default:
 					{
@@ -221,6 +221,13 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				public IParseFunction Visit(AnyToken target) => new Intrinsic(IntrinsicType.AnyCharacter, interfaceMethod: null);
 
 				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union, isMemoized);
+
+				public IParseFunction Visit(SeriesToken target)
+				{
+					var repeatedFunction = target.RepeatedToken.ApplyVisitor(this);
+					var delimiterFunction = target.DelimiterToken.ApplyVisitor(this);
+					return new Series(repeatedFunction, delimiterFunction, interfaceMethod: null);
+				}
 			}
 		}
 	}

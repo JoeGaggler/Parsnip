@@ -62,9 +62,14 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 
 			public IParseFunction Visit(ReferencedRule target) => target;
 
-			public IParseFunction Visit(CardinalityFunction target)
+			public IParseFunction Visit(Repetition target)
 			{
-				return new CardinalityFunction(target.InnerParseFunction.ApplyVisitor(this), target.Cardinality, target.InterfaceMethod);
+				return new Repetition(target.InnerParseFunction.ApplyVisitor(this), target.Cardinality, target.InterfaceMethod);
+			}
+
+			public IParseFunction Visit(Series target)
+			{
+				return new Series(target.RepeatedToken.ApplyVisitor(this), target.DelimiterToken.ApplyVisitor(this), target.InterfaceMethod);
 			}
 		}
 	}

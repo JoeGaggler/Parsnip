@@ -27,10 +27,14 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				}
 				else
 				{
+					// Union-types are not yet supported
 					return new SingleNodeType("AMBIGUOUS_SELECTION");
 				}
 			}
 		}
+
+		// Selections cannot have an interface method until union-types are supported
+		public InterfaceMethod InterfaceMethod => null;
 
 		public void ApplyVisitor(IParseFunctionActionVisitor visitor) => visitor.Visit(this);
 

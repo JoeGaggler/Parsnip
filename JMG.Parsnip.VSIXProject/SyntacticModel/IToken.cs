@@ -19,7 +19,8 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 		IActionVisitor<LiteralStringToken>,
 		IActionVisitor<IntrinsicToken>,
 		IActionVisitor<AnyToken>,
-		IActionVisitor<UnionToken>
+		IActionVisitor<UnionToken>,
+		IActionVisitor<SeriesToken>
 	{
 
 	}
@@ -29,7 +30,8 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel
 		IFuncVisitor<LiteralStringToken, TOutput>,
 		IFuncVisitor<IntrinsicToken, TOutput>,
 		IFuncVisitor<AnyToken, TOutput>,
-		IFuncVisitor<UnionToken, TOutput>
+		IFuncVisitor<UnionToken, TOutput>,
+		IFuncVisitor<SeriesToken, TOutput>
 	{
 
 	}

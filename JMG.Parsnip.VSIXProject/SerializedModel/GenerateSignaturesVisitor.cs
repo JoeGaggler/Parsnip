@@ -101,7 +101,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 		}
 
-		public void Visit(CardinalityFunction target, Access access)
+		public void Visit(Repetition target, Access access)
 		{
 			var invoker = CreateInvoker(baseName);
 			AddSignature(target, access, invoker);
@@ -109,7 +109,16 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var inner = target.InnerParseFunction;
 			var visitor = new GenerateSignaturesVisitor(parsnipCode, baseName + "_M", isMemoized: false, mustAddSignature: false);
 			inner.ApplyVisitor(visitor, Access.Private);
-			var innerInvocation = parsnipCode.Invokers[inner]("s", "f");
+		}
+
+		public void Visit(Series target, Access access)
+		{
+			var invoker = CreateInvoker(baseName);
+			AddSignature(target, access, invoker);
+
+			var visitor = new GenerateSignaturesVisitor(parsnipCode, baseName + "_D", isMemoized: false, mustAddSignature: false);
+			target.RepeatedToken.ApplyVisitor(visitor, Access.Private);
+			target.DelimiterToken.ApplyVisitor(visitor, Access.Private);
 		}
 	}
 }

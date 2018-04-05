@@ -190,7 +190,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
 		}
 
-		public void Visit(CardinalityFunction target, Signature input)
+		public void Visit(Repetition target, Signature input)
 		{
 			String methodName;
 			switch (target.Cardinality)
@@ -211,6 +211,34 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 			var nodeReference = $"{resultName}.Node";
 			var decl = new Decl(innerFunc.ReturnType, nodeReference);
+
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.State", "factory", target.InterfaceMethod);
+			if (input.IsMemoized)
+			{
+				var memField = NameGen.MemoizedFieldName(input.Name);
+				returnExpression = $"state.{memField} = {returnExpression}";
+			}
+			writer.Return(returnExpression);
+		}
+
+		public void Visit(Series target, Signature input)
+		{
+			var methodName = "ParseSeries";
+
+			var repeatedFunc = target.RepeatedToken;
+			var repeatedInvocation = parsnipCode.Invokers[repeatedFunc]("s", "f");
+
+			var delimFunc = target.DelimiterToken;
+			var delimInvocation = parsnipCode.Invokers[delimFunc]("s", "f");
+
+			var invocation = $"{methodName}(state, factory, (s, f) => {repeatedInvocation}, (s, f) => {delimInvocation})";
+
+			var resultName = "result";
+			writer.VarAssign(resultName, invocation);
+			writer.IfNullReturnNull(resultName);
+
+			var nodeReference = $"{resultName}.Node";
+			var decl = new Decl(target.ReturnType, nodeReference);
 
 			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.State", "factory", target.InterfaceMethod);
 			if (input.IsMemoized)
