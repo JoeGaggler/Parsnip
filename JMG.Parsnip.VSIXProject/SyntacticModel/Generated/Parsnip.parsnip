@@ -33,16 +33,10 @@ token `"/" token
 segment
 
 segment: Segment
-`"`" cardinality
-`"~" cardinality
-`"&" cardinality
-cardinality
+("`" | "~" | "&")? cardinality
 
 cardinality: TokenCardinality
-token `"+"
-token `"?"
-token `"*"
-token
+token ("+" | "?" | "*")?
 
 token: IToken
 `"."
