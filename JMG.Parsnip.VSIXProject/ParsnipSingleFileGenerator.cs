@@ -11,30 +11,23 @@ using JMG.Parsnip.VSIXProject.Extensions;
 using JMG.Parsnip.VSIXProject.CodeWriting;
 using JMG.Parsnip.VSIXProject.SemanticModel;
 using JMG.Parsnip.VSIXProject.SerializedModel;
+using Microsoft.VisualStudio.TextTemplating.VSHost;
 
 namespace JMG.Parsnip.VSIXProject
 {
-	internal class ParsnipSingleFileGenerator : IVsSingleFileGenerator
-	{
-		public static String GUID_STRING_BRACES = "{381F20E9-2A4C-4F5B-8355-58A76B23DDCA}";
+    [Guid("381F20E9-2A4C-4F5B-8355-58A76B23DDCA")]
+    public sealed class ParsnipSingleFileGenerator : BaseCodeGeneratorWithSite
+    {
+        public override string GetDefaultExtension()
+        {
+            return ".cs";
+        }
 
-		Int32 IVsSingleFileGenerator.DefaultExtension(out String pbstrDefaultExtension)
-		{
-			pbstrDefaultExtension = ".cs";
-			return VSConstants.S_OK;
-		}
-
-		Int32 IVsSingleFileGenerator.Generate(String wszInputFilePath, String bstrInputFileContents, String wszDefaultNamespace, IntPtr[] rgbOutputFileContents, out UInt32 pcbOutput, IVsGeneratorProgress pGenerateProgress)
-		{
-			String result = Generate(bstrInputFileContents, wszDefaultNamespace, wszInputFilePath);
+        protected override byte[] GenerateCode(string inputFileName, string inputFileContent)
+        {
+			String result = Generate(inputFileContent, this.FileNamespace, inputFileName);
 			var bytes = Encoding.UTF8.GetBytes(result);
-
-			int outputLength = bytes.Length;
-			rgbOutputFileContents[0] = Marshal.AllocCoTaskMem(outputLength);
-			Marshal.Copy(bytes, 0, rgbOutputFileContents[0], outputLength);
-			pcbOutput = (uint)outputLength;
-
-			return VSConstants.S_OK;
+            return bytes;
 		}
 
 		private String Generate(String bstrInputFileContents, String wszDefaultNamespace, String wszInputFilePath)
