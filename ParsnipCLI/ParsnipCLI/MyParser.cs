@@ -123,71 +123,61 @@ namespace ParsnipCLI
         private static ParseResult<List<T>> ParseSeries<T, D>(ReadOnlySpan<Char> input, int start, IMyParserFactory factory, MyFunc<T> parseAction, MyFunc<D> parseDelimiterAction)
         {
             var list = new List<T>();
-            var firstResult = parseAction(state, factory);
-            if (firstResult == null)
+            var firstResult = parseAction(input, start, factory);
+            if (firstResult.DidFail)
             {
-                return null;
+                return ParseResult<List<T>>.Fail;
             }
             list.Add(firstResult.Node);
-            state = firstResult.State;
+            var startSuccess = start + firstResult.Length;
             while (true)
             {
-                var delimResult = parseDelimiterAction(state, factory);
-                if (delimResult == null)
+                var delimResult = parseDelimiterAction(input, startSuccess, factory);
+                if (delimResult.DidFail)
                 {
                     break;
                 }
-                var nextResult = parseAction(delimResult.State, factory);
-                if (nextResult == null)
+                var t = delimResult.Length;
+
+                var nextResult = parseAction(input, startSuccess + t, factory);
+                if (nextResult.DidFail)
                 {
                     break;
                 }
+                t += nextResult.Length;
+
                 list.Add(nextResult.Node);
-                state = nextResult.State;
+                startSuccess += t;
             }
-            return new ParseResult<IReadOnlyList<T>> { State = state, Node = list };
+            return new ParseResult<List<T>>(list, startSuccess);
         }
 
         private static ParseResult<String> ParseIntrinsic_AnyCharacter(ReadOnlySpan<Char> input, int start)
-			{
-				var input = state.input;
-				var inputPosition = state.inputPosition;
-				if (inputPosition >= input.Length)
-				{
-					return null;
-				}
-				return new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] };
-			}
+        {
+            if (start >= input.Length)
+            {
+                return ParseResult<String>.Fail;
+            }
+            return new ParseResult<String>(input.Slice(start, 1).ToString(), 1);
+        }
 
-			private static ParseResult<String> ParseIntrinsic_AnyLetter(ReadOnlySpan<Char> input, int start)
-			{
-				var input = state.input;
-				var inputPosition = state.inputPosition;
-				if (inputPosition >= input.Length)
-				{
-					return null;
-				}
-				else if (!Char.IsLetter(input[inputPosition]))
-				{
-					return null;
-				}
-				return new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] };
-			}
+        private static ParseResult<String> ParseIntrinsic_AnyLetter(ReadOnlySpan<Char> input, int start)
+        {
+            if (start >= input.Length || !(input[start] is Char ch) || !Char.IsLetter(ch))
+            {
+                return ParseResult<String>.Fail;
+            }
+            return new ParseResult<String>(input.Slice(start, 1).ToString(), 1);
+        }
 
-			private static ParseResult<String> ParseIntrinsic_AnyDigit(ReadOnlySpan<Char> input, int start)
-			{
-				var input = state.input;
-				var inputPosition = state.inputPosition;
-				if (inputPosition >= input.Length)
-				{
-					return null;
-				}
-				else if (!Char.IsDigit(input[inputPosition]))
-				{
-					return null;
-				}
-				return new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] };
-			}
+        private static ParseResult<String> ParseIntrinsic_AnyDigit(ReadOnlySpan<Char> input, int start)
+        {
+            if (start >= input.Length || !(input[start] is Char ch) || !Char.IsDigit(ch))
+            {
+                return ParseResult<String>.Fail;
+            }
+            return new ParseResult<String>(input.Slice(start, 1).ToString(), 1);
+        }
 
         private static ParseResult<String> ParseIntrinsic_EndOfLine(ReadOnlySpan<Char> input, int start)
         {
@@ -225,17 +215,17 @@ namespace ParsnipCLI
 
         private static ParseResult<String> ParseIntrinsic_CString(ReadOnlySpan<Char> input, int start)
         {
-            var resultStart = ParseLexeme(state, "\"");
-            if (resultStart == null) return null;
-            var currentState = resultStart.State;
+            var resultStart = ParseLexeme(input, start, "\"");
+            if (resultStart.DidFail) return ParseResult<String>.Fail;
+            var currentState = start + resultStart.Length;
             var sb = new System.Text.StringBuilder();
             while (true)
             {
-                var resultEscape = ParseLexeme(currentState, "\\");
-                if (resultEscape != null)
+                var resultEscape = ParseLexeme(input, currentState, "\\");
+                if (!resultEscape.DidFail)
                 {
-                    var resultToken = ParseIntrinsic_AnyCharacter(resultEscape.State, factory);
-                    if (resultToken == null) return null;
+                    var resultToken = ParseIntrinsic_AnyCharacter(input, currentState + resultEscape.Length);
+                    if (resultToken.DidFail) return ParseResult<String>.Fail;
                     switch (resultToken.Node)
                     {
                         case "\\":
@@ -250,21 +240,21 @@ namespace ParsnipCLI
                         }
                         default:
                         {
-                            return null;
+                            return ParseResult<String>.Fail;
                         }
                     }
-                    currentState = resultToken.State;
+                    currentState = currentState + resultEscape.Length + resultToken.Length;
                     continue;
                 }
-                var resultEnd = ParseLexeme(currentState, "\"");
-                if (resultEnd != null)
+                var resultEnd = ParseLexeme(input, currentState, "\"");
+                if (!resultEnd.DidFail)
                 {
-                    return new ParseResult<String>() { Node = sb.ToString(), State = resultEnd.State };
+                    return new ParseResult<String>(sb.ToString(), currentState + resultEnd.Length);
                 }
-                var resultChar = ParseIntrinsic_AnyCharacter(currentState, factory);
-                if (resultChar == null) return null;
+                var resultChar = ParseIntrinsic_AnyCharacter(input, currentState);
+                if (resultChar.DidFail) return ParseResult<String>.Fail;
                 sb.Append(resultChar.Node);
-                currentState = resultChar.State;
+                currentState = currentState + resultChar.Length;
             }
         }
 
