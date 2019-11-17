@@ -4,11 +4,15 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Microsoft.Win32;
+using Task = System.Threading.Tasks.Task;
 
 namespace JMG.Parsnip.VSIXProject
 {
@@ -29,17 +33,20 @@ namespace JMG.Parsnip.VSIXProject
 	/// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
 	/// </para>
 	/// </remarks>
-	[PackageRegistration(UseManagedResourcesOnly = true)]
+	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
 	[Guid(ParsnipPackage.PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    [ProvideAutoLoad(UIContextGuids.SolutionExists)]
-	public sealed class ParsnipPackage : Package
+    [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideCodeGenerator(typeof(ParsnipSingleFileGenerator), name: GeneratorName, description: "Parsnip Generator", generatesDesignTimeSource: true)]
+    public sealed class ParsnipPackage : AsyncPackage
 	{
 		/// <summary>
 		/// VSPackage1 GUID string.
 		/// </summary>
 		public const string PackageGuidString = "dedc1c53-0202-4d15-af9b-92b3678f8a2a";
+
+        public const String GeneratorName = "Parsnip";
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ParsnipPackage"/> class.
@@ -52,45 +59,21 @@ namespace JMG.Parsnip.VSIXProject
 			// initialization is the Initialize method.
 		}
 
-		#region Package Members
+        #region Package Members
 
-		/// <summary>
-		/// Initialization of the package; this method is called right after the package is sited, so this is the place
-		/// where you can put all the initialization code that rely on services provided by VisualStudio.
-		/// </summary>
-		protected override void Initialize()
-		{
-			base.Initialize();
-
-			RegisterGenerator("Parsnip", "Parsnip Packrat Parser Producer", ParsnipSingleFileGenerator.GUID_STRING_BRACES, typeof(ParsnipSingleFileGenerator));
-		}
-
-		private void RegisterGenerator(String toolId, String toolName, String generatorGUID, Type generatorType)
-		{
-			var classId = this.ApplicationRegistryRoot.OpenSubKey("CLSID", RegistryKeyPermissionCheck.ReadWriteSubTree);
-			var myClassIdKey = classId.OpenSubKey(generatorGUID, RegistryKeyPermissionCheck.ReadWriteSubTree);
-			if (null != myClassIdKey)
-			{
-				// Already registered
-				return;
-			}
-
-			myClassIdKey = classId.CreateSubKey(generatorGUID, RegistryKeyPermissionCheck.ReadWriteSubTree);
-
-			myClassIdKey.SetValue("InprocServer32", @"C:\Windows\SysWOW64\mscoree.dll", RegistryValueKind.String);
-			myClassIdKey.SetValue("ThreadingModel", @"Both", RegistryValueKind.String);
-			myClassIdKey.SetValue(null, generatorType.FullName, RegistryValueKind.String);
-			myClassIdKey.SetValue("Class", generatorType.FullName, RegistryValueKind.String);
-			myClassIdKey.SetValue("Assembly", generatorType.Assembly.FullName, RegistryValueKind.String);
-			myClassIdKey.SetValue("CodeBase", generatorType.Assembly.Location, RegistryValueKind.String);
-
-			var generators = this.ApplicationRegistryRoot.OpenSubKey("Generators", RegistryKeyPermissionCheck.ReadWriteSubTree);
-			var csharp = generators.OpenSubKey("{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", RegistryKeyPermissionCheck.ReadWriteSubTree);
-			var mygenerator = csharp.CreateSubKey(toolId, RegistryKeyPermissionCheck.ReadWriteSubTree);
-			mygenerator.SetValue(null, toolName, RegistryValueKind.String);
-			mygenerator.SetValue("GeneratesDesignTimeSource", 1, RegistryValueKind.DWord);
-			mygenerator.SetValue("CLSID", generatorGUID, RegistryValueKind.String);
-		}
+        /// <summary>
+        /// Initialization of the package; this method is called right after the package is sited, so this is the place
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
+        /// <param name="progress">A provider for progress updates.</param>
+        /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        {
+            // When initialized asynchronously, the current thread may be a background thread at this point.
+            // Do any initialization that requires the UI thread after switching to the UI thread.
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        }
 
 		#endregion
 	}
