@@ -41,21 +41,29 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 
 		RuleIdentifier IParsnipRuleFactory.RuleIdentifier1(String t0, IReadOnlyList<String> t1) => new RuleIdentifier(t0 + String.Join("", t1));
 
-		Segment IParsnipRuleFactory.Segment1(TokenCardinality t0) => new Segment(MatchAction.Ignore, t0.Item, t0.Cardinality);
+		Segment IParsnipRuleFactory.Segment1(String t0, TokenCardinality t1)
+		{
+			MatchAction matchAction;
+			if (t0 == null) { matchAction = MatchAction.Consume; }
+			else if (t0 == "`") { matchAction = MatchAction.Ignore; }
+			else if (t0 == "~") { matchAction = MatchAction.Fail; }
+			else if (t0 == "&") { matchAction = MatchAction.Rewind; }
+			else { throw new InvalidOperationException($"Unexpected match action: {t0}"); }
 
-		Segment IParsnipRuleFactory.Segment2(TokenCardinality t0) => new Segment(MatchAction.Fail, t0.Item, t0.Cardinality);
+			return new Segment(matchAction, t1.Item, t1.Cardinality);
+		}
 
-		Segment IParsnipRuleFactory.Segment3(TokenCardinality t0) => new Segment(MatchAction.Rewind, t0.Item, t0.Cardinality);
+		TokenCardinality IParsnipRuleFactory.Cardinality1(IToken t0, String t1)
+		{
+			Cardinality cardinality;
+			if (t1 == null) { cardinality = Cardinality.One; }
+			else if (t1 == "+") { cardinality = Cardinality.Plus; }
+			else if (t1 == "?") { cardinality = Cardinality.Maybe; }
+			else if (t1 == "*") { cardinality = Cardinality.Star; }
+			else { throw new InvalidOperationException($"Unexpected cardinality: {t1}"); }
 
-		Segment IParsnipRuleFactory.Segment4(TokenCardinality t0) => new Segment(MatchAction.Consume, t0.Item, t0.Cardinality);
-
-		TokenCardinality IParsnipRuleFactory.Cardinality1(IToken t0) => new TokenCardinality(t0, Cardinality.Plus);
-
-		TokenCardinality IParsnipRuleFactory.Cardinality2(IToken t0) => new TokenCardinality(t0, Cardinality.Maybe);
-
-		TokenCardinality IParsnipRuleFactory.Cardinality3(IToken t0) => new TokenCardinality(t0, Cardinality.Star);
-
-		TokenCardinality IParsnipRuleFactory.Cardinality4(IToken t0) => new TokenCardinality(t0, Cardinality.One);
+			return new TokenCardinality(t0, cardinality);
+		}
 
 		Sequence IParsnipRuleFactory.Sequence1(IReadOnlyList<Segment> t0) => new Sequence(t0);
 

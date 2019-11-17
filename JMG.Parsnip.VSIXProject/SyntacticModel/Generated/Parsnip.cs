@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.19.0.0
+// Version: 1.20.0.0
 // File: Parsnip.parsnip
-// Date: 2018-04-05 17:23:45
+// Date: 2019-11-17 13:47:44
 
 using System;
 using System.Linq;
@@ -27,14 +27,8 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 		Sequence Sequence1(IReadOnlyList<Segment> t0);
 		Segment Special1(IToken t0, IToken t1);
 		Segment Special2(Segment t0);
-		Segment Segment1(TokenCardinality t0);
-		Segment Segment2(TokenCardinality t0);
-		Segment Segment3(TokenCardinality t0);
-		Segment Segment4(TokenCardinality t0);
-		TokenCardinality Cardinality1(IToken t0);
-		TokenCardinality Cardinality2(IToken t0);
-		TokenCardinality Cardinality3(IToken t0);
-		TokenCardinality Cardinality4(IToken t0);
+		Segment Segment1(String t0, TokenCardinality t1);
+		TokenCardinality Cardinality1(IToken t0, String t1);
 		IToken Token1();
 		IToken Token2(String t0);
 		IToken Token3(RuleIdentifier t0);
@@ -507,98 +501,70 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 				return new ParseResult<(IToken, IToken)>() { Node = (r1.Node, r3.Node), State = r3.State };
 			}
 
-			// Selection: (`"`" cardinality) | (`"~" cardinality) | (`"&" cardinality) | cardinality
+			// Sequence: ("`" | "~" | "&")? cardinality
 			private ParseResult<Segment> Mem_ParseRule_Segment;
 			private static ParseResult<Segment> ParseRule_Segment(PackratState state, IParsnipRuleFactory factory)
 			{
 				if (state.Mem_ParseRule_Segment != null) { return state.Mem_ParseRule_Segment; }
 
-				var r1 = ParseRule_Segment_C1(state, factory);
-				if (r1 != null) return state.Mem_ParseRule_Segment = new ParseResult<Segment>() { Node = factory.Segment1(r1.Node), State = r1.State };
-				var r2 = ParseRule_Segment_C2(state, factory);
-				if (r2 != null) return state.Mem_ParseRule_Segment = new ParseResult<Segment>() { Node = factory.Segment2(r2.Node), State = r2.State };
-				var r3 = ParseRule_Segment_C3(state, factory);
-				if (r3 != null) return state.Mem_ParseRule_Segment = new ParseResult<Segment>() { Node = factory.Segment3(r3.Node), State = r3.State };
-				var r4 = ParseRule_Cardinality(state, factory);
-				if (r4 != null) return state.Mem_ParseRule_Segment = new ParseResult<Segment>() { Node = factory.Segment4(r4.Node), State = r4.State };
+				var r1 = ParseRule_Segment_S1(state, factory);
+				if (r1 == null) return null;
+				var r2 = ParseRule_Cardinality(r1.State, factory);
+				if (r2 == null) return null;
+				return state.Mem_ParseRule_Segment = new ParseResult<Segment>() { Node = factory.Segment1(r1.Node, r2.Node), State = r2.State };
+			}
+
+			// Repetition: ("`" | "~" | "&")?
+			private static ParseResult<String> ParseRule_Segment_S1(PackratState state, IParsnipRuleFactory factory)
+			{
+				var result = ParseMaybe(state, factory, (s, f) => ParseRule_Segment_S1_M(s, f));
+				if (result == null) return null;
+				return new ParseResult<String>() { Node = result.Node, State = result.State };
+			}
+
+			// Selection: "`" | "~" | "&"
+			private static ParseResult<String> ParseRule_Segment_S1_M(PackratState state, IParsnipRuleFactory factory)
+			{
+				var r1 = ParseLexeme(state, "`");
+				if (r1 != null) return new ParseResult<String>() { Node = r1.Node, State = r1.State };
+				var r2 = ParseLexeme(state, "~");
+				if (r2 != null) return new ParseResult<String>() { Node = r2.Node, State = r2.State };
+				var r3 = ParseLexeme(state, "&");
+				if (r3 != null) return new ParseResult<String>() { Node = r3.Node, State = r3.State };
 				return null;
 			}
 
-			// Sequence: `"`" cardinality
-			private static ParseResult<TokenCardinality> ParseRule_Segment_C1(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseLexeme(state, "`");
-				if (r1 == null) return null;
-				var r2 = ParseRule_Cardinality(r1.State, factory);
-				if (r2 == null) return null;
-				return new ParseResult<TokenCardinality>() { Node = r2.Node, State = r2.State };
-			}
-
-			// Sequence: `"~" cardinality
-			private static ParseResult<TokenCardinality> ParseRule_Segment_C2(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseLexeme(state, "~");
-				if (r1 == null) return null;
-				var r2 = ParseRule_Cardinality(r1.State, factory);
-				if (r2 == null) return null;
-				return new ParseResult<TokenCardinality>() { Node = r2.Node, State = r2.State };
-			}
-
-			// Sequence: `"&" cardinality
-			private static ParseResult<TokenCardinality> ParseRule_Segment_C3(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseLexeme(state, "&");
-				if (r1 == null) return null;
-				var r2 = ParseRule_Cardinality(r1.State, factory);
-				if (r2 == null) return null;
-				return new ParseResult<TokenCardinality>() { Node = r2.Node, State = r2.State };
-			}
-
-			// Selection: (token `"+") | (token `"?") | (token `"*") | token
+			// Sequence: token ("+" | "?" | "*")?
 			private ParseResult<TokenCardinality> Mem_ParseRule_Cardinality;
 			private static ParseResult<TokenCardinality> ParseRule_Cardinality(PackratState state, IParsnipRuleFactory factory)
 			{
 				if (state.Mem_ParseRule_Cardinality != null) { return state.Mem_ParseRule_Cardinality; }
 
-				var r1 = ParseRule_Cardinality_C1(state, factory);
-				if (r1 != null) return state.Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>() { Node = factory.Cardinality1(r1.Node), State = r1.State };
-				var r2 = ParseRule_Cardinality_C2(state, factory);
-				if (r2 != null) return state.Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>() { Node = factory.Cardinality2(r2.Node), State = r2.State };
-				var r3 = ParseRule_Cardinality_C3(state, factory);
-				if (r3 != null) return state.Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>() { Node = factory.Cardinality3(r3.Node), State = r3.State };
-				var r4 = ParseRule_Token(state, factory);
-				if (r4 != null) return state.Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>() { Node = factory.Cardinality4(r4.Node), State = r4.State };
+				var r1 = ParseRule_Token(state, factory);
+				if (r1 == null) return null;
+				var r2 = ParseRule_Cardinality_S2(r1.State, factory);
+				if (r2 == null) return null;
+				return state.Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>() { Node = factory.Cardinality1(r1.Node, r2.Node), State = r2.State };
+			}
+
+			// Repetition: ("+" | "?" | "*")?
+			private static ParseResult<String> ParseRule_Cardinality_S2(PackratState state, IParsnipRuleFactory factory)
+			{
+				var result = ParseMaybe(state, factory, (s, f) => ParseRule_Cardinality_S2_M(s, f));
+				if (result == null) return null;
+				return new ParseResult<String>() { Node = result.Node, State = result.State };
+			}
+
+			// Selection: "+" | "?" | "*"
+			private static ParseResult<String> ParseRule_Cardinality_S2_M(PackratState state, IParsnipRuleFactory factory)
+			{
+				var r1 = ParseLexeme(state, "+");
+				if (r1 != null) return new ParseResult<String>() { Node = r1.Node, State = r1.State };
+				var r2 = ParseLexeme(state, "?");
+				if (r2 != null) return new ParseResult<String>() { Node = r2.Node, State = r2.State };
+				var r3 = ParseLexeme(state, "*");
+				if (r3 != null) return new ParseResult<String>() { Node = r3.Node, State = r3.State };
 				return null;
-			}
-
-			// Sequence: token `"+"
-			private static ParseResult<IToken> ParseRule_Cardinality_C1(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseRule_Token(state, factory);
-				if (r1 == null) return null;
-				var r2 = ParseLexeme(r1.State, "+");
-				if (r2 == null) return null;
-				return new ParseResult<IToken>() { Node = r1.Node, State = r2.State };
-			}
-
-			// Sequence: token `"?"
-			private static ParseResult<IToken> ParseRule_Cardinality_C2(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseRule_Token(state, factory);
-				if (r1 == null) return null;
-				var r2 = ParseLexeme(r1.State, "?");
-				if (r2 == null) return null;
-				return new ParseResult<IToken>() { Node = r1.Node, State = r2.State };
-			}
-
-			// Sequence: token `"*"
-			private static ParseResult<IToken> ParseRule_Cardinality_C3(PackratState state, IParsnipRuleFactory factory)
-			{
-				var r1 = ParseRule_Token(state, factory);
-				if (r1 == null) return null;
-				var r2 = ParseLexeme(r1.State, "*");
-				if (r2 == null) return null;
-				return new ParseResult<IToken>() { Node = r1.Node, State = r2.State };
 			}
 
 			// Selection: (`".") | <CSTRING> | rule-identifier | ((`"<" intrinsic-identifier `">") | "--") | (`"(" union `")")
@@ -790,5 +756,4 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 		}
 	}
-
 }
