@@ -1,7 +1,7 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.19.0.0
+// Version: 1.20.0.0
 // File: Parsnip.parsnip
-// Date: 2018-04-05 17:45:47
+// Date: 2019-11-17 13:47:44
 
 using System;
 using System.Linq;
@@ -756,5 +756,4 @@ namespace JMG.Parsnip.VSIXProject.SyntacticModel.Generated
 			}
 		}
 	}
-
 }
