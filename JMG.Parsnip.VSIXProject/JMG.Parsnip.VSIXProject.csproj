@@ -63,6 +63,7 @@
     <Compile Include="CodeWriting\StringExtensions.cs" />
     <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="NameGen.cs" />
+    <Compile Include="ParsnipGenerator.cs" />
     <Compile Include="ParsnipSingleFileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ParsnipPackage.cs" />
@@ -96,10 +97,10 @@
     <Compile Include="SyntacticModel\Choice.cs" />
     <Compile Include="SyntacticModel\ClassIdentifier.cs" />
     <Compile Include="SyntacticModel\Comment.cs" />
-    <Compile Include="SyntacticModel\Generated\Parsnip.cs">
+    <Compile Include="SyntacticModel\Generated\Parsnip.parsnip.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Parsnip.parsnip</DependentUpon>
+      <DependentUpon>Parsnip.parsnip.txt</DependentUpon>
     </Compile>
     <Compile Include="SyntacticModel\Generated\ParsnipRuleFactory.cs" />
     <Compile Include="SyntacticModel\IntrinsicToken.cs" />
@@ -129,9 +130,9 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <None Include="SyntacticModel\Generated\Parsnip.parsnip">
+    <None Include="SyntacticModel\Generated\Parsnip.parsnip.txt">
       <Generator>Parsnip</Generator>
-      <LastGenOutput>Parsnip.cs</LastGenOutput>
+      <LastGenOutput>Parsnip.parsnip.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>JMG.Parsnip.CLI</RootNamespace>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>parsnip</ToolCommandName>
+    <AssemblyName>JMG.Parsnip</AssemblyName>
+    <Version>1.22</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JMG.Parsnip.VSIXProject\JMG.Parsnip.VSIXProject.csproj" />
+    <PackageReference Include="Microsoft.VisualStudio.TextTemplating.VSHost.15.0">
+      <Version>16.1.28917.181</Version>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

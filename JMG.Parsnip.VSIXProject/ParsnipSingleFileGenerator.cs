@@ -8,10 +8,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using JMG.Parsnip.VSIXProject.Extensions;
-using JMG.Parsnip.VSIXProject.CodeWriting;
 using JMG.Parsnip.VSIXProject.SemanticModel;
-using JMG.Parsnip.VSIXProject.SerializedModel;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace JMG.Parsnip.VSIXProject
 {
@@ -23,121 +23,106 @@ namespace JMG.Parsnip.VSIXProject
             return ".cs";
         }
 
+        private Boolean TryGetCommand(String inputFileName, out String command, out String baseName, out String extension)
+        {
+            extension = Path.GetExtension(inputFileName);
+
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(inputFileName);
+            if (String.IsNullOrEmpty(fileNameWithoutExtension))
+            {
+                command = null;
+                baseName = null;
+                return false;
+            }
+
+            baseName = Path.GetFileNameWithoutExtension(fileNameWithoutExtension);
+            var secondExtension = Path.GetExtension(fileNameWithoutExtension);
+            if (secondExtension == null || secondExtension.Length < 2)
+            {
+                command = null;
+                return false;
+            }
+
+            command = "parsnip";
+            return true;
+        }
+
         protected override byte[] GenerateCode(string inputFileName, string inputFileContent)
         {
-			String result = Generate(inputFileContent, this.FileNamespace, inputFileName);
-			var bytes = Encoding.UTF8.GetBytes(result);
+            String result = Generate(inputFileContent, this.FileNamespace, inputFileName);
+            var bytes = Encoding.UTF8.GetBytes(result);
             return bytes;
-		}
+        }
 
-		private String Generate(String bstrInputFileContents, String wszDefaultNamespace, String wszInputFilePath)
-		{
-			try
-			{
-				var fileName = Path.GetFileName(wszInputFilePath);
-				var fileBaseName = Path.GetFileNameWithoutExtension(wszInputFilePath);
-				var className = NameGen.ClassName(fileBaseName);
-				var inputString = System.IO.File.ReadAllText(wszInputFilePath);
+        private string Generate(string fileContents, string defaultNamespace, string inputFilePath)
+        {
+            try
+            {
+                var folder = Path.GetDirectoryName(inputFilePath);
 
-				var syntacticModel = SyntacticModel.Generated.Parsnip.Parse(inputString, new SyntacticModel.Generated.ParsnipRuleFactory());
-				var semanticModel = SemanticModel.Analyzer.Analyze(syntacticModel);
+                if (!TryGetCommand(inputFilePath, out var command, out var baseName, out var extension))
+                {
+                    return GetErrorHeader() + $"#error Unable to detect intended generator from the file name. Provide the name of the dotnet tool using the secondary file extension like this: MyFile.toolname.txt";
+                }
 
-				// TRANSFORMATIONS
-				semanticModel = SemanticModel.Transformations.Collapsing.Go(semanticModel);
-				semanticModel = SemanticModel.Transformations.AssignRuleReferenceTypes.Go(semanticModel);
-				semanticModel = SemanticModel.Transformations.AssignRuleFactoryMethods.Go(semanticModel);
+                var inputFileName = Path.GetFileName(inputFilePath);
 
-				var writer = new CodeWriter();
+                String args = $"{command} --namespace \"{defaultNamespace}\" --name \"{baseName}\" --extension \"{extension}\"";
 
-				var versionString = typeof(ParsnipSingleFileGenerator).Assembly
-					.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
-					.OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
-					.FirstOrDefault()?.InformationalVersion
-					?? "unknown";
+                var processStartInfo = new ProcessStartInfo("dotnet", args);
+                processStartInfo.RedirectStandardInput = true;
+                processStartInfo.RedirectStandardOutput = true;
+                processStartInfo.RedirectStandardError = true;
+                processStartInfo.CreateNoWindow = true;
+                processStartInfo.ErrorDialog = false;
+                processStartInfo.StandardOutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+                processStartInfo.UseShellExecute = false;
+                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                processStartInfo.WorkingDirectory = folder;
 
-				writer.Comment("Code Generated via Parsnip Packrat Parser Producer");
-				writer.Comment($"Version: {versionString}");
-				writer.Comment($"File: {fileName}");
-				writer.Comment($"Date: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
-				writer.EndOfLine();
-				writer.UsingNamespace("System");
-				writer.UsingNamespace("System.Linq");
-				writer.UsingNamespace("System.Diagnostics");
-				writer.UsingNamespace("System.Threading.Tasks");
-				writer.UsingNamespace("System.Collections.Generic");
-				writer.EndOfLine();
+                var p = Process.Start(processStartInfo);
 
-				using (writer.Namespace(wszDefaultNamespace))
-				{
-					var interfaceName = $"I{className}RuleFactory";
-					using (writer.Interface(interfaceName, Access.Public))
-					{
-						foreach (var method in semanticModel.InterfaceMethods)
-						{
-							var returnType = NameGen.TypeString(method.ReturnType);
-							var name = method.Name;
-							var parameterTypes = method.ParameterTypes.Select((i, j) => $"{NameGen.TypeString(i)} t{j}");
-							var parameterTypeList = String.Join(", ", parameterTypes);
-							writer.LineOfCode($"{returnType} {name}({parameterTypeList});");
-						}
-					}
-					writer.EndOfLine();
+                using (var writer = p.StandardInput)
+                {
+                    p.StandardInput.Write(fileContents);
+                }
 
-					using (writer.Class(className, Access.Public))
-					{
-						writer.LineOfCode("private class ParseResult<T> { public T Node; public PackratState State; }");
-						writer.EndOfLine();
-						writer.LineOfCode("private class EmptyNode { private EmptyNode() { } public static EmptyNode Instance = new EmptyNode(); }");
-						writer.EndOfLine();
-						var firstRule = semanticModel.Rules[0];
-						var firstRuleReturnType = NameGen.TypeString(firstRule.ReturnType);
-						var firstRuleParseMethodName = NameGen.ParseFunctionMethodName(firstRule.RuleIdentifier);
-						using (writer.Method(Access.Public, true, firstRuleReturnType, "Parse", new[] {
-							new LocalVarDecl("String", "input"),
-							new LocalVarDecl(interfaceName, "factory"),
-						}))
-						{
-							writer.Assign("var states", "new PackratState[input.Length + 1]");
-							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states, factory));");
-							writer.Assign("var state", "states[0]");
-							writer.Assign("var result", $"PackratState.{firstRuleParseMethodName}(state, factory)");
-							writer.LineOfCode("if (result == null) return null;");
-							writer.Return("result.Node");
-						}
-						writer.EndOfLine();
-						var packratStateClassName = "PackratState";
-						using (writer.Class(packratStateClassName, Access.Private))
-						{
-							writer.LineOfCode("private readonly string input;");
-							writer.LineOfCode("private readonly int inputPosition;");
-							writer.LineOfCode("private readonly PackratState[] states;");
-							writer.LineOfCode($"private readonly {interfaceName} factory;");
-							writer.EndOfLine();
-							using (writer.Constructor(Access.Public, packratStateClassName, new[] {
-							new LocalVarDecl("String", "input"),
-							new LocalVarDecl("Int32", "inputPosition"),
-							new LocalVarDecl("PackratState[]", "states"),
-							new LocalVarDecl(interfaceName, "factory")
-						}))
-							{
-								writer.Assign("this.input", "input");
-								writer.Assign("this.inputPosition", "inputPosition");
-								writer.Assign("this.states", "states");
-								writer.Assign("this.factory", "factory");
-							}
+                var outputString = p.StandardOutput.ReadToEnd();
+                var errorString = p.StandardError.ReadToEnd();
 
-							var parsnipCode = new ParsnipCode();
-							parsnipCode.WriteMethods(writer, interfaceName, semanticModel);
-						}
-					}
-				}
+                var didExit = p.WaitForExit((int)TimeSpan.FromSeconds(10).TotalMilliseconds);
+                if (didExit)
+                {
+                    if (p.ExitCode == 0)
+                    {
+                        return outputString;
+                    }
+                    else
+                    {
+                        return GetErrorHeader() + $"#error The generator returned error code {p.ExitCode}{Environment.NewLine}/*{Environment.NewLine}{errorString}{Environment.NewLine}*/";
+                    }
+                }
+                else
+                {
+                    p.Kill();
+                    return GetErrorHeader() + $"#error The generator failed to complete within ten seconds.";
+                }
+            }
+            catch (Exception exc)
+            {
+                return GetErrorHeader() + $"#error Failed to launch the generator{Environment.NewLine}/*{Environment.NewLine}{exc.ToString()}{Environment.NewLine}*/";
+            }
+        }
 
-				return writer.GetText();
-			}
-			catch (Exception exception)
-			{
-				return exception.ToString();
-			}
-		}
-	}
+        public String GetErrorHeader()
+        {
+            var versionString = typeof(ParsnipSingleFileGenerator).Assembly
+                    .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                    .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+                    .FirstOrDefault()?.InformationalVersion
+                    ?? "unknown";
+
+            return $"// Parsnip C# Code Generator {versionString}{Environment.NewLine}";
+        }
+    }
 }
