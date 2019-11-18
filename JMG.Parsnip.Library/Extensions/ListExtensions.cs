@@ -68,5 +68,7 @@ namespace JMG.Parsnip.VSIXProject.Extensions
 		}
 
 		public static Boolean Contains<T>(this IReadOnlyList<T> collection, T item) where T : class => null != collection.IndexOfObject(item);
+
+        public static String Concat<T>(this T stringList) where T : IEnumerable<String> => String.Join(String.Empty, stringList);
 	}
 }

@@ -11,11 +11,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 	{
 		Choice IParsnipRuleFactory.Choice1(Union t0) => new Choice(t0);
 
-		ClassIdentifier IParsnipRuleFactory.ClassIdentifier1(IReadOnlyList<String> t0) => new ClassIdentifier(String.Join("", t0));
+		ClassIdentifier IParsnipRuleFactory.ClassIdentifier1(IReadOnlyList<String> t0) => new ClassIdentifier(t0.Concat());
 
-		String IParsnipRuleFactory.Comment1(IReadOnlyList<String> t0) => String.Join("", t0);
+		String IParsnipRuleFactory.Comment1(IReadOnlyList<String> t0) => t0.Concat();
 
-		String IParsnipRuleFactory.CsharpIdentifier1(String t0, IReadOnlyList<String> t1) => t0 + String.Join("", t1);
+		String IParsnipRuleFactory.CsharpIdentifier1(String t0, IReadOnlyList<String> t1) => t0 + t1.Concat();
 
 		ParsnipDefinition IParsnipRuleFactory.Definition1(IReadOnlyList<IParsnipDefinitionItem> t0) => new ParsnipDefinition(t0.Where(i => i != null).ToList());
 
@@ -25,7 +25,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3() => null;
 
-		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => String.Join("", t0);
+		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => t0.Concat();
 
 		String IParsnipRuleFactory.IntrinsicIdentifier2(String t0) => t0;
 
@@ -39,7 +39,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		RuleHeadPrefix IParsnipRuleFactory.RuleHeadPrefix1(RuleIdentifier t0) => new RuleHeadPrefix(t0);
 
-		RuleIdentifier IParsnipRuleFactory.RuleIdentifier1(String t0, IReadOnlyList<String> t1) => new RuleIdentifier(t0 + String.Join("", t1));
+		RuleIdentifier IParsnipRuleFactory.RuleIdentifier1(String t0, IReadOnlyList<String> t1) => new RuleIdentifier(t0 + t1.Concat());
 
 		Segment IParsnipRuleFactory.Segment1(String t0, TokenCardinality t1)
 		{

@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "JMG.Parsnip": {
-      "version": "1.22.1",
+      "version": "1.22.2",
       "commands": [
         "parsnip"
       ]
