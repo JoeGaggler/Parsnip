@@ -7,15 +7,18 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>parsnip</ToolCommandName>
     <AssemblyName>JMG.Parsnip</AssemblyName>
-    <Version>1.22</Version>
+    <Version>1.22.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JMG.Parsnip.VSIXProject\JMG.Parsnip.VSIXProject.csproj" />
     <PackageReference Include="Microsoft.VisualStudio.TextTemplating.VSHost.15.0">
       <Version>16.1.28917.181</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JMG.Parsnip.Library\JMG.Parsnip.Library.csproj" />
   </ItemGroup>
 
 </Project>

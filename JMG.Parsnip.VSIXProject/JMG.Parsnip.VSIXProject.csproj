@@ -54,85 +54,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CodeWriting\Access.cs" />
-    <Compile Include="CodeWriting\BraceScope.cs" />
-    <Compile Include="CodeWriting\CodeWriter.cs" />
-    <Compile Include="CodeWriting\CodeWriterExtensions.cs" />
-    <Compile Include="CodeWriting\LocalVarDecl.cs" />
-    <Compile Include="CodeWriting\NamespaceScope.cs" />
-    <Compile Include="CodeWriting\StringExtensions.cs" />
-    <Compile Include="Extensions\ListExtensions.cs" />
-    <Compile Include="NameGen.cs" />
-    <Compile Include="ParsnipGenerator.cs" />
     <Compile Include="ParsnipSingleFileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ParsnipPackage.cs" />
-    <Compile Include="SemanticModel\Analyzer.cs" />
-    <Compile Include="SemanticModel\AppendingExtensions.cs" />
-    <Compile Include="SemanticModel\Repetition.cs" />
-    <Compile Include="SemanticModel\InterfaceMethod.cs" />
-    <Compile Include="SemanticModel\Intrinsic.cs" />
-    <Compile Include="SemanticModel\LiteralString.cs" />
-    <Compile Include="SemanticModel\MatchAction.cs" />
-    <Compile Include="SemanticModel\ReferencedRule.cs" />
-    <Compile Include="SemanticModel\Selection.cs" />
-    <Compile Include="SemanticModel\INodeType.cs" />
-    <Compile Include="SemanticModel\IParseFunction.cs" />
-    <Compile Include="SemanticModel\Rule.cs" />
-    <Compile Include="SemanticModel\ParsnipModel.cs" />
-    <Compile Include="SemanticModel\Sequence.cs" />
-    <Compile Include="SemanticModel\SeriesFunction.cs" />
-    <Compile Include="SemanticModel\Transformations\AssignRuleFactoryMethods.cs" />
-    <Compile Include="SemanticModel\Transformations\AssignRuleReferenceTypes.cs" />
-    <Compile Include="SemanticModel\Transformations\Collapsing.cs" />
-    <Compile Include="SemanticModel\Transformations\ReplacingVisitor.cs" />
-    <Compile Include="SerializedModel\CommentParseFunctionVisitor.cs" />
-    <Compile Include="SerializedModel\GenerateMethodsVisitor.cs" />
-    <Compile Include="SerializedModel\GenerateSignaturesVisitor.cs" />
-    <Compile Include="SerializedModel\NodeTypeExtensions.cs" />
-    <Compile Include="SerializedModel\Signature.cs" />
-    <Compile Include="SerializedModel\ParsnipCode.cs" />
-    <Compile Include="SyntacticModel\AnyCharacterToken.cs" />
-    <Compile Include="SyntacticModel\Cardinality.cs" />
-    <Compile Include="SyntacticModel\Choice.cs" />
-    <Compile Include="SyntacticModel\ClassIdentifier.cs" />
-    <Compile Include="SyntacticModel\Comment.cs" />
-    <Compile Include="SyntacticModel\Generated\Parsnip.parsnip.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Parsnip.parsnip.txt</DependentUpon>
-    </Compile>
-    <Compile Include="SyntacticModel\Generated\ParsnipRuleFactory.cs" />
-    <Compile Include="SyntacticModel\IntrinsicToken.cs" />
-    <Compile Include="SyntacticModel\IParsnipDefinitionItem.cs" />
-    <Compile Include="SyntacticModel\LiteralStringToken.cs" />
-    <Compile Include="SyntacticModel\MatchAction.cs" />
-    <Compile Include="SyntacticModel\Rule.cs" />
-    <Compile Include="SyntacticModel\RuleBody.cs" />
-    <Compile Include="SyntacticModel\RuleHead.cs" />
-    <Compile Include="SyntacticModel\RuleHeadPrefix.cs" />
-    <Compile Include="SyntacticModel\RuleIdentifier.cs" />
-    <Compile Include="SyntacticModel\RuleIdentifierToken.cs" />
-    <Compile Include="SyntacticModel\Segment.cs" />
-    <Compile Include="SyntacticModel\IToken.cs" />
-    <Compile Include="SyntacticModel\Sequence.cs" />
-    <Compile Include="SyntacticModel\SeriesToken.cs" />
-    <Compile Include="SyntacticModel\SyntaxExtensions.cs" />
-    <Compile Include="SyntacticModel\ParsnipDefinition.cs" />
-    <Compile Include="SyntacticModel\TokenCardinality.cs" />
-    <Compile Include="SyntacticModel\Union.cs" />
-    <Compile Include="SyntacticModel\UnionToken.cs" />
-    <Compile Include="Visiting\IVisitor.cs" />
-    <Compile Include="Void.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="SyntacticModel\Generated\Parsnip.parsnip.txt">
-      <Generator>Parsnip</Generator>
-      <LastGenOutput>Parsnip.parsnip.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

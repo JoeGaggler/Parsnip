@@ -7,8 +7,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.Extensions;
-using JMG.Parsnip.VSIXProject.SemanticModel;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
