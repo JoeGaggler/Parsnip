@@ -42,11 +42,6 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var returnType = target.ReturnType.GetParseResultTypeString();
 			var memName = NameGen.MemoizedFieldName(name);
 
-			if (isMemoized)
-			{
-				writer.LineOfCode($"private {returnType} {memName};");
-			}
-
 			var disposable = writer.Method(access, true, returnType, name, parameters);
 
 			if (isMemoized)
@@ -58,6 +53,17 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			return disposable;
 		}
 
+        private static void WriteMemoizedField(CodeWriter writer, IParseFunction target, String name, Boolean isMemoized)
+        {
+            var returnType = target.ReturnType.GetParseResultTypeString();
+            var memName = NameGen.MemoizedFieldName(name);
+
+            if (isMemoized)
+            {
+                writer.LineOfCode($"internal {returnType} {memName};");
+            }
+        }
+
 		public void WriteMethods(CodeWriter writer, String interfaceName, ParsnipModel semanticModel)
 		{
 			// Populate dictionary of rule identifiers to method names
@@ -68,14 +74,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// Generate method signatures
-			var methodAccess = Access.Public;
+			var methodAccess = Access.Private;
 			foreach (var rule in semanticModel.Rules)
 			{
 				var methodName = this.RuleMethodNames[rule.RuleIdentifier];
 				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName, isMemoized: true, mustAddSignature: true), methodAccess);
-
-				// Only the first method is public
-				methodAccess = Access.Private;
 			}
 
 			writer.EndOfLine();
@@ -110,7 +113,16 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 		}
 
-		private static void WriteDelimiterMethod(CodeWriter writer, String interfaceName)
+        public void WriteMemoizedFields(CodeWriter writer)
+        {
+            foreach (var methodItem in this.methodItems)
+            {
+                var target = methodItem.Func;
+                WriteMemoizedField(writer, target, methodItem.Name, methodItem.IsMemoized);
+            }
+        }
+
+        private static void WriteDelimiterMethod(CodeWriter writer, String interfaceName)
 		{
 			// Delimited
 			var delimParams = new[] {
@@ -217,7 +229,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}			
 		}
 
-		private static void WriteIntrinsics(CodeWriter writer, String interfaceName)
+        private static void WriteIntrinsics(CodeWriter writer, String interfaceName)
 		{
 			var typicalParams = new List<LocalVarDecl>
 			{

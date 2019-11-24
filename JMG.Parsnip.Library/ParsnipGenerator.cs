@@ -67,36 +67,38 @@ namespace JMG.Parsnip.VSIXProject
                         }))
                         {
                             writer.Assign("var states", "new PackratState[input.Length + 1]");
-                            writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states, factory));");
+                            writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states));");
                             writer.Assign("var state", "states[0]");
-                            writer.Assign("var result", $"PackratState.{firstRuleParseMethodName}(state, factory)");
+                            writer.Assign("var result", $"{firstRuleParseMethodName}(state, factory)");
                             writer.LineOfCode("if (result == null) return null;");
                             writer.Return("result.Node");
                         }
                         writer.EndOfLine();
+
+                        var parsnipCode = new ParsnipCode();
+                        parsnipCode.WriteMethods(writer, interfaceName, semanticModel);
+                        writer.EndOfLine();
+
                         var packratStateClassName = "PackratState";
                         using (writer.Class(packratStateClassName, Access.Private))
                         {
-                            writer.LineOfCode("private readonly string input;");
-                            writer.LineOfCode("private readonly int inputPosition;");
-                            writer.LineOfCode("private readonly PackratState[] states;");
-                            writer.LineOfCode($"private readonly {interfaceName} factory;");
+                            writer.LineOfCode("internal readonly string input;");
+                            writer.LineOfCode("internal readonly int inputPosition;");
+                            writer.LineOfCode("internal readonly PackratState[] states;");
                             writer.EndOfLine();
                             using (writer.Constructor(Access.Public, packratStateClassName, new[] {
                                 new LocalVarDecl("String", "input"),
                                 new LocalVarDecl("Int32", "inputPosition"),
-                                new LocalVarDecl("PackratState[]", "states"),
-                                new LocalVarDecl(interfaceName, "factory")
+                                new LocalVarDecl("PackratState[]", "states")
                             }))
                             {
                                 writer.Assign("this.input", "input");
                                 writer.Assign("this.inputPosition", "inputPosition");
                                 writer.Assign("this.states", "states");
-                                writer.Assign("this.factory", "factory");
                             }
+                            writer.EndOfLine();
 
-                            var parsnipCode = new ParsnipCode();
-                            parsnipCode.WriteMethods(writer, interfaceName, semanticModel);
+                            parsnipCode.WriteMemoizedFields(writer);
                         }
                     }
                 }

@@ -17,6 +17,8 @@ namespace JMG.Parsnip.CLI
                     .FirstOrDefault()?.InformationalVersion
                     ?? "unknown";
 
+            // Bootstrap command, run from "Generated" directory: 
+            // ..\..\..\JMG.Parsnip.CLI\bin\Debug\netcoreapp3.0\JMG.Parsnip.exe --namespace "JMG.Parsnip.SyntacticModel.Generated" --name Parsnip --extension ".txt" < Parsnip.parsnip.txt > Parsnip.parsnip.cs
             if (args.Length < 6)
             {
                 Console.Error.WriteLine("#error Expected arguments: namespace, name, extension");
