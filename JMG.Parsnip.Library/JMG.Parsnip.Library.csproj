@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>JMG.Parsnip</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="SyntacticModel\Generated\Parsnip.parsnip.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Parsnip.parsnip.txt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SyntacticModel\Generated\Parsnip.parsnip.txt">
+      <Generator>Parsnip</Generator>
+      <LastGenOutput>Parsnip.parsnip.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>
