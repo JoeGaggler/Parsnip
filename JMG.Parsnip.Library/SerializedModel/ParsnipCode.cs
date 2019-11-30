@@ -37,25 +37,31 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void MapFunctionInvocation(IParseFunction function, Invoker invoker) => this.invokers[function] = invoker;
 
-		private IDisposable WriteMethodSignature(CodeWriter writer, IParseFunction target, Access access, String name, String stateName, IReadOnlyList<LocalVarDecl> parameters, Boolean isMemoized)
+		private IDisposable WriteMethodSignature(CodeWriter writer, IParseFunction target, Access access, String name, String inputPositionName, String statesName, IReadOnlyList<LocalVarDecl> parameters, Boolean isMemoized)
+		{
+			var returnType = target.ReturnType.GetParseResultTypeString();
+			var memName = NameGen.MemoizedFieldName(name);
+
+			var disposable = writer.Method(access, true, returnType, name, parameters);
+
+			if (isMemoized)
+			{
+				writer.LineOfCode($"if ({statesName}[{inputPositionName}].{memName} is var mem && mem != null) {{ return mem; }}");
+				writer.EndOfLine();
+			}
+
+			return disposable;
+		}
+
+		private static void WriteMemoizedField(CodeWriter writer, IParseFunction target, String name, Boolean isMemoized)
 		{
 			var returnType = target.ReturnType.GetParseResultTypeString();
 			var memName = NameGen.MemoizedFieldName(name);
 
 			if (isMemoized)
 			{
-				writer.LineOfCode($"private {returnType} {memName};");
+				writer.LineOfCode($"internal {returnType} {memName};");
 			}
-
-			var disposable = writer.Method(access, true, returnType, name, parameters);
-
-			if (isMemoized)
-			{
-				writer.LineOfCode($"if ({stateName}.{memName} != null) {{ return {stateName}.{memName}; }}");
-				writer.EndOfLine();
-			}
-
-			return disposable;
 		}
 
 		public void WriteMethods(CodeWriter writer, String interfaceName, ParsnipModel semanticModel)
@@ -68,14 +74,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			// Generate method signatures
-			var methodAccess = Access.Public;
+			var methodAccess = Access.Private;
 			foreach (var rule in semanticModel.Rules)
 			{
 				var methodName = this.RuleMethodNames[rule.RuleIdentifier];
 				rule.ParseFunction.ApplyVisitor(new GenerateSignaturesVisitor(this, methodName, isMemoized: true, mustAddSignature: true), methodAccess);
-
-				// Only the first method is public
-				methodAccess = Access.Private;
 			}
 
 			writer.EndOfLine();
@@ -87,9 +90,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			WriteLexeme(writer);
 
-			var typicalParams = new List<LocalVarDecl>
+			var typicalParams = new List<LocalVarDecl> // Invocation
 			{
-				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl("String", "input"),
+				new LocalVarDecl("Int32", "inputPosition"),
+				new LocalVarDecl("PackratState[]", "states"),
 				new LocalVarDecl(interfaceName, "factory")
 			};
 
@@ -103,10 +108,19 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				var target = methodItem.Func;
 				writer.Comment(target.ApplyVisitor(commentVisitor));
 				var returnType = target.ReturnType.GetParseResultTypeString();
-				using (WriteMethodSignature(writer, target, methodItem.Access, methodItem.Name, "state", typicalParams, methodItem.IsMemoized))
+				using (WriteMethodSignature(writer, target, methodItem.Access, methodItem.Name, "inputPosition", "states", typicalParams, methodItem.IsMemoized))
 				{
 					target.ApplyVisitor(generateMethods, methodItem);
 				}
+			}
+		}
+
+		public void WriteMemoizedFields(CodeWriter writer)
+		{
+			foreach (var methodItem in this.methodItems)
+			{
+				var target = methodItem.Func;
+				WriteMemoizedField(writer, target, methodItem.Name, methodItem.IsMemoized);
 			}
 		}
 
@@ -114,42 +128,45 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		{
 			// Delimited
 			var delimParams = new[] {
-				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl("String", "input"), // Invocation
+				new LocalVarDecl("Int32", "inputPosition"),
+				new LocalVarDecl("PackratState[]", "states"),
 				new LocalVarDecl(interfaceName, "factory"),
-				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<T>>", "parseAction"),
-				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<D>>", "parseDelimiterAction")
+				new LocalVarDecl($"Func<String, Int32, PackratState[], {interfaceName}, ParseResult<T>>", "parseAction"), // Invocation
+				new LocalVarDecl($"Func<String, Int32, PackratState[], {interfaceName}, ParseResult<D>>", "parseDelimiterAction") // Invocation
 			};
 
 			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseSeries<T, D>", delimParams))
 			{
 				writer.VarAssign("list", "new List<T>()");
+				writer.VarAssign("nextResultInputPosition", "inputPosition");
 
-				writer.VarAssign("firstResult", "parseAction(state, factory)");
+				writer.VarAssign("firstResult", "parseAction(input, nextResultInputPosition, states, factory)"); // Invocation
 				using (writer.If("firstResult == null"))
 				{
 					writer.Return("null");
 				}
+				writer.LineOfCode("nextResultInputPosition += firstResult.Advanced;");
 				writer.LineOfCode("list.Add(firstResult.Node);");
-				writer.Assign("state", "firstResult.State");
 
 				using (writer.While("true"))
 				{
-					writer.VarAssign("delimResult", "parseDelimiterAction(state, factory)");
+					writer.VarAssign("delimResult", "parseDelimiterAction(input, nextResultInputPosition, states, factory)"); // Invocation
 					using (writer.If("delimResult == null"))
 					{
 						writer.SwitchBreak();
 					}
 
-					writer.VarAssign("nextResult", "parseAction(delimResult.State, factory)");
+					writer.VarAssign("nextResult", "parseAction(input, nextResultInputPosition + delimResult.Advanced, states, factory)"); // Invocation
 					using (writer.If("nextResult == null"))
 					{
 						writer.SwitchBreak();
 					}
 
 					writer.LineOfCode("list.Add(nextResult.Node);");
-					writer.Assign("state", "nextResult.State");
+					writer.Assign("nextResultInputPosition", "nextResultInputPosition + delimResult.Advanced + nextResult.Advanced");
 				}
-				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
+				writer.Return("new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 			}
 		}
 
@@ -157,18 +174,20 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		{
 			// Maybe			
 			var cardParams = new[] {
-				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl("String", "input"), // Invocation
+				new LocalVarDecl("Int32", "inputPosition"),
+				new LocalVarDecl("PackratState[]", "states"),
 				new LocalVarDecl(interfaceName, "factory"),
-				new LocalVarDecl($"Func<PackratState, {interfaceName}, ParseResult<T>>", "parseAction")
+				new LocalVarDecl($"Func<String, Int32, PackratState[], {interfaceName}, ParseResult<T>>", "parseAction") // Invocation
 			};
 			using (writer.Method(Access.Private, true, "ParseResult<T>", "ParseMaybe<T>", cardParams))
 			{
-				writer.VarAssign("result", "parseAction(state, factory)");
+				writer.VarAssign("result", "parseAction(input, inputPosition, states, factory)"); // Invocation
 				using (writer.If("result != null"))
 				{
 					writer.Return("result");
 				}
-				writer.Return("new ParseResult<T> { State = state, Node = default(T) }");
+				writer.Return("new ParseResult<T>(default(T), 0)");
 			}
 
 			// Star
@@ -176,17 +195,18 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseStar<T>", cardParams))
 			{
 				writer.VarAssign("list", "new List<T>()");
+				writer.VarAssign("nextResultInputPosition", "inputPosition");
 				using (writer.While("true"))
 				{
-					writer.VarAssign("nextResult", "parseAction(state, factory)");
+					writer.VarAssign("nextResult", "parseAction(input, nextResultInputPosition, states, factory)"); // Invocation
 					using (writer.If("nextResult == null"))
 					{
 						writer.SwitchBreak();
 					}
 					writer.LineOfCode("list.Add(nextResult.Node);");
-					writer.Assign("state", "nextResult.State");
+					writer.Assign("nextResultInputPosition", "nextResultInputPosition + nextResult.Advanced");
 				}
-				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
+				writer.Return("new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 			}
 
 			// Plus
@@ -194,55 +214,54 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParsePlus<T>", cardParams))
 			{
 				writer.VarAssign("list", "new List<T>()");
+				writer.VarAssign("nextResultInputPosition", "inputPosition");
 
-				writer.VarAssign("firstResult", "parseAction(state, factory)");
+				writer.VarAssign("firstResult", "parseAction(input, nextResultInputPosition, states, factory)"); // Invocation
 				using (writer.If("firstResult == null"))
 				{
 					writer.Return("null");
 				}
 				writer.LineOfCode("list.Add(firstResult.Node);");
-				writer.Assign("state", "firstResult.State");
+				writer.Assign("nextResultInputPosition", "nextResultInputPosition + firstResult.Advanced");
 
 				using (writer.While("true"))
 				{
-					writer.VarAssign("nextResult", "parseAction(state, factory)");
+					writer.VarAssign("nextResult", "parseAction(input, nextResultInputPosition, states, factory)"); // Invocation
 					using (writer.If("nextResult == null"))
 					{
 						writer.SwitchBreak();
 					}
 					writer.LineOfCode("list.Add(nextResult.Node);");
-					writer.Assign("state", "nextResult.State");
+					writer.Assign("nextResultInputPosition", "nextResultInputPosition + nextResult.Advanced");
 				}
-				writer.Return("new ParseResult<IReadOnlyList<T>> { State = state, Node = list }");
-			}			
+				writer.Return("new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
+			}
 		}
 
 		private static void WriteIntrinsics(CodeWriter writer, String interfaceName)
 		{
 			var typicalParams = new List<LocalVarDecl>
 			{
-				new LocalVarDecl("PackratState", "state"),
+				new LocalVarDecl("String", "input"), // Invocation
+				new LocalVarDecl("Int32", "inputPosition"),
+				new LocalVarDecl("PackratState[]", "states"),
 				new LocalVarDecl(interfaceName, "factory")
 			};
 
 			// Any Character
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyCharacter", typicalParams))
 			{
-				writer.VarAssign("input", "state.input");
-				writer.VarAssign("inputPosition", "state.inputPosition");
 				using (writer.If("inputPosition >= input.Length"))
 				{
 					writer.Return("null");
 				}
-				writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] }");
+				writer.Return("new ParseResult<String>(input.Substring(inputPosition, 1), 1)");
 			}
 
 			// Any Letter
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyLetter", typicalParams))
 			{
-				writer.VarAssign("input", "state.input");
-				writer.VarAssign("inputPosition", "state.inputPosition");
 				using (writer.If("inputPosition >= input.Length"))
 				{
 					writer.Return("null");
@@ -252,16 +271,14 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					writer.Return("null");
 
 				}
-				writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] }");
+				writer.Return("new ParseResult<String>(input.Substring(inputPosition, 1), 1)");
 			}
 
-			
+
 			// Any Digit
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyDigit", typicalParams))
 			{
-				writer.VarAssign("input", "state.input");
-				writer.VarAssign("inputPosition", "state.inputPosition");
 				using (writer.If("inputPosition >= input.Length"))
 				{
 					writer.Return("null");
@@ -271,23 +288,23 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					writer.Return("null");
 
 				}
-				writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, 1), State = state.states[inputPosition + 1] }");
+				writer.Return("new ParseResult<String>(input.Substring(inputPosition, 1), 1)");
 			}
 
 			// End of Line
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_EndOfLine", typicalParams))
 			{
-				writer.VarAssign("result1", "ParseLexeme(state, \"\\r\\n\")");
+				writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\")"); // Invocation
 				using (writer.If("result1 != null"))
 				{
-					writer.Return("new ParseResult<String>() { Node = result1.Node, State = result1.State }");
+					writer.Return("new ParseResult<String>(result1.Node, result1.Advanced)");
 				}
 
-				writer.VarAssign("result2", "ParseLexeme(state, \"\\n\")");
+				writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\")"); // Invocation
 				using (writer.If("result2 != null"))
 				{
-					writer.Return("new ParseResult<String>() { Node = result2.Node, State = result2.State }");
+					writer.Return("new ParseResult<String>(result2.Node, result2.Advanced)");
 				}
 
 				writer.Return("null");
@@ -297,11 +314,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfStream", typicalParams))
 			{
-				writer.VarAssign("input", "state.input");
-				writer.VarAssign("inputPosition", "state.inputPosition");
 				using (writer.If("inputPosition == input.Length"))
 				{
-					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
+					writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, 0)");
 				}
 				writer.Return("null");
 			}
@@ -310,23 +325,21 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
 			{
-				writer.VarAssign("input", "state.input");
-				writer.VarAssign("inputPosition", "state.inputPosition");
 				using (writer.If("inputPosition == input.Length"))
 				{
-					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = state }");
+					writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, 0)");
 				}
 
-				writer.VarAssign("result1", "ParseLexeme(state, \"\\r\\n\")");
+				writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\")"); // Invocation
 				using (writer.If("result1 != null"))
 				{
-					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result1.State }");
+					writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, result1.Advanced)");
 				}
 
-				writer.VarAssign("result2", "ParseLexeme(state, \"\\n\")");
+				writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\")"); // Invocation
 				using (writer.If("result2 != null"))
 				{
-					writer.Return("new ParseResult<EmptyNode>() { Node = EmptyNode.Instance, State = result2.State }");
+					writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, result2.Advanced)");
 				}
 
 				writer.Return("null");
@@ -336,16 +349,18 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_CString", typicalParams))
 			{
-				writer.VarAssign("resultStart", "ParseLexeme(state, \"\\\"\")");
+				writer.VarAssign("resultStart", "ParseLexeme(input, inputPosition, \"\\\"\")"); // Invocation
 				writer.IfNullReturnNull("resultStart");
-				writer.VarAssign("currentState", "resultStart.State");
+				writer.VarAssign("nextInputPosition", "inputPosition + resultStart.Advanced");
 				writer.VarAssign("sb", "new System.Text.StringBuilder()");
 				using (writer.While("true"))
 				{
-					writer.VarAssign("resultEscape", "ParseLexeme(currentState, \"\\\\\")");
+					writer.VarAssign("inputPosition2", "nextInputPosition");
+					writer.VarAssign("resultEscape", "ParseLexeme(input, inputPosition2, \"\\\\\")"); // Invocation
 					using (writer.If("resultEscape != null"))
 					{
-						writer.VarAssign("resultToken", "ParseIntrinsic_AnyCharacter(resultEscape.State, factory)");
+						writer.Assign("inputPosition2", "inputPosition2 + resultEscape.Advanced");
+						writer.VarAssign("resultToken", "ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory)"); // Invocation
 						writer.IfNullReturnNull("resultToken");
 						using (writer.Switch("resultToken.Node"))
 						{
@@ -365,18 +380,19 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 								writer.Return("null");
 							}
 						}
-						writer.Assign("currentState", "resultToken.State");
+						writer.Assign("inputPosition2", "inputPosition2 + resultToken.Advanced");
+
 						writer.Continue();
 					}
-					writer.VarAssign("resultEnd", "ParseLexeme(currentState, \"\\\"\")");
+					writer.VarAssign("resultEnd", "ParseLexeme(input, inputPosition2, \"\\\"\")"); // Invocation
 					using (writer.If("resultEnd != null"))
 					{
-						writer.Return("new ParseResult<String>() { Node = sb.ToString(), State = resultEnd.State }");
+						writer.Return("new ParseResult<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition)");
 					}
-					writer.VarAssign("resultChar", "ParseIntrinsic_AnyCharacter(currentState, factory)");
+					writer.VarAssign("resultChar", "ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory)"); // Invocation
 					writer.IfNullReturnNull("resultChar");
 					writer.LineOfCode("sb.Append(resultChar.Node);");
-					writer.Assign("currentState", "resultChar.State");
+					writer.Assign("nextInputPosition", "inputPosition2 + resultChar.Advanced");
 				}
 			}
 
@@ -384,11 +400,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			writer.EndOfLine();
 			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", typicalParams))
 			{
-				writer.VarAssign("input", "state.input");
-				writer.VarAssign("inputPosition", "state.inputPosition");
 				using (writer.If("inputPosition >= input.Length"))
 				{
-					writer.Return("new ParseResult<String>() { Node = String.Empty, State = state }");
+					writer.Return("new ParseResult<String>(String.Empty, 0)");
 				}
 				writer.VarAssign("sb", "new System.Text.StringBuilder()");
 				writer.VarAssign("nextInputPosition", "inputPosition");
@@ -401,18 +415,21 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					}
 					writer.LineOfCode("nextInputPosition++;");
 				}
-				writer.Return("new ParseResult<String>() { Node = state.input.Substring(inputPosition, nextInputPosition - inputPosition), State = state.states[nextInputPosition] }");
+				writer.Return("new ParseResult<String>(input.Substring(inputPosition, nextInputPosition - inputPosition), nextInputPosition - inputPosition)");
 			}
 		}
 
 		private static void WriteLexeme(CodeWriter writer)
 		{
-			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseLexeme", new[] { new LocalVarDecl("PackratState", "state"), new LocalVarDecl("String", "lexeme") }))
+			using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseLexeme", new[] {
+				new LocalVarDecl("String", "input"), // Invocation
+				new LocalVarDecl("Int32", "inputPosition"),
+				new LocalVarDecl("String", "lexeme") }))
 			{
 				writer.VarAssign("lexemeLength", "lexeme.Length");
-				writer.IfTrueReturnNull("state.inputPosition + lexemeLength > state.input.Length");
-				writer.IfTrueReturnNull("state.input.Substring(state.inputPosition, lexemeLength) != lexeme");
-				writer.Return("new ParseResult<String>() { Node = lexeme, State = state.states[state.inputPosition + lexemeLength] }");
+				writer.IfTrueReturnNull("inputPosition + lexemeLength > input.Length");
+				writer.IfTrueReturnNull("input.Substring(inputPosition, lexemeLength) != lexeme");
+				writer.Return("new ParseResult<String>(lexeme, lexemeLength)");
 			}
 		}
 	}
