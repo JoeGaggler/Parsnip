@@ -66,8 +66,7 @@ namespace JMG.Parsnip.CLI
 			}
 
 			String fileContents;
-			//using (var inputStream = Console.OpenStandardInput())
-            using (var inputStream = File.OpenRead(@"C:\Source\GitHub\JoeGaggler\Parsnip\JMG.Parsnip.Library\SyntacticModel\Generated\Parsnip.parsnip.txt"))
+			using (var inputStream = Console.OpenStandardInput())
 			using (var reader = new StreamReader(inputStream))
 			{
 				fileContents = await reader.ReadToEndAsync();
