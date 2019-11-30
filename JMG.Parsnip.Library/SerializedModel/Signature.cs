@@ -26,5 +26,5 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public Boolean IsMemoized { get; }
 	}
 
-	internal delegate String Invoker(String stateName, String factoryName);
+	internal delegate String Invoker(String inputPositionName, String stateName, String factoryName);
 }

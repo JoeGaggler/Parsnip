@@ -23,7 +23,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			this.mustAddSignature = mustAddSignature;
 		}
 
-		private static Invoker CreateInvoker(String baseName) => (s, f) => $"{baseName}({s}, {f})";
+		private static Invoker CreateInvoker(String baseName) => (i, s, f) => $"{baseName}({i}, {s}, {f})";
 
 		private void AddSignature(IParseFunction target, Access access, Invoker invoker)
 		{
@@ -62,7 +62,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
         public void Visit(Intrinsic target, Access access)
 		{
 			var methodName = parsnipCode.Intrinsics[target.Type];
-			Invoker invoker = (s, f) => $"{methodName}({s}, {f})";
+			Invoker invoker = (i, s, f) => $"{methodName}({i}, {s}, {f})";
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
@@ -76,7 +76,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(LiteralString target, Access access)
 		{
 			var expanded = target.Text.Replace("\\", "\\\\");
-			Invoker invoker = (s, f) => $"ParseLexeme({s}, \"{expanded}\")";
+			Invoker invoker = (i, s, f) => $"ParseLexeme({i}, {s}, \"{expanded}\")";
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
@@ -90,7 +90,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(ReferencedRule target, Access access)
 		{
 			var methodName = parsnipCode.RuleMethodNames[target.Identifier];
-			Invoker invoker = (s, f) => $"{methodName}({s}, {f})";
+			Invoker invoker = (i, s, f) => $"{methodName}({i}, {s}, {f})";
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
