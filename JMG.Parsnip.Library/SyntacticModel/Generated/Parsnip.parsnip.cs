@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.23
-// Date: 2019-11-29 19:30:31
+// Date: 2019-11-29 19:36:30
 
 using System;
 using System.Linq;
@@ -62,7 +62,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		public static ParsnipDefinition Parse(String input, IParsnipRuleFactory factory)
 		{
 			var states = new PackratState[input.Length + 1];
-			Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, i, states));
+			Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, states));
 			var state = states[0];
 			var result = ParseRule_Definition(0, state, factory);
 			if (result == null) return null;
@@ -746,7 +746,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			internal readonly string input;
 			internal readonly PackratState[] states;
 
-			public PackratState(String input, Int32 inputPosition, PackratState[] states)
+			public PackratState(String input, PackratState[] states)
 			{
 				this.input = input;
 				this.states = states;
