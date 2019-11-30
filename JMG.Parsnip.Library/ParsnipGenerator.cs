@@ -83,10 +83,8 @@ namespace JMG.Parsnip.VSIXProject
 						{
 							writer.Assign("var states", "new PackratState[input.Length + 1]");
 							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState());");
-							writer.Assign("var state", "states[0]");
 							writer.Assign("var result", $"{firstRuleParseMethodName}(input, 0, states, factory)"); // Invocation
-							writer.LineOfCode("if (result == null) return null;");
-							writer.Return("result.Node");
+							writer.Return("result?.Node");
 						}
 						writer.EndOfLine();
 

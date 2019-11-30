@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.23
-// Date: 2019-11-29 21:48:12
+// Date: 2019-11-29 22:06:56
 
 using System;
 using System.Linq;
@@ -61,10 +61,8 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		{
 			var states = new PackratState[input.Length + 1];
 			Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState());
-			var state = states[0];
 			var result = ParseRule_Definition(input, 0, states, factory);
-			if (result == null) return null;
-			return result.Node;
+			return result?.Node;
 		}
 
 
