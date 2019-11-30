@@ -23,7 +23,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			this.mustAddSignature = mustAddSignature;
 		}
 
-		private static Invoker CreateInvoker(String baseName) => (i, s, f) => $"{baseName}({i}, {s}, {f})";
+		private static Invoker CreateInvoker(String baseName) => (i, p, s, f) => $"{baseName}({i}, {p}, {s}, {f})"; // Invocation
 
 		private void AddSignature(IParseFunction target, Access access, Invoker invoker)
 		{
@@ -35,34 +35,34 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(Selection target, Access access)
 		{
-            VisitFunctionWithSteps(target, access, "C", t => t.Steps.Select(i => i.Function).ToArray());
-        }
+			VisitFunctionWithSteps(target, access, "C", t => t.Steps.Select(i => i.Function).ToArray());
+		}
 
 		public void Visit(Sequence target, Access access)
-        {
-            VisitFunctionWithSteps(target, access, "S", t => t.Steps.Select(i => i.Function).ToArray());
-        }
+		{
+			VisitFunctionWithSteps(target, access, "S", t => t.Steps.Select(i => i.Function).ToArray());
+		}
 
-        private void VisitFunctionWithSteps<T>(T target, Access access, String letter, Func<T, IReadOnlyList<IParseFunction>> stepsFunctions) where T : IParseFunction
-        {
-            var invoker = CreateInvoker(baseName);
-            AddSignature(target, access, invoker);
+		private void VisitFunctionWithSteps<T>(T target, Access access, String letter, Func<T, IReadOnlyList<IParseFunction>> stepsFunctions) where T : IParseFunction
+		{
+			var invoker = CreateInvoker(baseName);
+			AddSignature(target, access, invoker);
 
-            int index = 0;
-            foreach (var func in stepsFunctions(target))
-            {
-                index++;
-                String stepBaseName = $"{baseName}_{letter}{index}";
+			int index = 0;
+			foreach (var func in stepsFunctions(target))
+			{
+				index++;
+				String stepBaseName = $"{baseName}_{letter}{index}";
 
-                var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName, isMemoized: false, mustAddSignature: false);
-                func.ApplyVisitor(visitor, Access.Private);
-            }
-        }
+				var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName, isMemoized: false, mustAddSignature: false);
+				func.ApplyVisitor(visitor, Access.Private);
+			}
+		}
 
-        public void Visit(Intrinsic target, Access access)
+		public void Visit(Intrinsic target, Access access)
 		{
 			var methodName = parsnipCode.Intrinsics[target.Type];
-			Invoker invoker = (i, s, f) => $"{methodName}({i}, {s}, {f})";
+			Invoker invoker = (i, p, s, f) => $"{methodName}({i}, {p}, {s}, {f})"; // Invocation
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
@@ -76,7 +76,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(LiteralString target, Access access)
 		{
 			var expanded = target.Text.Replace("\\", "\\\\");
-			Invoker invoker = (i, s, f) => $"ParseLexeme({i}, {s}, \"{expanded}\")";
+			Invoker invoker = (i, p, s, f) => $"ParseLexeme({i}, {p}, {s}, \"{expanded}\")"; // Invocation
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
@@ -90,7 +90,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(ReferencedRule target, Access access)
 		{
 			var methodName = parsnipCode.RuleMethodNames[target.Identifier];
-			Invoker invoker = (i, s, f) => $"{methodName}({i}, {s}, {f})";
+			Invoker invoker = (i, p, s, f) => $"{methodName}({i}, {p}, {s}, {f})"; // Invocation
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);

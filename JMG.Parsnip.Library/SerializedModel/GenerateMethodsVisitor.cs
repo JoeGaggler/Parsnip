@@ -81,7 +81,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var nodeName = $"{resultName}.Node";
 			var stateName = $"{resultName}.State";
 			var invoker = this.parsnipCode.Invokers[target];
-			writer.VarAssign(resultName, invoker("inputPosition", "state", "factory"));
+			writer.VarAssign(resultName, invoker("input", "inputPosition", "state", "factory")); // Invocation
 			writer.IfNullReturnNull(resultName);
 
 			var decl = new Decl(target.ReturnType, nodeName);
@@ -105,7 +105,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				var invoker = this.parsnipCode.Invokers[func];
 				var resultName = $"r{stepIndex}";
 
-				writer.VarAssign(resultName, invoker("inputPosition", "state", "factory"));
+				writer.VarAssign(resultName, invoker("input", "inputPosition", "state", "factory")); // Invocation
 
 				var factoryName = "factory";
 				var interfaceMethod = step.InterfaceMethod;
@@ -156,7 +156,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					returnedResults.Add(new Decl(type, nodeName));
 				}
 
-				writer.VarAssign(resultName, invoker(currentInputPosition, currentState, "factory"));
+				writer.VarAssign(resultName, invoker("input", currentInputPosition, currentState, "factory")); // Invocation
 
 				switch (step.MatchAction)
 				{
@@ -204,8 +204,8 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			var innerFunc = target.InnerParseFunction;
-			var innerInvocation = parsnipCode.Invokers[innerFunc]("i", "s", "f");
-			var invocation = $"{methodName}(inputPosition, state, factory, (i, s, f) => {innerInvocation})";
+			var innerInvocation = parsnipCode.Invokers[innerFunc]("i", "p", "s", "f"); // Invocation
+			var invocation = $"{methodName}(input, inputPosition, state, factory, (i, p, s, f) => {innerInvocation})"; // Invocation
 
 			var resultName = "result";
 			writer.VarAssign(resultName, invocation);
@@ -228,12 +228,12 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var methodName = "ParseSeries";
 
 			var repeatedFunc = target.RepeatedToken;
-			var repeatedInvocation = parsnipCode.Invokers[repeatedFunc]("i", "s", "f");
+			var repeatedInvocation = parsnipCode.Invokers[repeatedFunc]("i", "p", "s", "f"); // Invocation
 
 			var delimFunc = target.DelimiterToken;
-			var delimInvocation = parsnipCode.Invokers[delimFunc]("i", "s", "f");
+			var delimInvocation = parsnipCode.Invokers[delimFunc]("i", "p", "s", "f"); // Invocation
 
-			var invocation = $"{methodName}(inputPosition, state, factory, (i, s, f) => {repeatedInvocation}, (i, s, f) => {delimInvocation})";
+			var invocation = $"{methodName}(input, inputPosition, state, factory, (i, p, s, f) => {repeatedInvocation}, (i, p, s, f) => {delimInvocation})"; // Invocation
 
 			var resultName = "result";
 			writer.VarAssign(resultName, invocation);

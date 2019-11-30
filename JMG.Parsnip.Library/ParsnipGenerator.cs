@@ -85,9 +85,9 @@ namespace JMG.Parsnip.VSIXProject
 						}))
 						{
 							writer.Assign("var states", "new PackratState[input.Length + 1]");
-							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(input, states));");
+							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(states));");
 							writer.Assign("var state", "states[0]");
-							writer.Assign("var result", $"{firstRuleParseMethodName}(0, state, factory)");
+							writer.Assign("var result", $"{firstRuleParseMethodName}(input, 0, state, factory)"); // Invocation
 							writer.LineOfCode("if (result == null) return null;");
 							writer.Return("result.Node");
 						}
@@ -100,15 +100,12 @@ namespace JMG.Parsnip.VSIXProject
 						var packratStateClassName = "PackratState";
 						using (writer.Class(packratStateClassName, Access.Private))
 						{
-							writer.LineOfCode("internal readonly string input;");
 							writer.LineOfCode("internal readonly PackratState[] states;");
 							writer.EndOfLine();
 							using (writer.Constructor(Access.Public, packratStateClassName, new[] {
-								new LocalVarDecl("String", "input"),
 								new LocalVarDecl("PackratState[]", "states")
 							}))
 							{
-								writer.Assign("this.input", "input");
 								writer.Assign("this.states", "states");
 							}
 							writer.EndOfLine();
