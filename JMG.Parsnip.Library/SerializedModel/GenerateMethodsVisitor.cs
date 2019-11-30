@@ -14,18 +14,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		private readonly String interfaceName;
 		private readonly ParsnipCode parsnipCode;
 
-		private readonly IReadOnlyList<LocalVarDecl> typicalParams;
-
 		public GenerateMethodsVisitor(ParsnipCode parsnipCode, CodeWriter writer, String interfaceName)
 		{
 			this.writer = writer;
 			this.interfaceName = interfaceName;
 			this.parsnipCode = parsnipCode;
-			this.typicalParams = new List<LocalVarDecl>
-			{
-				new LocalVarDecl("PackratState", "state"),
-				new LocalVarDecl(interfaceName, "factory")
-			};
 		}
 
 		private class Decl
@@ -40,8 +33,8 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			public String Name { get; }
 		}
 
-		private String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String stateReference, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
-		{
+		private String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
+        {
 			String nodeString;
 			if (returnType == EmptyNodeType.Instance)
 			{
@@ -72,25 +65,24 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			var returnTypeString = returnType.GetParseResultTypeString();
-			return ($"new {returnTypeString}({nodeString}, {stateReference}, {inputPositionReference})");
+			return ($"new {returnTypeString}({nodeString}, {inputPositionReference})");
 		}
 
 		private void BasicTargetWithInterfaceMethod(IParseFunction target, InterfaceMethod interfaceMethod, Signature signature)
 		{
 			var resultName = "r";
 			var nodeName = $"{resultName}.Node";
-			var stateName = $"{resultName}.State";
 			var invoker = this.parsnipCode.Invokers[target];
-			writer.VarAssign(resultName, invoker("input", "inputPosition", "state", "factory")); // Invocation
+			writer.VarAssign(resultName, invoker("input", "inputPosition", "states", "factory")); // Invocation
 			writer.IfNullReturnNull(resultName);
 
 			var decl = new Decl(target.ReturnType, nodeName);
 
-			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, stateName, "inputPosition", "factory", interfaceMethod);
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, "inputPosition", "factory", interfaceMethod);
 			if (signature.IsMemoized)
 			{
 				var memField = NameGen.MemoizedFieldName(signature.Name);
-				returnExpression = $"state.{memField} = {returnExpression}";
+				returnExpression = $"states[inputPosition].{memField} = {returnExpression}";
 			}
 			writer.Return(returnExpression);
 		}
@@ -105,7 +97,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				var invoker = this.parsnipCode.Invokers[func];
 				var resultName = $"r{stepIndex}";
 
-				writer.VarAssign(resultName, invoker("input", "inputPosition", "state", "factory")); // Invocation
+				writer.VarAssign(resultName, invoker("input", "inputPosition", "states", "factory")); // Invocation
 
 				var factoryName = "factory";
 				var interfaceMethod = step.InterfaceMethod;
@@ -121,11 +113,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 					nodes = new[] { new Decl(func.ReturnType, nodeReference) };
 				}
 
-				var returnExpression = GetReturnExpression(target.ReturnType, nodes, $"{resultName}.State", $"{resultName}.Advanced", factoryName, interfaceMethod);
+				var returnExpression = GetReturnExpression(target.ReturnType, nodes, $"{resultName}.Advanced", factoryName, interfaceMethod);
 				if (input.IsMemoized)
 				{
 					var memField = NameGen.MemoizedFieldName(input.Name);
-					returnExpression = $"state.{memField} = {returnExpression}";
+					returnExpression = $"states[inputPosition].{memField} = {returnExpression}";
 				}
 				writer.LineOfCode($"if ({resultName} != null) return {returnExpression};");
 			}
@@ -139,7 +131,6 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var returnedResults = new List<Decl>();
 
 			int stepIndex = 0;
-			var currentState = "state";
             var currentInputPosition = "inputPosition";
 			foreach (var step in target.Steps)
 			{
@@ -149,30 +140,29 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				var invoker = this.parsnipCode.Invokers[func];
 				var resultName = $"r{stepIndex}";
 				var nodeName = $"{resultName}.Node";
-				var nextState = $"{resultName}.State";
 
 				if (step.IsReturned)
 				{
 					returnedResults.Add(new Decl(type, nodeName));
 				}
 
-				writer.VarAssign(resultName, invoker("input", currentInputPosition, currentState, "factory")); // Invocation
+				writer.VarAssign(resultName, invoker("input", currentInputPosition, "states", "factory")); // Invocation
 
 				switch (step.MatchAction)
 				{
-					case MatchAction.Consume: writer.IfNullReturnNull(resultName); currentState = nextState; break;
+					case MatchAction.Consume: writer.IfNullReturnNull(resultName); break;
 					case MatchAction.Fail: writer.IfNotNullReturnNull(resultName); break;
 					case MatchAction.Rewind: writer.IfNullReturnNull(resultName); break;
-					case MatchAction.Ignore: writer.IfNullReturnNull(resultName); currentState = nextState; break;
+					case MatchAction.Ignore: writer.IfNullReturnNull(resultName); break;
 				}
                 currentInputPosition = $"{currentInputPosition} + {resultName}.Advanced";
             }
 
-			var returnExpression = GetReturnExpression(target.ReturnType, returnedResults, currentState, $"{currentInputPosition} - inputPosition", "factory", target.InterfaceMethod);
+			var returnExpression = GetReturnExpression(target.ReturnType, returnedResults, $"{currentInputPosition} - inputPosition", "factory", target.InterfaceMethod);
 			if (input.IsMemoized)
 			{
 				var memField = NameGen.MemoizedFieldName(input.Name);
-				returnExpression = $"state.{memField} = {returnExpression}";
+				returnExpression = $"states[inputPosition].{memField} = {returnExpression}";
 			}
 			writer.Return(returnExpression);
 		}
@@ -205,7 +195,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 			var innerFunc = target.InnerParseFunction;
 			var innerInvocation = parsnipCode.Invokers[innerFunc]("i", "p", "s", "f"); // Invocation
-			var invocation = $"{methodName}(input, inputPosition, state, factory, (i, p, s, f) => {innerInvocation})"; // Invocation
+			var invocation = $"{methodName}(input, inputPosition, states, factory, (i, p, s, f) => {innerInvocation})"; // Invocation
 
 			var resultName = "result";
 			writer.VarAssign(resultName, invocation);
@@ -214,11 +204,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var nodeReference = $"{resultName}.Node";
 			var decl = new Decl(innerFunc.ReturnType, nodeReference);
 
-			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.State", $"{resultName}.Advanced", "factory", target.InterfaceMethod);
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.Advanced", "factory", target.InterfaceMethod);
 			if (input.IsMemoized)
 			{
 				var memField = NameGen.MemoizedFieldName(input.Name);
-				returnExpression = $"state.{memField} = {returnExpression}";
+				returnExpression = $"states[inputPosition].{memField} = {returnExpression}";
 			}
 			writer.Return(returnExpression);
 		}
@@ -233,7 +223,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var delimFunc = target.DelimiterToken;
 			var delimInvocation = parsnipCode.Invokers[delimFunc]("i", "p", "s", "f"); // Invocation
 
-			var invocation = $"{methodName}(input, inputPosition, state, factory, (i, p, s, f) => {repeatedInvocation}, (i, p, s, f) => {delimInvocation})"; // Invocation
+			var invocation = $"{methodName}(input, inputPosition, states, factory, (i, p, s, f) => {repeatedInvocation}, (i, p, s, f) => {delimInvocation})"; // Invocation
 
 			var resultName = "result";
 			writer.VarAssign(resultName, invocation);
@@ -242,11 +232,11 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var nodeReference = $"{resultName}.Node";
 			var decl = new Decl(target.ReturnType, nodeReference);
 
-			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.State", $"{resultName}.Advanced", "factory", target.InterfaceMethod);
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.Advanced", "factory", target.InterfaceMethod);
 			if (input.IsMemoized)
 			{
 				var memField = NameGen.MemoizedFieldName(input.Name);
-				returnExpression = $"state.{memField} = {returnExpression}";
+				returnExpression = $"states[inputPosition].{memField} = {returnExpression}";
 			}
 			writer.Return(returnExpression);
 		}

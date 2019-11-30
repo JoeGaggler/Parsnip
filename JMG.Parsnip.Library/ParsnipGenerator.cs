@@ -59,16 +59,13 @@ namespace JMG.Parsnip.VSIXProject
 						using (writer.Class(parseResultClassNameT, Access.Private))
 						{
 							writer.LineOfCode("public readonly T Node;");
-							writer.LineOfCode("public readonly PackratState State;");
 							writer.LineOfCode("public readonly Int32 Advanced;");
 							writer.EndOfLine();
 							using (writer.Constructor(Access.Public, parseResultClassName, new[] {
 							   new LocalVarDecl("T", "node"),
-							   new LocalVarDecl("PackratState", "state"),
 							   new LocalVarDecl("Int32", "advanced") }))
 							{
 								writer.Assign("this.Node", "node");
-								writer.Assign("this.State", "state");
 								writer.Assign("this.Advanced", "advanced");
 							}
 						}
@@ -85,9 +82,9 @@ namespace JMG.Parsnip.VSIXProject
 						}))
 						{
 							writer.Assign("var states", "new PackratState[input.Length + 1]");
-							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(states));");
+							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState());");
 							writer.Assign("var state", "states[0]");
-							writer.Assign("var result", $"{firstRuleParseMethodName}(input, 0, state, factory)"); // Invocation
+							writer.Assign("var result", $"{firstRuleParseMethodName}(input, 0, states, factory)"); // Invocation
 							writer.LineOfCode("if (result == null) return null;");
 							writer.Return("result.Node");
 						}
@@ -100,13 +97,8 @@ namespace JMG.Parsnip.VSIXProject
 						var packratStateClassName = "PackratState";
 						using (writer.Class(packratStateClassName, Access.Private))
 						{
-							writer.LineOfCode("internal readonly PackratState[] states;");
-							writer.EndOfLine();
-							using (writer.Constructor(Access.Public, packratStateClassName, new[] {
-								new LocalVarDecl("PackratState[]", "states")
-							}))
+							using (writer.Constructor(Access.Public, packratStateClassName, new LocalVarDecl[] { }))
 							{
-								writer.Assign("this.states", "states");
 							}
 							writer.EndOfLine();
 

@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.23
-// Date: 2019-11-29 20:17:28
+// Date: 2019-11-29 21:16:55
 
 using System;
 using System.Linq;
@@ -46,13 +46,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private class ParseResult<T>
 		{
 			public readonly T Node;
-			public readonly PackratState State;
 			public readonly Int32 Advanced;
 
-			public ParseResult(T node, PackratState state, Int32 advanced)
+			public ParseResult(T node, Int32 advanced)
 			{
 				this.Node = node;
-				this.State = state;
 				this.Advanced = advanced;
 			}
 		}
@@ -62,109 +60,104 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		public static ParsnipDefinition Parse(String input, IParsnipRuleFactory factory)
 		{
 			var states = new PackratState[input.Length + 1];
-			Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState(states));
+			Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState());
 			var state = states[0];
-			var result = ParseRule_Definition(input, 0, state, factory);
+			var result = ParseRule_Definition(input, 0, states, factory);
 			if (result == null) return null;
 			return result.Node;
 		}
 
 
-		private static ParseResult<T> ParseMaybe<T>(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory, Func<String, Int32, PackratState, IParsnipRuleFactory, ParseResult<T>> parseAction)
+		private static ParseResult<T> ParseMaybe<T>(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory, Func<String, Int32, PackratState[], IParsnipRuleFactory, ParseResult<T>> parseAction)
 		{
-			var result = parseAction(input, inputPosition, state, factory);
+			var result = parseAction(input, inputPosition, states, factory);
 			if (result != null)
 			{
 				return result;
 			}
-			return new ParseResult<T>(default(T), state, 0);
+			return new ParseResult<T>(default(T), 0);
 		}
 
-		private static ParseResult<IReadOnlyList<T>> ParseStar<T>(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory, Func<String, Int32, PackratState, IParsnipRuleFactory, ParseResult<T>> parseAction)
+		private static ParseResult<IReadOnlyList<T>> ParseStar<T>(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory, Func<String, Int32, PackratState[], IParsnipRuleFactory, ParseResult<T>> parseAction)
 		{
 			var list = new List<T>();
 			var nextResultInputPosition = inputPosition;
 			while (true)
 			{
-				var nextResult = parseAction(input, nextResultInputPosition, state, factory);
+				var nextResult = parseAction(input, nextResultInputPosition, states, factory);
 				if (nextResult == null)
 				{
 					break;
 				}
 				list.Add(nextResult.Node);
-				state = nextResult.State;
 				nextResultInputPosition = nextResultInputPosition + nextResult.Advanced;
 			}
-			return new ParseResult<IReadOnlyList<T>>(list, state, nextResultInputPosition - inputPosition);
+			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
 		}
 
-		private static ParseResult<IReadOnlyList<T>> ParsePlus<T>(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory, Func<String, Int32, PackratState, IParsnipRuleFactory, ParseResult<T>> parseAction)
+		private static ParseResult<IReadOnlyList<T>> ParsePlus<T>(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory, Func<String, Int32, PackratState[], IParsnipRuleFactory, ParseResult<T>> parseAction)
 		{
 			var list = new List<T>();
 			var nextResultInputPosition = inputPosition;
-			var firstResult = parseAction(input, nextResultInputPosition, state, factory);
+			var firstResult = parseAction(input, nextResultInputPosition, states, factory);
 			if (firstResult == null)
 			{
 				return null;
 			}
 			list.Add(firstResult.Node);
-			state = firstResult.State;
 			nextResultInputPosition = nextResultInputPosition + firstResult.Advanced;
 			while (true)
 			{
-				var nextResult = parseAction(input, nextResultInputPosition, state, factory);
+				var nextResult = parseAction(input, nextResultInputPosition, states, factory);
 				if (nextResult == null)
 				{
 					break;
 				}
 				list.Add(nextResult.Node);
-				state = nextResult.State;
 				nextResultInputPosition = nextResultInputPosition + nextResult.Advanced;
 			}
-			return new ParseResult<IReadOnlyList<T>>(list, state, nextResultInputPosition - inputPosition);
+			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
 		}
 
-		private static ParseResult<IReadOnlyList<T>> ParseSeries<T, D>(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory, Func<String, Int32, PackratState, IParsnipRuleFactory, ParseResult<T>> parseAction, Func<String, Int32, PackratState, IParsnipRuleFactory, ParseResult<D>> parseDelimiterAction)
+		private static ParseResult<IReadOnlyList<T>> ParseSeries<T, D>(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory, Func<String, Int32, PackratState[], IParsnipRuleFactory, ParseResult<T>> parseAction, Func<String, Int32, PackratState[], IParsnipRuleFactory, ParseResult<D>> parseDelimiterAction)
 		{
 			var list = new List<T>();
 			var nextResultInputPosition = inputPosition;
-			var firstResult = parseAction(input, nextResultInputPosition, state, factory);
+			var firstResult = parseAction(input, nextResultInputPosition, states, factory);
 			if (firstResult == null)
 			{
 				return null;
 			}
 			nextResultInputPosition += firstResult.Advanced;
 			list.Add(firstResult.Node);
-			state = firstResult.State;
 			while (true)
 			{
-				var delimResult = parseDelimiterAction(input, nextResultInputPosition, state, factory);
+				var delimResult = parseDelimiterAction(input, nextResultInputPosition, states, factory);
 				if (delimResult == null)
 				{
 					break;
 				}
-				var nextResult = parseAction(input, nextResultInputPosition + delimResult.Advanced, delimResult.State, factory);
+				var nextResult = parseAction(input, nextResultInputPosition + delimResult.Advanced, states, factory);
 				if (nextResult == null)
 				{
 					break;
 				}
 				list.Add(nextResult.Node);
-				state = nextResult.State;
 				nextResultInputPosition = nextResultInputPosition + delimResult.Advanced + nextResult.Advanced;
 			}
-			return new ParseResult<IReadOnlyList<T>>(list, state, nextResultInputPosition - inputPosition);
+			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
 		}
 
-		private static ParseResult<String> ParseIntrinsic_AnyCharacter(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_AnyCharacter(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition >= input.Length)
 			{
 				return null;
 			}
-			return new ParseResult<String>(input.Substring(inputPosition, 1), state.states[inputPosition + 1], 1);
+			return new ParseResult<String>(input.Substring(inputPosition, 1), 1);
 		}
 
-		private static ParseResult<String> ParseIntrinsic_AnyLetter(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_AnyLetter(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition >= input.Length)
 			{
@@ -174,10 +167,10 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			{
 				return null;
 			}
-			return new ParseResult<String>(input.Substring(inputPosition, 1), state.states[inputPosition + 1], 1);
+			return new ParseResult<String>(input.Substring(inputPosition, 1), 1);
 		}
 
-		private static ParseResult<String> ParseIntrinsic_AnyDigit(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_AnyDigit(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition >= input.Length)
 			{
@@ -187,67 +180,66 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			{
 				return null;
 			}
-			return new ParseResult<String>(input.Substring(inputPosition, 1), state.states[inputPosition + 1], 1);
+			return new ParseResult<String>(input.Substring(inputPosition, 1), 1);
 		}
 
-		private static ParseResult<String> ParseIntrinsic_EndOfLine(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_EndOfLine(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result1 = ParseLexeme(input, inputPosition, state, "\r\n");
+			var result1 = ParseLexeme(input, inputPosition, "\r\n");
 			if (result1 != null)
 			{
-				return new ParseResult<String>(result1.Node, result1.State, result1.Advanced);
+				return new ParseResult<String>(result1.Node, result1.Advanced);
 			}
-			var result2 = ParseLexeme(input, inputPosition, state, "\n");
+			var result2 = ParseLexeme(input, inputPosition, "\n");
 			if (result2 != null)
 			{
-				return new ParseResult<String>(result2.Node, result2.State, result2.Advanced);
+				return new ParseResult<String>(result2.Node, result2.Advanced);
 			}
 			return null;
 		}
 
-		private static ParseResult<EmptyNode> ParseIntrinsic_EndOfStream(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<EmptyNode> ParseIntrinsic_EndOfStream(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition == input.Length)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, state, 0);
+				return new ParseResult<EmptyNode>(EmptyNode.Instance, 0);
 			}
 			return null;
 		}
 
-		private static ParseResult<EmptyNode> ParseIntrinsic_EndOfLineOrStream(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<EmptyNode> ParseIntrinsic_EndOfLineOrStream(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition == input.Length)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, state, 0);
+				return new ParseResult<EmptyNode>(EmptyNode.Instance, 0);
 			}
-			var result1 = ParseLexeme(input, inputPosition, state, "\r\n");
+			var result1 = ParseLexeme(input, inputPosition, "\r\n");
 			if (result1 != null)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, result1.State, result1.Advanced);
+				return new ParseResult<EmptyNode>(EmptyNode.Instance, result1.Advanced);
 			}
-			var result2 = ParseLexeme(input, inputPosition, state, "\n");
+			var result2 = ParseLexeme(input, inputPosition, "\n");
 			if (result2 != null)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, result2.State, result2.Advanced);
+				return new ParseResult<EmptyNode>(EmptyNode.Instance, result2.Advanced);
 			}
 			return null;
 		}
 
-		private static ParseResult<String> ParseIntrinsic_CString(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_CString(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var resultStart = ParseLexeme(input, inputPosition, state, "\"");
+			var resultStart = ParseLexeme(input, inputPosition, "\"");
 			if (resultStart == null) return null;
-			var currentState = resultStart.State;
 			var nextInputPosition = inputPosition + resultStart.Advanced;
 			var sb = new System.Text.StringBuilder();
 			while (true)
 			{
 				var inputPosition2 = nextInputPosition;
-				var resultEscape = ParseLexeme(input, inputPosition2, currentState, "\\");
+				var resultEscape = ParseLexeme(input, inputPosition2, "\\");
 				if (resultEscape != null)
 				{
 					inputPosition2 = inputPosition2 + resultEscape.Advanced;
-					var resultToken = ParseIntrinsic_AnyCharacter(input, inputPosition2, resultEscape.State, factory);
+					var resultToken = ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory);
 					if (resultToken == null) return null;
 					switch (resultToken.Node)
 					{
@@ -266,28 +258,26 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 							return null;
 						}
 					}
-					currentState = resultToken.State;
 					inputPosition2 = inputPosition2 + resultToken.Advanced;
 					continue;
 				}
-				var resultEnd = ParseLexeme(input, inputPosition2, currentState, "\"");
+				var resultEnd = ParseLexeme(input, inputPosition2, "\"");
 				if (resultEnd != null)
 				{
-					return new ParseResult<String>(sb.ToString(), resultEnd.State, inputPosition2 + resultEnd.Advanced - inputPosition);
+					return new ParseResult<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition);
 				}
-				var resultChar = ParseIntrinsic_AnyCharacter(input, inputPosition2, currentState, factory);
+				var resultChar = ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory);
 				if (resultChar == null) return null;
 				sb.Append(resultChar.Node);
-				currentState = resultChar.State;
 				nextInputPosition = inputPosition2 + resultChar.Advanced;
 			}
 		}
 
-		private static ParseResult<String> ParseIntrinsic_OptionalHorizontalWhitespace(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_OptionalHorizontalWhitespace(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition >= input.Length)
 			{
-				return new ParseResult<String>(String.Empty, state, 0);
+				return new ParseResult<String>(String.Empty, 0);
 			}
 			var sb = new System.Text.StringBuilder();
 			var nextInputPosition = inputPosition;
@@ -300,448 +290,445 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 				}
 				nextInputPosition++;
 			}
-			return new ParseResult<String>(input.Substring(inputPosition, nextInputPosition - inputPosition), state.states[nextInputPosition], nextInputPosition - inputPosition);
+			return new ParseResult<String>(input.Substring(inputPosition, nextInputPosition - inputPosition), nextInputPosition - inputPosition);
 		}
 
-		private static ParseResult<String> ParseLexeme(String input, Int32 inputPosition, PackratState state, String lexeme)
+		private static ParseResult<String> ParseLexeme(String input, Int32 inputPosition, String lexeme)
 		{
 			var lexemeLength = lexeme.Length;
 			if (inputPosition + lexemeLength > input.Length) return null;
 			if (input.Substring(inputPosition, lexemeLength) != lexeme) return null;
-			return new ParseResult<String>(lexeme, state.states[inputPosition + lexemeLength], lexemeLength);
+			return new ParseResult<String>(lexeme, lexemeLength);
 		}
 
 		// Repetition: definition-item+
-		private static ParseResult<ParsnipDefinition> ParseRule_Definition(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<ParsnipDefinition> ParseRule_Definition(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Definition != null) { return state.Mem_ParseRule_Definition; }
+			if (states[inputPosition].Mem_ParseRule_Definition is var mem && mem != null) { return mem; }
 
-			var result = ParsePlus(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_DefinitionItem(i, p, s, f));
+			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_DefinitionItem(i, p, s, f));
 			if (result == null) return null;
-			return state.Mem_ParseRule_Definition = new ParseResult<ParsnipDefinition>(factory.Definition1(result.Node), result.State, result.Advanced);
+			return states[inputPosition].Mem_ParseRule_Definition = new ParseResult<ParsnipDefinition>(factory.Definition1(result.Node), result.Advanced);
 		}
 
 		// Selection: rule | comment | (`<EOL>)
-		private static ParseResult<IParsnipDefinitionItem> ParseRule_DefinitionItem(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<IParsnipDefinitionItem> ParseRule_DefinitionItem(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_DefinitionItem != null) { return state.Mem_ParseRule_DefinitionItem; }
+			if (states[inputPosition].Mem_ParseRule_DefinitionItem is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_Rule(input, inputPosition, state, factory);
-			if (r1 != null) return state.Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem1(r1.Node), r1.State, r1.Advanced);
-			var r2 = ParseRule_Comment(input, inputPosition, state, factory);
-			if (r2 != null) return state.Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem2(r2.Node), r2.State, r2.Advanced);
-			var r3 = ParseRule_DefinitionItem_C3(input, inputPosition, state, factory);
-			if (r3 != null) return state.Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem3(), r3.State, r3.Advanced);
+			var r1 = ParseRule_Rule(input, inputPosition, states, factory);
+			if (r1 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem1(r1.Node), r1.Advanced);
+			var r2 = ParseRule_Comment(input, inputPosition, states, factory);
+			if (r2 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem2(r2.Node), r2.Advanced);
+			var r3 = ParseRule_DefinitionItem_C3(input, inputPosition, states, factory);
+			if (r3 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem3(), r3.Advanced);
 			return null;
 		}
 
 		// Sequence: `<EOL>
-		private static ParseResult<EmptyNode> ParseRule_DefinitionItem_C3(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<EmptyNode> ParseRule_DefinitionItem_C3(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseIntrinsic_EndOfLine(input, inputPosition, state, factory);
+			var r1 = ParseIntrinsic_EndOfLine(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			return new ParseResult<EmptyNode>(EmptyNode.Instance, r1.State, inputPosition + r1.Advanced - inputPosition);
+			return new ParseResult<EmptyNode>(EmptyNode.Instance, inputPosition + r1.Advanced - inputPosition);
 		}
 
 		// Sequence: rule-head rule-body
-		private static ParseResult<Rule> ParseRule_Rule(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Rule> ParseRule_Rule(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Rule != null) { return state.Mem_ParseRule_Rule; }
+			if (states[inputPosition].Mem_ParseRule_Rule is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_RuleHead(input, inputPosition, state, factory);
+			var r1 = ParseRule_RuleHead(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseRule_RuleBody(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_RuleBody(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			return state.Mem_ParseRule_Rule = new ParseResult<Rule>(factory.Rule1(r1.Node, r2.Node), r2.State, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_Rule = new ParseResult<Rule>(factory.Rule1(r1.Node, r2.Node), inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
 		// Selection: (rule-head-prefix `-- class-identifier `-- `<EOL>) | (rule-head-prefix `-- `<EOL>)
-		private static ParseResult<RuleHead> ParseRule_RuleHead(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<RuleHead> ParseRule_RuleHead(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_RuleHead != null) { return state.Mem_ParseRule_RuleHead; }
+			if (states[inputPosition].Mem_ParseRule_RuleHead is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_RuleHead_C1(input, inputPosition, state, factory);
-			if (r1 != null) return state.Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead1(r1.Node.Item1, r1.Node.Item2), r1.State, r1.Advanced);
-			var r2 = ParseRule_RuleHead_C2(input, inputPosition, state, factory);
-			if (r2 != null) return state.Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead2(r2.Node), r2.State, r2.Advanced);
+			var r1 = ParseRule_RuleHead_C1(input, inputPosition, states, factory);
+			if (r1 != null) return states[inputPosition].Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead1(r1.Node.Item1, r1.Node.Item2), r1.Advanced);
+			var r2 = ParseRule_RuleHead_C2(input, inputPosition, states, factory);
+			if (r2 != null) return states[inputPosition].Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead2(r2.Node), r2.Advanced);
 			return null;
 		}
 
 		// Sequence: rule-head-prefix `-- class-identifier `-- `<EOL>
-		private static ParseResult<(RuleHeadPrefix, ClassIdentifier)> ParseRule_RuleHead_C1(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<(RuleHeadPrefix, ClassIdentifier)> ParseRule_RuleHead_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseRule_RuleHeadPrefix(input, inputPosition, state, factory);
+			var r1 = ParseRule_RuleHeadPrefix(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseRule_ClassIdentifier(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, factory);
+			var r3 = ParseRule_ClassIdentifier(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
 			if (r3 == null) return null;
-			var r4 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced, r3.State, factory);
+			var r4 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced, states, factory);
 			if (r4 == null) return null;
-			var r5 = ParseIntrinsic_EndOfLine(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced, r4.State, factory);
+			var r5 = ParseIntrinsic_EndOfLine(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced, states, factory);
 			if (r5 == null) return null;
-			return new ParseResult<(RuleHeadPrefix, ClassIdentifier)>((r1.Node, r3.Node), r5.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced + r5.Advanced - inputPosition);
+			return new ParseResult<(RuleHeadPrefix, ClassIdentifier)>((r1.Node, r3.Node), inputPosition + r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced + r5.Advanced - inputPosition);
 		}
 
 		// Sequence: rule-head-prefix `-- `<EOL>
-		private static ParseResult<RuleHeadPrefix> ParseRule_RuleHead_C2(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<RuleHeadPrefix> ParseRule_RuleHead_C2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseRule_RuleHeadPrefix(input, inputPosition, state, factory);
+			var r1 = ParseRule_RuleHeadPrefix(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseIntrinsic_EndOfLine(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, factory);
+			var r3 = ParseIntrinsic_EndOfLine(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
 			if (r3 == null) return null;
-			return new ParseResult<RuleHeadPrefix>(r1.Node, r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return new ParseResult<RuleHeadPrefix>(r1.Node, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Sequence: rule-identifier `-- `":"
-		private static ParseResult<RuleHeadPrefix> ParseRule_RuleHeadPrefix(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<RuleHeadPrefix> ParseRule_RuleHeadPrefix(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_RuleHeadPrefix != null) { return state.Mem_ParseRule_RuleHeadPrefix; }
+			if (states[inputPosition].Mem_ParseRule_RuleHeadPrefix is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_RuleIdentifier(input, inputPosition, state, factory);
+			var r1 = ParseRule_RuleIdentifier(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, ":");
+			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ":");
 			if (r3 == null) return null;
-			return state.Mem_ParseRule_RuleHeadPrefix = new ParseResult<RuleHeadPrefix>(factory.RuleHeadPrefix1(r1.Node), r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_RuleHeadPrefix = new ParseResult<RuleHeadPrefix>(factory.RuleHeadPrefix1(r1.Node), inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Repetition: choice+
-		private static ParseResult<RuleBody> ParseRule_RuleBody(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<RuleBody> ParseRule_RuleBody(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_RuleBody != null) { return state.Mem_ParseRule_RuleBody; }
+			if (states[inputPosition].Mem_ParseRule_RuleBody is var mem && mem != null) { return mem; }
 
-			var result = ParsePlus(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_Choice(i, p, s, f));
+			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Choice(i, p, s, f));
 			if (result == null) return null;
-			return state.Mem_ParseRule_RuleBody = new ParseResult<RuleBody>(factory.RuleBody1(result.Node), result.State, result.Advanced);
+			return states[inputPosition].Mem_ParseRule_RuleBody = new ParseResult<RuleBody>(factory.RuleBody1(result.Node), result.Advanced);
 		}
 
 		// Sequence: union `-- `<EOLOS>
-		private static ParseResult<Choice> ParseRule_Choice(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Choice> ParseRule_Choice(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Choice != null) { return state.Mem_ParseRule_Choice; }
+			if (states[inputPosition].Mem_ParseRule_Choice is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_Union(input, inputPosition, state, factory);
+			var r1 = ParseRule_Union(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, factory);
+			var r3 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
 			if (r3 == null) return null;
-			return state.Mem_ParseRule_Choice = new ParseResult<Choice>(factory.Choice1(r1.Node), r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_Choice = new ParseResult<Choice>(factory.Choice1(r1.Node), inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Series: sequence/(-- "|" --)
-		private static ParseResult<Union> ParseRule_Union(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Union> ParseRule_Union(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Union != null) { return state.Mem_ParseRule_Union; }
+			if (states[inputPosition].Mem_ParseRule_Union is var mem && mem != null) { return mem; }
 
-			var result = ParseSeries(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_Sequence(i, p, s, f), (i, p, s, f) => ParseRule_Union_D(i, p, s, f));
+			var result = ParseSeries(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Sequence(i, p, s, f), (i, p, s, f) => ParseRule_Union_D(i, p, s, f));
 			if (result == null) return null;
-			return state.Mem_ParseRule_Union = new ParseResult<Union>(factory.Union1(result.Node), result.State, result.Advanced);
+			return states[inputPosition].Mem_ParseRule_Union = new ParseResult<Union>(factory.Union1(result.Node), result.Advanced);
 		}
 
 		// Sequence: -- "|" --
-		private static ParseResult<(String, String, String)> ParseRule_Union_D(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<(String, String, String)> ParseRule_Union_D(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition, state, factory);
+			var r1 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseLexeme(input, inputPosition + r1.Advanced, r1.State, "|");
+			var r2 = ParseLexeme(input, inputPosition + r1.Advanced, "|");
 			if (r2 == null) return null;
-			var r3 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, factory);
+			var r3 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
 			if (r3 == null) return null;
-			return new ParseResult<(String, String, String)>((r1.Node, r2.Node, r3.Node), r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return new ParseResult<(String, String, String)>((r1.Node, r2.Node, r3.Node), inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Series: special/--
-		private static ParseResult<Sequence> ParseRule_Sequence(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Sequence> ParseRule_Sequence(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Sequence != null) { return state.Mem_ParseRule_Sequence; }
+			if (states[inputPosition].Mem_ParseRule_Sequence is var mem && mem != null) { return mem; }
 
-			var result = ParseSeries(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_Special(i, p, s, f), (i, p, s, f) => ParseIntrinsic_OptionalHorizontalWhitespace(i, p, s, f));
+			var result = ParseSeries(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Special(i, p, s, f), (i, p, s, f) => ParseIntrinsic_OptionalHorizontalWhitespace(i, p, s, f));
 			if (result == null) return null;
-			return state.Mem_ParseRule_Sequence = new ParseResult<Sequence>(factory.Sequence1(result.Node), result.State, result.Advanced);
+			return states[inputPosition].Mem_ParseRule_Sequence = new ParseResult<Sequence>(factory.Sequence1(result.Node), result.Advanced);
 		}
 
 		// Selection: (token `"/" token) | segment
-		private static ParseResult<Segment> ParseRule_Special(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Segment> ParseRule_Special(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Special != null) { return state.Mem_ParseRule_Special; }
+			if (states[inputPosition].Mem_ParseRule_Special is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_Special_C1(input, inputPosition, state, factory);
-			if (r1 != null) return state.Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special1(r1.Node.Item1, r1.Node.Item2), r1.State, r1.Advanced);
-			var r2 = ParseRule_Segment(input, inputPosition, state, factory);
-			if (r2 != null) return state.Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special2(r2.Node), r2.State, r2.Advanced);
+			var r1 = ParseRule_Special_C1(input, inputPosition, states, factory);
+			if (r1 != null) return states[inputPosition].Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special1(r1.Node.Item1, r1.Node.Item2), r1.Advanced);
+			var r2 = ParseRule_Segment(input, inputPosition, states, factory);
+			if (r2 != null) return states[inputPosition].Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special2(r2.Node), r2.Advanced);
 			return null;
 		}
 
 		// Sequence: token `"/" token
-		private static ParseResult<(IToken, IToken)> ParseRule_Special_C1(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<(IToken, IToken)> ParseRule_Special_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseRule_Token(input, inputPosition, state, factory);
+			var r1 = ParseRule_Token(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseLexeme(input, inputPosition + r1.Advanced, r1.State, "/");
+			var r2 = ParseLexeme(input, inputPosition + r1.Advanced, "/");
 			if (r2 == null) return null;
-			var r3 = ParseRule_Token(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, factory);
+			var r3 = ParseRule_Token(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
 			if (r3 == null) return null;
-			return new ParseResult<(IToken, IToken)>((r1.Node, r3.Node), r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return new ParseResult<(IToken, IToken)>((r1.Node, r3.Node), inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Sequence: ("`" | "~" | "&")? cardinality
-		private static ParseResult<Segment> ParseRule_Segment(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Segment> ParseRule_Segment(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Segment != null) { return state.Mem_ParseRule_Segment; }
+			if (states[inputPosition].Mem_ParseRule_Segment is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_Segment_S1(input, inputPosition, state, factory);
+			var r1 = ParseRule_Segment_S1(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseRule_Cardinality(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_Cardinality(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			return state.Mem_ParseRule_Segment = new ParseResult<Segment>(factory.Segment1(r1.Node, r2.Node), r2.State, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_Segment = new ParseResult<Segment>(factory.Segment1(r1.Node, r2.Node), inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
 		// Repetition: ("`" | "~" | "&")?
-		private static ParseResult<String> ParseRule_Segment_S1(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Segment_S1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result = ParseMaybe(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_Segment_S1_M(i, p, s, f));
+			var result = ParseMaybe(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Segment_S1_M(i, p, s, f));
 			if (result == null) return null;
-			return new ParseResult<String>(result.Node, result.State, result.Advanced);
+			return new ParseResult<String>(result.Node, result.Advanced);
 		}
 
 		// Selection: "`" | "~" | "&"
-		private static ParseResult<String> ParseRule_Segment_S1_M(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Segment_S1_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseLexeme(input, inputPosition, state, "`");
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.State, r1.Advanced);
-			var r2 = ParseLexeme(input, inputPosition, state, "~");
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.State, r2.Advanced);
-			var r3 = ParseLexeme(input, inputPosition, state, "&");
-			if (r3 != null) return new ParseResult<String>(r3.Node, r3.State, r3.Advanced);
+			var r1 = ParseLexeme(input, inputPosition, "`");
+			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			var r2 = ParseLexeme(input, inputPosition, "~");
+			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
+			var r3 = ParseLexeme(input, inputPosition, "&");
+			if (r3 != null) return new ParseResult<String>(r3.Node, r3.Advanced);
 			return null;
 		}
 
 		// Sequence: token ("+" | "?" | "*")?
-		private static ParseResult<TokenCardinality> ParseRule_Cardinality(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<TokenCardinality> ParseRule_Cardinality(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Cardinality != null) { return state.Mem_ParseRule_Cardinality; }
+			if (states[inputPosition].Mem_ParseRule_Cardinality is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_Token(input, inputPosition, state, factory);
+			var r1 = ParseRule_Token(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseRule_Cardinality_S2(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_Cardinality_S2(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			return state.Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>(factory.Cardinality1(r1.Node, r2.Node), r2.State, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>(factory.Cardinality1(r1.Node, r2.Node), inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
 		// Repetition: ("+" | "?" | "*")?
-		private static ParseResult<String> ParseRule_Cardinality_S2(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Cardinality_S2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result = ParseMaybe(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_Cardinality_S2_M(i, p, s, f));
+			var result = ParseMaybe(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Cardinality_S2_M(i, p, s, f));
 			if (result == null) return null;
-			return new ParseResult<String>(result.Node, result.State, result.Advanced);
+			return new ParseResult<String>(result.Node, result.Advanced);
 		}
 
 		// Selection: "+" | "?" | "*"
-		private static ParseResult<String> ParseRule_Cardinality_S2_M(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Cardinality_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseLexeme(input, inputPosition, state, "+");
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.State, r1.Advanced);
-			var r2 = ParseLexeme(input, inputPosition, state, "?");
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.State, r2.Advanced);
-			var r3 = ParseLexeme(input, inputPosition, state, "*");
-			if (r3 != null) return new ParseResult<String>(r3.Node, r3.State, r3.Advanced);
+			var r1 = ParseLexeme(input, inputPosition, "+");
+			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			var r2 = ParseLexeme(input, inputPosition, "?");
+			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
+			var r3 = ParseLexeme(input, inputPosition, "*");
+			if (r3 != null) return new ParseResult<String>(r3.Node, r3.Advanced);
 			return null;
 		}
 
 		// Selection: (`".") | <CSTRING> | rule-identifier | ((`"<" intrinsic-identifier `">") | "--") | (`"(" union `")")
-		private static ParseResult<IToken> ParseRule_Token(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<IToken> ParseRule_Token(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Token != null) { return state.Mem_ParseRule_Token; }
+			if (states[inputPosition].Mem_ParseRule_Token is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_Token_C1(input, inputPosition, state, factory);
-			if (r1 != null) return state.Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token1(), r1.State, r1.Advanced);
-			var r2 = ParseIntrinsic_CString(input, inputPosition, state, factory);
-			if (r2 != null) return state.Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token2(r2.Node), r2.State, r2.Advanced);
-			var r3 = ParseRule_RuleIdentifier(input, inputPosition, state, factory);
-			if (r3 != null) return state.Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token3(r3.Node), r3.State, r3.Advanced);
-			var r4 = ParseRule_Token_C4(input, inputPosition, state, factory);
-			if (r4 != null) return state.Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token4(r4.Node), r4.State, r4.Advanced);
-			var r5 = ParseRule_Token_C5(input, inputPosition, state, factory);
-			if (r5 != null) return state.Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token5(r5.Node), r5.State, r5.Advanced);
+			var r1 = ParseRule_Token_C1(input, inputPosition, states, factory);
+			if (r1 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token1(), r1.Advanced);
+			var r2 = ParseIntrinsic_CString(input, inputPosition, states, factory);
+			if (r2 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token2(r2.Node), r2.Advanced);
+			var r3 = ParseRule_RuleIdentifier(input, inputPosition, states, factory);
+			if (r3 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token3(r3.Node), r3.Advanced);
+			var r4 = ParseRule_Token_C4(input, inputPosition, states, factory);
+			if (r4 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token4(r4.Node), r4.Advanced);
+			var r5 = ParseRule_Token_C5(input, inputPosition, states, factory);
+			if (r5 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token5(r5.Node), r5.Advanced);
 			return null;
 		}
 
 		// Sequence: `"."
-		private static ParseResult<EmptyNode> ParseRule_Token_C1(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<EmptyNode> ParseRule_Token_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseLexeme(input, inputPosition, state, ".");
+			var r1 = ParseLexeme(input, inputPosition, ".");
 			if (r1 == null) return null;
-			return new ParseResult<EmptyNode>(EmptyNode.Instance, r1.State, inputPosition + r1.Advanced - inputPosition);
+			return new ParseResult<EmptyNode>(EmptyNode.Instance, inputPosition + r1.Advanced - inputPosition);
 		}
 
 		// Selection: (`"<" intrinsic-identifier `">") | "--"
-		private static ParseResult<String> ParseRule_Token_C4(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Token_C4(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseRule_Token_C4_C1(input, inputPosition, state, factory);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.State, r1.Advanced);
-			var r2 = ParseLexeme(input, inputPosition, state, "--");
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.State, r2.Advanced);
+			var r1 = ParseRule_Token_C4_C1(input, inputPosition, states, factory);
+			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			var r2 = ParseLexeme(input, inputPosition, "--");
+			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
 			return null;
 		}
 
 		// Sequence: `"<" intrinsic-identifier `">"
-		private static ParseResult<String> ParseRule_Token_C4_C1(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Token_C4_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseLexeme(input, inputPosition, state, "<");
+			var r1 = ParseLexeme(input, inputPosition, "<");
 			if (r1 == null) return null;
-			var r2 = ParseRule_IntrinsicIdentifier(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_IntrinsicIdentifier(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, ">");
+			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ">");
 			if (r3 == null) return null;
-			return new ParseResult<String>(r2.Node, r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return new ParseResult<String>(r2.Node, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Sequence: `"(" union `")"
-		private static ParseResult<Union> ParseRule_Token_C5(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<Union> ParseRule_Token_C5(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseLexeme(input, inputPosition, state, "(");
+			var r1 = ParseLexeme(input, inputPosition, "(");
 			if (r1 == null) return null;
-			var r2 = ParseRule_Union(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_Union(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, ")");
+			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ")");
 			if (r3 == null) return null;
-			return new ParseResult<Union>(r2.Node, r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return new ParseResult<Union>(r2.Node, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Sequence: <Aa> (<Aa> | "-")*
-		private static ParseResult<RuleIdentifier> ParseRule_RuleIdentifier(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<RuleIdentifier> ParseRule_RuleIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_RuleIdentifier != null) { return state.Mem_ParseRule_RuleIdentifier; }
+			if (states[inputPosition].Mem_ParseRule_RuleIdentifier is var mem && mem != null) { return mem; }
 
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, state, factory);
+			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseRule_RuleIdentifier_S2(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_RuleIdentifier_S2(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			return state.Mem_ParseRule_RuleIdentifier = new ParseResult<RuleIdentifier>(factory.RuleIdentifier1(r1.Node, r2.Node), r2.State, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_RuleIdentifier = new ParseResult<RuleIdentifier>(factory.RuleIdentifier1(r1.Node, r2.Node), inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
 		// Repetition: (<Aa> | "-")*
-		private static ParseResult<IReadOnlyList<String>> ParseRule_RuleIdentifier_S2(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<IReadOnlyList<String>> ParseRule_RuleIdentifier_S2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result = ParseStar(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_RuleIdentifier_S2_M(i, p, s, f));
+			var result = ParseStar(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_RuleIdentifier_S2_M(i, p, s, f));
 			if (result == null) return null;
-			return new ParseResult<IReadOnlyList<String>>(result.Node, result.State, result.Advanced);
+			return new ParseResult<IReadOnlyList<String>>(result.Node, result.Advanced);
 		}
 
 		// Selection: <Aa> | "-"
-		private static ParseResult<String> ParseRule_RuleIdentifier_S2_M(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_RuleIdentifier_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, state, factory);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.State, r1.Advanced);
-			var r2 = ParseLexeme(input, inputPosition, state, "-");
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.State, r2.Advanced);
+			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
+			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			var r2 = ParseLexeme(input, inputPosition, "-");
+			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
 			return null;
 		}
 
 		// Series: csharp-identifier/"."
-		private static ParseResult<ClassIdentifier> ParseRule_ClassIdentifier(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<ClassIdentifier> ParseRule_ClassIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_ClassIdentifier != null) { return state.Mem_ParseRule_ClassIdentifier; }
+			if (states[inputPosition].Mem_ParseRule_ClassIdentifier is var mem && mem != null) { return mem; }
 
-			var result = ParseSeries(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_CsharpIdentifier(i, p, s, f), (i, p, s, f) => ParseLexeme(i, p, s, "."));
+			var result = ParseSeries(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_CsharpIdentifier(i, p, s, f), (i, p, s, f) => ParseLexeme(i, p, "."));
 			if (result == null) return null;
-			return state.Mem_ParseRule_ClassIdentifier = new ParseResult<ClassIdentifier>(factory.ClassIdentifier1(result.Node), result.State, result.Advanced);
+			return states[inputPosition].Mem_ParseRule_ClassIdentifier = new ParseResult<ClassIdentifier>(factory.ClassIdentifier1(result.Node), result.Advanced);
 		}
 
 		// Sequence: <Aa> (<Aa> | <#>)*
-		private static ParseResult<String> ParseRule_CsharpIdentifier(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_CsharpIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_CsharpIdentifier != null) { return state.Mem_ParseRule_CsharpIdentifier; }
+			if (states[inputPosition].Mem_ParseRule_CsharpIdentifier is var mem && mem != null) { return mem; }
 
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, state, factory);
+			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseRule_CsharpIdentifier_S2(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_CsharpIdentifier_S2(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			return state.Mem_ParseRule_CsharpIdentifier = new ParseResult<String>(factory.CsharpIdentifier1(r1.Node, r2.Node), r2.State, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_CsharpIdentifier = new ParseResult<String>(factory.CsharpIdentifier1(r1.Node, r2.Node), inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
 		// Repetition: (<Aa> | <#>)*
-		private static ParseResult<IReadOnlyList<String>> ParseRule_CsharpIdentifier_S2(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<IReadOnlyList<String>> ParseRule_CsharpIdentifier_S2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result = ParseStar(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_CsharpIdentifier_S2_M(i, p, s, f));
+			var result = ParseStar(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_CsharpIdentifier_S2_M(i, p, s, f));
 			if (result == null) return null;
-			return new ParseResult<IReadOnlyList<String>>(result.Node, result.State, result.Advanced);
+			return new ParseResult<IReadOnlyList<String>>(result.Node, result.Advanced);
 		}
 
 		// Selection: <Aa> | <#>
-		private static ParseResult<String> ParseRule_CsharpIdentifier_S2_M(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_CsharpIdentifier_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, state, factory);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.State, r1.Advanced);
-			var r2 = ParseIntrinsic_AnyDigit(input, inputPosition, state, factory);
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.State, r2.Advanced);
+			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
+			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			var r2 = ParseIntrinsic_AnyDigit(input, inputPosition, states, factory);
+			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
 			return null;
 		}
 
 		// Selection: <Aa>+ | "#"
-		private static ParseResult<String> ParseRule_IntrinsicIdentifier(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_IntrinsicIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_IntrinsicIdentifier != null) { return state.Mem_ParseRule_IntrinsicIdentifier; }
+			if (states[inputPosition].Mem_ParseRule_IntrinsicIdentifier is var mem && mem != null) { return mem; }
 
-			var r1 = ParseRule_IntrinsicIdentifier_C1(input, inputPosition, state, factory);
-			if (r1 != null) return state.Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>(factory.IntrinsicIdentifier1(r1.Node), r1.State, r1.Advanced);
-			var r2 = ParseLexeme(input, inputPosition, state, "#");
-			if (r2 != null) return state.Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>(factory.IntrinsicIdentifier2(r2.Node), r2.State, r2.Advanced);
+			var r1 = ParseRule_IntrinsicIdentifier_C1(input, inputPosition, states, factory);
+			if (r1 != null) return states[inputPosition].Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>(factory.IntrinsicIdentifier1(r1.Node), r1.Advanced);
+			var r2 = ParseLexeme(input, inputPosition, "#");
+			if (r2 != null) return states[inputPosition].Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>(factory.IntrinsicIdentifier2(r2.Node), r2.Advanced);
 			return null;
 		}
 
 		// Repetition: <Aa>+
-		private static ParseResult<IReadOnlyList<String>> ParseRule_IntrinsicIdentifier_C1(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<IReadOnlyList<String>> ParseRule_IntrinsicIdentifier_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result = ParsePlus(input, inputPosition, state, factory, (i, p, s, f) => ParseIntrinsic_AnyLetter(i, p, s, f));
+			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseIntrinsic_AnyLetter(i, p, s, f));
 			if (result == null) return null;
-			return new ParseResult<IReadOnlyList<String>>(result.Node, result.State, result.Advanced);
+			return new ParseResult<IReadOnlyList<String>>(result.Node, result.Advanced);
 		}
 
 		// Sequence: `"//" (~<EOLOS> .)* `<EOLOS>
-		private static ParseResult<String> ParseRule_Comment(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Comment(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			if (state.Mem_ParseRule_Comment != null) { return state.Mem_ParseRule_Comment; }
+			if (states[inputPosition].Mem_ParseRule_Comment is var mem && mem != null) { return mem; }
 
-			var r1 = ParseLexeme(input, inputPosition, state, "//");
+			var r1 = ParseLexeme(input, inputPosition, "//");
 			if (r1 == null) return null;
-			var r2 = ParseRule_Comment_S2(input, inputPosition + r1.Advanced, r1.State, factory);
+			var r2 = ParseRule_Comment_S2(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			var r3 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced, r2.State, factory);
+			var r3 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
 			if (r3 == null) return null;
-			return state.Mem_ParseRule_Comment = new ParseResult<String>(factory.Comment1(r2.Node), r3.State, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
+			return states[inputPosition].Mem_ParseRule_Comment = new ParseResult<String>(factory.Comment1(r2.Node), inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
 		// Repetition: (~<EOLOS> .)*
-		private static ParseResult<IReadOnlyList<String>> ParseRule_Comment_S2(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<IReadOnlyList<String>> ParseRule_Comment_S2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var result = ParseStar(input, inputPosition, state, factory, (i, p, s, f) => ParseRule_Comment_S2_M(i, p, s, f));
+			var result = ParseStar(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Comment_S2_M(i, p, s, f));
 			if (result == null) return null;
-			return new ParseResult<IReadOnlyList<String>>(result.Node, result.State, result.Advanced);
+			return new ParseResult<IReadOnlyList<String>>(result.Node, result.Advanced);
 		}
 
 		// Sequence: ~<EOLOS> .
-		private static ParseResult<String> ParseRule_Comment_S2_M(String input, Int32 inputPosition, PackratState state, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseRule_Comment_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition, state, factory);
+			var r1 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition, states, factory);
 			if (r1 != null) return null;
-			var r2 = ParseIntrinsic_AnyCharacter(input, inputPosition + r1.Advanced, state, factory);
+			var r2 = ParseIntrinsic_AnyCharacter(input, inputPosition + r1.Advanced, states, factory);
 			if (r2 == null) return null;
-			return new ParseResult<String>(r2.Node, r2.State, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
+			return new ParseResult<String>(r2.Node, inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
 		private class PackratState
 		{
-			internal readonly PackratState[] states;
-
-			public PackratState(PackratState[] states)
+			public PackratState()
 			{
-				this.states = states;
 			}
 
 			internal ParseResult<ParsnipDefinition> Mem_ParseRule_Definition;

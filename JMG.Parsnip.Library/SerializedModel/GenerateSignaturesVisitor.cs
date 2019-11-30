@@ -76,7 +76,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public void Visit(LiteralString target, Access access)
 		{
 			var expanded = target.Text.Replace("\\", "\\\\");
-			Invoker invoker = (i, p, s, f) => $"ParseLexeme({i}, {p}, {s}, \"{expanded}\")"; // Invocation
+			Invoker invoker = (i, p, s, f) => $"ParseLexeme({i}, {p}, \"{expanded}\")"; // Invocation
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
