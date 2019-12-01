@@ -8,9 +8,12 @@ using JMG.Parsnip.SemanticModel;
 
 namespace JMG.Parsnip.SerializedModel
 {
+	/// <summary>
+	/// Method signature for a parse function
+	/// </summary>
 	internal class Signature
 	{
-		public Signature(String name, Access access, SemanticModel.IParseFunction func, Invoker invoker, Boolean isMemoized)
+		public Signature(String name, Access access, IParseFunction func, Invoker invoker, Boolean isMemoized)
 		{
 			this.Name = name;
 			this.Access = access;

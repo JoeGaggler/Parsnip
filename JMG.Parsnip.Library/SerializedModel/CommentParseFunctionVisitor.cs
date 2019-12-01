@@ -137,7 +137,15 @@ namespace JMG.Parsnip.SerializedModel
 		{
 			var value1 = target.RepeatedToken.ApplyVisitor(WithoutHeader);
 			var value2 = target.DelimiterToken.ApplyVisitor(WithoutHeader);
-			return $"Series: {value1}/{value2}";
+			if (ShowHeader)
+			{
+				return $"Series: {value1}/{value2}";
+			}
+			if (ShowWrapped)
+			{
+				return $"({value1}/{value2})";
+			}
+			return $"{value1}/{value2}";
 		}
 	}
 }

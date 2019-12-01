@@ -33,7 +33,7 @@ namespace JMG.Parsnip.SemanticModel.Transformations
 				var firstStep = steps[0];
 
 				// Cannot collapse multiselection functions, only children
-				// Unable to propogate interface methods. Keep this transformation ahead of <AssignRuleReferenceTypes>
+				// Unable to propagate interface methods. Keep this transformation ahead of <AssignRuleReferenceTypes>
 				if (steps.Count > 1 || firstStep.InterfaceMethod != null)
 				{
 					var newSteps = steps.Select(i => new SelectionStep(i.Function.ApplyVisitor(this), interfaceMethod: null)).ToList();
@@ -49,7 +49,7 @@ namespace JMG.Parsnip.SemanticModel.Transformations
 				var firstStep = steps[0];
 
 				// Cannot collapse multiselection functions, only children
-				// Unable to propogate unconsumed segments. Keep this transformation ahead of <AssignRuleReferenceTypes>
+				// Unable to propagate unconsumed segments. Keep this transformation ahead of <AssignRuleReferenceTypes>
 				if (steps.Count > 1 || firstStep.MatchAction != MatchAction.Consume)
 				{
 					var newSteps = steps.Select(i => new SequenceStep(i.Function.ApplyVisitor(this), i.MatchAction)).ToList();

@@ -15,10 +15,5 @@ namespace JMG.Parsnip.SyntacticModel
 		}
 
 		public IReadOnlyList<Segment> Segments { get; private set; }
-
-		//internal void HackReplaceSegment(Segment oldSegment, Segment newSegment)
-		//{
-		//	this.Segments = this.Segments.Replacing(oldSegment, newSegment);
-		//}
 	}
 }

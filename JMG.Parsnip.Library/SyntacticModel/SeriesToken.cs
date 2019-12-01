@@ -15,6 +15,7 @@ namespace JMG.Parsnip.SyntacticModel
 		}
 
 		public IToken RepeatedToken { get; }
+
 		public IToken DelimiterToken { get; }
 
 		public void ApplyVisitor(ITokenActionVisitor visitor) => visitor.Visit(this);
