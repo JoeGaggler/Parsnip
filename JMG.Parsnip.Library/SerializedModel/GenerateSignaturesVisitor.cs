@@ -38,12 +38,19 @@ namespace JMG.Parsnip.SerializedModel
 
 		private static Invoker CreateInvoker(String baseName) => (i, p, s, f) => $"{baseName}({i}, {p}, {s}, {f})"; // Invocation
 
-		private void AddSignature(IParseFunction target, Access access, Invoker invoker, Boolean requiresGeneration)
+		private Boolean AddSignature(IParseFunction target, Access access, Boolean requiresGeneration)
 		{
 			if (requiresGeneration || this.mustAddSignature)
 			{
-				this.signatures.Add(new Signature(baseName, access, target, invoker, isMemoized));
+				this.signatures.Add(new Signature(baseName, access, target, isMemoized));
+				return true;
 			}
+
+			return false;
+		}
+
+		private void AddInvoker(IParseFunction target, Invoker invoker)
+		{
 			this.invokers[target] = invoker;
 		}
 
@@ -59,8 +66,7 @@ namespace JMG.Parsnip.SerializedModel
 
 		private void VisitFunctionWithSteps<T>(T target, Access access, String letter, Func<T, IReadOnlyList<IParseFunction>> stepsFunctions) where T : IParseFunction
 		{
-			var invoker = CreateInvoker(baseName);
-			AddSignature(target, access, invoker, requiresGeneration: true); // Functions with steps must always generate a method
+			AddSignature(target, access, requiresGeneration: true); // Functions with steps must always generate a method
 
 			int index = 0;
 			foreach (var func in stepsFunctions(target))
@@ -71,10 +77,15 @@ namespace JMG.Parsnip.SerializedModel
 				var visitor = new GenerateSignaturesVisitor(stepBaseName, isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
 				func.ApplyVisitor(visitor, Access.Private);
 			}
+
+			var invoker = CreateInvoker(baseName);
+			AddInvoker(target, invoker);
 		}
 
 		public void Visit(Intrinsic target, Access access)
 		{
+			AddSignature(target, access, requiresGeneration: false); // Intrinsics have built-in methods
+
 			var methodName = target.Type switch
 			{
 				IntrinsicType.AnyCharacter => "ParseIntrinsic_AnyCharacter",
@@ -89,41 +100,42 @@ namespace JMG.Parsnip.SerializedModel
 			};
 
 			Invoker invoker = CreateInvoker(methodName);
-			AddSignature(target, access, invoker, requiresGeneration: false); // Intrinsics have built-in methods
+			AddInvoker(target, invoker);
 		}
 
 		public void Visit(LiteralString target, Access access)
 		{
+			AddSignature(target, access, requiresGeneration: false); // Lexeme is built-in
 			var expanded = target.Text.Replace("\\", "\\\\");
 			Invoker invoker = (i, p, s, f) => $"ParseLexeme({i}, {p}, \"{expanded}\")"; // Invocation
-			AddSignature(target, access, invoker, requiresGeneration: false); // Lexeme is built-in
+			AddInvoker(target, invoker);
 		}
 
 		public void Visit(ReferencedRule target, Access access)
 		{
+			AddSignature(target, access, requiresGeneration: false); // Referenced rule will generate itself
 			var methodName = this.ruleMethodNames[target.Identifier];
 			Invoker invoker = (i, p, s, f) => $"{methodName}({i}, {p}, {s}, {f})"; // Invocation
-			AddSignature(target, access, invoker, requiresGeneration: false); // Referenced rule will generate itself
+			AddInvoker(target, invoker);
 		}
 
 		public void Visit(Repetition target, Access access)
 		{
-			var inner = target.InnerParseFunction;
-			var visitor = new GenerateSignaturesVisitor(baseName + "_M", isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
-			inner.ApplyVisitor(visitor, Access.Private);
-
-
 			// If generation not required for other reasons, repetition can be inlined using built-in functions
-			Boolean requiresGeneration;
 			Invoker invoker;
-			if (mustAddSignature)
+			Boolean isGenerated = AddSignature(target, access, requiresGeneration: false);
+
+			// Applying recursion after adding the parent signature
+			var innerFunc = target.InnerParseFunction;
+			var visitor = new GenerateSignaturesVisitor(baseName + "_M", isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
+			innerFunc.ApplyVisitor(visitor, Access.Private);
+
+			if (isGenerated)
 			{
-				requiresGeneration = true;
 				invoker = CreateInvoker(baseName);
 			}
 			else
 			{
-				requiresGeneration = false;
 				String methodName;
 				switch (target.Cardinality)
 				{
@@ -133,23 +145,39 @@ namespace JMG.Parsnip.SerializedModel
 					default: throw new InvalidOperationException();
 				}
 
-				var innerFunc = target.InnerParseFunction;
 				var innerInvocation = this.invokers[innerFunc]("i", "p", "s", "f"); // Invocation
 				invoker = (i, p, s, f) => $"{methodName}({i}, {p}, {s}, {f}, (i, p, s, f) => {innerInvocation})"; // Invocation
 			}
 
-			AddSignature(target, access, invoker, requiresGeneration);
+			AddInvoker(target, invoker);
 		}
 
 		public void Visit(Series target, Access access)
 		{
-			var invoker = CreateInvoker(baseName);
+			// If generation not required for other reasons, series can be inlined using built-in functions
+			Invoker invoker;
+			Boolean isGenerated = AddSignature(target, access, requiresGeneration: false); // Series is a built-in function
 
-			AddSignature(target, access, invoker, requiresGeneration: true); // Series is a built-in function, but currently is not simplified?
-
+			// Applying recursion after adding the parent signature
 			var visitor = new GenerateSignaturesVisitor(baseName + "_D", isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
 			target.RepeatedToken.ApplyVisitor(visitor, Access.Private);
 			target.DelimiterToken.ApplyVisitor(visitor, Access.Private);
+
+			if (isGenerated)
+			{
+				invoker = CreateInvoker(baseName);
+			}
+			else
+			{
+				var repeatedFunc = target.RepeatedToken;
+				var repeatedInvocation = this.invokers[repeatedFunc]("i", "p", "s", "f"); // Invocation
+
+				var delimFunc = target.DelimiterToken;
+				var delimInvocation = this.invokers[delimFunc]("i", "p", "s", "f"); // Invocation
+				invoker = (i, p, s, f) => $"ParseSeries({i}, {p}, {s}, {f}, (i, p, s, f) => {repeatedInvocation}, (i, p, s, f) => {delimInvocation})"; // Invocation
+			}
+			
+			AddInvoker(target, invoker);
 		}
 	}
 }

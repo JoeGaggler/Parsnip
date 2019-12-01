@@ -13,19 +13,17 @@ namespace JMG.Parsnip.SerializedModel
 	/// </summary>
 	internal class Signature
 	{
-		public Signature(String name, Access access, IParseFunction func, Invoker invoker, Boolean isMemoized)
-		{
+		public Signature(String name, Access access, IParseFunction func, Boolean isMemoized)
+        {
 			this.Name = name;
 			this.Access = access;
 			this.Func = func;
-			this.Invoker = invoker;
 			this.IsMemoized = isMemoized;
 		}
 
 		public String Name { get; }
 		public Access Access { get; }
 		public IParseFunction Func { get; }
-		public Invoker Invoker { get; }
 		public Boolean IsMemoized { get; }
 	}
 
