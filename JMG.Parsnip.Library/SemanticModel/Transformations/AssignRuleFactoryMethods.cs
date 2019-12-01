@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
+namespace JMG.Parsnip.SemanticModel.Transformations
 {
 	/// <summary>
 	/// Assigns rule factory methods to all of the grammar rules

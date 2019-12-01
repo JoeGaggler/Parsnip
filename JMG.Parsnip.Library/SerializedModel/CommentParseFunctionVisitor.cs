@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.SemanticModel;
+using JMG.Parsnip.SemanticModel;
 
-namespace JMG.Parsnip.VSIXProject.SerializedModel
+namespace JMG.Parsnip.SerializedModel
 {
 	/// <summary>
 	/// Parse function visitor that produces a textual definition of the parse function

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.CodeWriting;
-using JMG.Parsnip.VSIXProject.SemanticModel;
+using JMG.Parsnip.CodeWriting;
+using JMG.Parsnip.SemanticModel;
 
-namespace JMG.Parsnip.VSIXProject.SerializedModel
+namespace JMG.Parsnip.SerializedModel
 {
 	internal class Signature
 	{

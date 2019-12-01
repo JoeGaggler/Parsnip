@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
+namespace JMG.Parsnip.SemanticModel.Transformations
 {
 	/// <summary>
 	/// Simplifies the grammar to collapse redundant steps

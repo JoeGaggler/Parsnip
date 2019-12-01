@@ -1,4 +1,4 @@
-﻿using JMG.Parsnip.VSIXProject.Extensions;
+﻿using JMG.Parsnip.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.Extensions
+namespace JMG.Parsnip.Extensions
 {
 	/// <summary>
 	/// Extensions for <see cref="List{T}"/>

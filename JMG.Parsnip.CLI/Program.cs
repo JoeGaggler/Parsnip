@@ -72,7 +72,7 @@ namespace JMG.Parsnip.CLI
 				fileContents = await reader.ReadToEndAsync();
 			}
 
-			var output = VSIXProject.ParsnipGenerator.Generate(fileContents, defaultNamespace, $"{nameArg}{extensionArg}", versionString);
+			var output = ParsnipGenerator.Generate(fileContents, defaultNamespace, $"{nameArg}{extensionArg}", versionString);
 			Console.Out.WriteLine(output);
 
 			return 0;

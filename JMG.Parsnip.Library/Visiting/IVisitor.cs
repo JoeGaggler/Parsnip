@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.Visiting
+namespace JMG.Parsnip.Visiting
 {
 	internal interface IActionVisitor<in TVisitee>
 	{

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JMG.Parsnip.VSIXProject.CodeWriting;
-using JMG.Parsnip.VSIXProject.SerializedModel;
+using JMG.Parsnip.CodeWriting;
+using JMG.Parsnip.SerializedModel;
 
-namespace JMG.Parsnip.VSIXProject
+namespace JMG.Parsnip
 {
 	/// <summary>
 	/// Parser generator
@@ -35,8 +35,35 @@ namespace JMG.Parsnip.VSIXProject
 				semanticModel = SemanticModel.Transformations.AssignRuleReferenceTypes.Go(semanticModel);
 				semanticModel = SemanticModel.Transformations.AssignRuleFactoryMethods.Go(semanticModel);
 
-				var writer = new CodeWriter();
+				// Reusables
+				var interfaceName = $"I{className}RuleFactory";
+				var packratStateClassName = "PackratState";
+				var parseResultClassName = "ParseResult";
+				var parseResultClassNameT = $"{parseResultClassName}<T>";
+				var typicalParams = new List<LocalVarDecl>
+				{
+					new LocalVarDecl("String", "input"), // Invocation
+					new LocalVarDecl("Int32", "inputPosition"),
+					new LocalVarDecl($"{packratStateClassName}[]", "states"),
+					new LocalVarDecl(interfaceName, "factory")
+				};
+				var cardParams = new[] {
+					new LocalVarDecl("String", "input"), // Invocation
+					new LocalVarDecl("Int32", "inputPosition"),
+					new LocalVarDecl($"{packratStateClassName}[]", "states"),
+					new LocalVarDecl(interfaceName, "factory"),
+					new LocalVarDecl($"Func<String, Int32, {packratStateClassName}[], {interfaceName}, {parseResultClassNameT}>", "parseAction") // Invocation
+				};
+				var delimParams = new[] {
+					new LocalVarDecl("String", "input"), // Invocation
+					new LocalVarDecl("Int32", "inputPosition"),
+					new LocalVarDecl($"{packratStateClassName}[]", "states"),
+					new LocalVarDecl(interfaceName, "factory"),
+					new LocalVarDecl($"Func<String, Int32, {packratStateClassName}[], {interfaceName}, {parseResultClassName}<T>>", "parseAction"), // Invocation
+					new LocalVarDecl($"Func<String, Int32, {packratStateClassName}[], {interfaceName}, {parseResultClassName}<D>>", "parseDelimiterAction") // Invocation
+				};
 
+				var writer = new CodeWriter();
 				writer.Comment("Code Generated via Parsnip Packrat Parser Producer");
 				writer.Comment($"Version: {versionString}");
 				writer.Comment($"Date: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
@@ -50,7 +77,6 @@ namespace JMG.Parsnip.VSIXProject
 
 				using (writer.Namespace(outputNamespace))
 				{
-					var interfaceName = $"I{className}RuleFactory";
 					using (writer.Interface(interfaceName, Access.Internal))
 					{
 						foreach (var method in semanticModel.InterfaceMethods)
@@ -66,8 +92,6 @@ namespace JMG.Parsnip.VSIXProject
 
 					using (writer.Class(className, Access.Internal))
 					{
-						var parseResultClassName = "ParseResult";
-						var parseResultClassNameT = $"{parseResultClassName}<T>";
 						using (writer.Class(parseResultClassNameT, Access.Private))
 						{
 							writer.LineOfCode("public readonly T Node;");
@@ -93,8 +117,8 @@ namespace JMG.Parsnip.VSIXProject
 							new LocalVarDecl(interfaceName, "factory"),
 						}))
 						{
-							writer.Assign("var states", "new PackratState[input.Length + 1]");
-							writer.LineOfCode("Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new PackratState());");
+							writer.Assign("var states", $"new {packratStateClassName}[input.Length + 1]");
+							writer.LineOfCode($"Enumerable.Range(0, input.Length + 1).ToList().ForEach(i => states[i] = new {packratStateClassName}());");
 							writer.Assign("var result", $"{firstRuleParseMethodName}(input, 0, states, factory)"); // Invocation
 							writer.Return("result?.Node");
 						}
@@ -103,8 +127,8 @@ namespace JMG.Parsnip.VSIXProject
 						var ruleMethodNames = semanticModel.Rules.ToDictionary(i => i.RuleIdentifier, i => NameGen.ParseFunctionMethodName(i.RuleIdentifier));
 
 						// Generate method signatures
-						List<Signature> signatures = new List<Signature>();
-						Dictionary<SemanticModel.IParseFunction, Invoker> invokers = new Dictionary<SemanticModel.IParseFunction, Invoker>();
+						var signatures = new List<Signature>();
+						var invokers = new Dictionary<SemanticModel.IParseFunction, Invoker>();
 						foreach (var rule in semanticModel.Rules)
 						{
 							var methodName = ruleMethodNames[rule.RuleIdentifier];
@@ -113,27 +137,20 @@ namespace JMG.Parsnip.VSIXProject
 						}
 						writer.EndOfLine();
 
-						// Maybe			
-						var cardParams = new[] {
-							new LocalVarDecl("String", "input"), // Invocation
-							new LocalVarDecl("Int32", "inputPosition"),
-							new LocalVarDecl("PackratState[]", "states"),
-							new LocalVarDecl(interfaceName, "factory"),
-							new LocalVarDecl($"Func<String, Int32, PackratState[], {interfaceName}, ParseResult<T>>", "parseAction") // Invocation
-						};
-						using (writer.Method(Access.Private, true, "ParseResult<T>", "ParseMaybe<T>", cardParams))
+						// Maybe
+						using (writer.Method(Access.Private, true, parseResultClassNameT, "ParseMaybe<T>", cardParams))
 						{
 							writer.VarAssign("result", "parseAction(input, inputPosition, states, factory)"); // Invocation
 							using (writer.If("result != null"))
 							{
 								writer.Return("result");
 							}
-							writer.Return("new ParseResult<T>(default(T), 0)");
+							writer.Return($"new {parseResultClassNameT}(default(T), 0)");
 						}
 
 						// Star
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseStar<T>", cardParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<IReadOnlyList<T>>", "ParseStar<T>", cardParams))
 						{
 							writer.VarAssign("list", "new List<T>()");
 							writer.VarAssign("nextResultInputPosition", "inputPosition");
@@ -147,12 +164,12 @@ namespace JMG.Parsnip.VSIXProject
 								writer.LineOfCode("list.Add(nextResult.Node);");
 								writer.Assign("nextResultInputPosition", "nextResultInputPosition + nextResult.Advanced");
 							}
-							writer.Return("new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
+							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 						}
 
 						// Plus
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParsePlus<T>", cardParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<IReadOnlyList<T>>", "ParsePlus<T>", cardParams))
 						{
 							writer.VarAssign("list", "new List<T>()");
 							writer.VarAssign("nextResultInputPosition", "inputPosition");
@@ -175,21 +192,12 @@ namespace JMG.Parsnip.VSIXProject
 								writer.LineOfCode("list.Add(nextResult.Node);");
 								writer.Assign("nextResultInputPosition", "nextResultInputPosition + nextResult.Advanced");
 							}
-							writer.Return("new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
+							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 						}
 						writer.EndOfLine();
 
 						// Delimited
-						var delimParams = new[] {
-							new LocalVarDecl("String", "input"), // Invocation
-							new LocalVarDecl("Int32", "inputPosition"),
-							new LocalVarDecl("PackratState[]", "states"),
-							new LocalVarDecl(interfaceName, "factory"),
-							new LocalVarDecl($"Func<String, Int32, PackratState[], {interfaceName}, ParseResult<T>>", "parseAction"), // Invocation
-							new LocalVarDecl($"Func<String, Int32, PackratState[], {interfaceName}, ParseResult<D>>", "parseDelimiterAction") // Invocation
-						};
-
-						using (writer.Method(Access.Private, true, "ParseResult<IReadOnlyList<T>>", "ParseSeries<T, D>", delimParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<IReadOnlyList<T>>", "ParseSeries<T, D>", delimParams))
 						{
 							writer.VarAssign("list", "new List<T>()");
 							writer.VarAssign("nextResultInputPosition", "inputPosition");
@@ -219,30 +227,24 @@ namespace JMG.Parsnip.VSIXProject
 								writer.LineOfCode("list.Add(nextResult.Node);");
 								writer.Assign("nextResultInputPosition", "nextResultInputPosition + delimResult.Advanced + nextResult.Advanced");
 							}
-							writer.Return("new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
+							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 						}
-						//
+
 						writer.EndOfLine();
-						var typicalParams = new List<LocalVarDecl>
-						{
-							new LocalVarDecl("String", "input"), // Invocation
-							new LocalVarDecl("Int32", "inputPosition"),
-							new LocalVarDecl("PackratState[]", "states"),
-							new LocalVarDecl(interfaceName, "factory")
-						};
+
 						// Any Character
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyCharacter", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyCharacter", typicalParams))
 						{
 							using (writer.If("inputPosition >= input.Length"))
 							{
 								writer.Return("null");
 							}
-							writer.Return("new ParseResult<String>(input.Substring(inputPosition, 1), 1)");
+							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, 1), 1)");
 						}
 
 						// Any Letter
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyLetter", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetter", typicalParams))
 						{
 							using (writer.If("inputPosition >= input.Length"))
 							{
@@ -253,13 +255,13 @@ namespace JMG.Parsnip.VSIXProject
 								writer.Return("null");
 
 							}
-							writer.Return("new ParseResult<String>(input.Substring(inputPosition, 1), 1)");
+							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, 1), 1)");
 						}
 
 
 						// Any Digit
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_AnyDigit", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyDigit", typicalParams))
 						{
 							using (writer.If("inputPosition >= input.Length"))
 							{
@@ -270,23 +272,23 @@ namespace JMG.Parsnip.VSIXProject
 								writer.Return("null");
 
 							}
-							writer.Return("new ParseResult<String>(input.Substring(inputPosition, 1), 1)");
+							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, 1), 1)");
 						}
 
 						// End of Line
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_EndOfLine", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLine", typicalParams))
 						{
 							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\")"); // Invocation
 							using (writer.If("result1 != null"))
 							{
-								writer.Return("new ParseResult<String>(result1.Node, result1.Advanced)");
+								writer.Return($"new {parseResultClassName}<String>(result1.Node, result1.Advanced)");
 							}
 
 							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\")"); // Invocation
 							using (writer.If("result2 != null"))
 							{
-								writer.Return("new ParseResult<String>(result2.Node, result2.Advanced)");
+								writer.Return($"new {parseResultClassName}<String>(result2.Node, result2.Advanced)");
 							}
 
 							writer.Return("null");
@@ -294,34 +296,34 @@ namespace JMG.Parsnip.VSIXProject
 
 						// End of Stream
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfStream", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<EmptyNode>", "ParseIntrinsic_EndOfStream", typicalParams))
 						{
 							using (writer.If("inputPosition == input.Length"))
 							{
-								writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, 0)");
+								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, 0)");
 							}
 							writer.Return("null");
 						}
 
 						// End of Line Or Stream
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<EmptyNode>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<EmptyNode>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
 						{
 							using (writer.If("inputPosition == input.Length"))
 							{
-								writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, 0)");
+								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, 0)");
 							}
 
 							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\")"); // Invocation
 							using (writer.If("result1 != null"))
 							{
-								writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, result1.Advanced)");
+								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, result1.Advanced)");
 							}
 
 							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\")"); // Invocation
 							using (writer.If("result2 != null"))
 							{
-								writer.Return("new ParseResult<EmptyNode>(EmptyNode.Instance, result2.Advanced)");
+								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, result2.Advanced)");
 							}
 
 							writer.Return("null");
@@ -329,7 +331,7 @@ namespace JMG.Parsnip.VSIXProject
 
 						// C-String
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_CString", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_CString", typicalParams))
 						{
 							writer.VarAssign("resultStart", "ParseLexeme(input, inputPosition, \"\\\"\")"); // Invocation
 							writer.IfNullReturnNull("resultStart");
@@ -369,7 +371,7 @@ namespace JMG.Parsnip.VSIXProject
 								writer.VarAssign("resultEnd", "ParseLexeme(input, inputPosition2, \"\\\"\")"); // Invocation
 								using (writer.If("resultEnd != null"))
 								{
-									writer.Return("new ParseResult<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition)");
+									writer.Return($"new {parseResultClassName}<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition)");
 								}
 								writer.VarAssign("resultChar", "ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory)"); // Invocation
 								writer.IfNullReturnNull("resultChar");
@@ -380,11 +382,11 @@ namespace JMG.Parsnip.VSIXProject
 
 						// Optional Horizontal Whitespace
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", typicalParams))
 						{
 							using (writer.If("inputPosition >= input.Length"))
 							{
-								writer.Return("new ParseResult<String>(String.Empty, 0)");
+								writer.Return($"new {parseResultClassName}<String>(String.Empty, 0)");
 							}
 							writer.VarAssign("sb", "new System.Text.StringBuilder()");
 							writer.VarAssign("nextInputPosition", "inputPosition");
@@ -397,12 +399,12 @@ namespace JMG.Parsnip.VSIXProject
 								}
 								writer.LineOfCode("nextInputPosition++;");
 							}
-							writer.Return("new ParseResult<String>(input.Substring(inputPosition, nextInputPosition - inputPosition), nextInputPosition - inputPosition)");
+							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, nextInputPosition - inputPosition), nextInputPosition - inputPosition)");
 						}
 						writer.EndOfLine();
 
 						// Write Lexeme
-						using (writer.Method(Access.Private, true, "ParseResult<String>", "ParseLexeme", new[] {
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseLexeme", new[] {
 							new LocalVarDecl("String", "input"), // Invocation
 							new LocalVarDecl("Int32", "inputPosition"),
 							new LocalVarDecl("String", "lexeme") }))
@@ -410,7 +412,7 @@ namespace JMG.Parsnip.VSIXProject
 							writer.VarAssign("lexemeLength", "lexeme.Length");
 							writer.IfTrueReturnNull("inputPosition + lexemeLength > input.Length");
 							writer.IfTrueReturnNull("input.Substring(inputPosition, lexemeLength) != lexeme");
-							writer.Return("new ParseResult<String>(lexeme, lexemeLength)");
+							writer.Return($"new {parseResultClassName}<String>(lexeme, lexemeLength)");
 						}
 
 						// Generate methods
@@ -439,7 +441,6 @@ namespace JMG.Parsnip.VSIXProject
 						}
 						writer.EndOfLine();
 
-						var packratStateClassName = "PackratState";
 						using (writer.Class(packratStateClassName, Access.Private))
 						{
 							foreach (var methodItem in signatures)
