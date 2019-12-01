@@ -7,7 +7,7 @@ using JMG.Parsnip.VSIXProject.Extensions;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
-	internal static class AppendingExtensions
+	internal static class ParsnipModelExtensions
 	{
 		public static ParsnipModel AddingRule(this ParsnipModel model, Rule rule) => new ParsnipModel(model.Rules.Appending(rule), model.InterfaceMethods);
 

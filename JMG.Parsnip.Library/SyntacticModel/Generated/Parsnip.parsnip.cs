@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.23
-// Date: 2019-11-29 22:06:56
+// Date: 2019-11-30 21:10:34
 
 using System;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace JMG.Parsnip.SyntacticModel.Generated
 {
-	public interface IParsnipRuleFactory
+	internal interface IParsnipRuleFactory
 	{
 		ParsnipDefinition Definition1(IReadOnlyList<IParsnipDefinitionItem> t0);
 		IParsnipDefinitionItem DefinitionItem1(Rule t0);
@@ -41,7 +41,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		String Comment1(IReadOnlyList<String> t0);
 	}
 
-	public class Parsnip
+	internal class Parsnip
 	{
 		private class ParseResult<T>
 		{
@@ -64,7 +64,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			var result = ParseRule_Definition(input, 0, states, factory);
 			return result?.Node;
 		}
-
 
 		private static ParseResult<T> ParseMaybe<T>(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory, Func<String, Int32, PackratState[], IParsnipRuleFactory, ParseResult<T>> parseAction)
 		{
@@ -725,10 +724,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		private class PackratState
 		{
-			public PackratState()
-			{
-			}
-
 			internal ParseResult<ParsnipDefinition> Mem_ParseRule_Definition;
 			internal ParseResult<IParsnipDefinitionItem> Mem_ParseRule_DefinitionItem;
 			internal ParseResult<Rule> Mem_ParseRule_Rule;

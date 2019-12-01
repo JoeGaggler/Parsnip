@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
+	/// <summary>
+	/// Represents a factory method that creates a parent token from a set of parsed child tokens
+	/// </summary>
 	internal class InterfaceMethod
 	{
 		public InterfaceMethod(INodeType returnType, String name, IReadOnlyList<INodeType> parameterTypes)

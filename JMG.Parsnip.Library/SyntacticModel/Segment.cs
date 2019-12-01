@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class Segment
+	internal class Segment
 	{
 		public Segment(MatchAction action, IToken token, Cardinality cardinality)
 		{

@@ -5,6 +5,10 @@
     <RootNamespace>JMG.Parsnip</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Update="SyntacticModel\Generated\Parsnip.parsnip.cs">
       <DesignTime>True</DesignTime>

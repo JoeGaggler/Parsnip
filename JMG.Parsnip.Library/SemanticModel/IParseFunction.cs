@@ -7,6 +7,9 @@ using JMG.Parsnip.VSIXProject.Visiting;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel
 {
+	/// <summary>
+	/// Interface for a type that implements a parsing step
+	/// </summary>
 	internal interface IParseFunction
 	{
 		InterfaceMethod InterfaceMethod { get; }

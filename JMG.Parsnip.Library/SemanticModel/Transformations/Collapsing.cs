@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
 {
+	/// <summary>
+	/// Simplifies the grammar to collapse redundant steps
+	/// </summary>
 	internal static class Collapsing
 	{
 		public static ParsnipModel Go(ParsnipModel model)

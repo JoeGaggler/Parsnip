@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class LiteralStringToken : IToken
+	internal class LiteralStringToken : IToken
 	{
 		public LiteralStringToken(String text)
 		{

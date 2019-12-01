@@ -7,6 +7,9 @@ using JMG.Parsnip.VSIXProject.SemanticModel;
 
 namespace JMG.Parsnip.VSIXProject.SerializedModel
 {
+	/// <summary>
+	/// Parse function visitor that produces a textual definition of the parse function
+	/// </summary>
 	internal class CommentParseFunctionVisitor : IParseFunctionFuncVisitor<String>
 	{
 		private readonly Boolean ShowHeader;

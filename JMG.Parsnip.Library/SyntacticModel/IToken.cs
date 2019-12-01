@@ -7,14 +7,17 @@ using JMG.Parsnip.VSIXProject.Visiting;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public interface IToken
+	/// <summary>
+	/// Interface for a type that represents a Parsnip syntax token
+	/// </summary>
+	internal interface IToken
 	{
 		void ApplyVisitor(ITokenActionVisitor visitor);
 
 		TOutput ApplyVisitor<TOutput>(ITokenFuncVisitor<TOutput> visitor);
 	}
 
-	public interface ITokenActionVisitor :
+	internal interface ITokenActionVisitor :
 		IActionVisitor<RuleIdentifierToken>,
 		IActionVisitor<LiteralStringToken>,
 		IActionVisitor<IntrinsicToken>,
@@ -25,7 +28,7 @@ namespace JMG.Parsnip.SyntacticModel
 
 	}
 
-	public interface ITokenFuncVisitor<TOutput> :
+	internal interface ITokenFuncVisitor<TOutput> :
 		IFuncVisitor<RuleIdentifierToken, TOutput>,
 		IFuncVisitor<LiteralStringToken, TOutput>,
 		IFuncVisitor<IntrinsicToken, TOutput>,

@@ -8,30 +8,43 @@ using JMG.Parsnip.VSIXProject.SemanticModel;
 
 namespace JMG.Parsnip.VSIXProject.SerializedModel
 {
+	/// <summary>
+	/// Parse function visitor that generates the method signature
+	/// </summary>
 	internal class GenerateSignaturesVisitor : IParseFunctionActionVisitor<Access>
 	{
-		private readonly ParsnipCode parsnipCode;
 		private readonly String baseName;
 		private readonly Boolean isMemoized;
 		private readonly Boolean mustAddSignature;
+		private readonly IReadOnlyDictionary<String, String> ruleMethodNames;
+		private readonly List<Signature> signatures;
+		private readonly Dictionary<IParseFunction, Invoker> invokers;
 
-		public GenerateSignaturesVisitor(ParsnipCode parsnipCode, String baseName, Boolean isMemoized, Boolean mustAddSignature)
+		public GenerateSignaturesVisitor(
+			String baseName, 
+			Boolean isMemoized, 
+			Boolean mustAddSignature,
+			IReadOnlyDictionary<String, String> ruleMethodNames,
+			List<Signature> signatures,
+			Dictionary<IParseFunction, Invoker> invokers)
 		{
-			this.parsnipCode = parsnipCode;
 			this.baseName = baseName;
 			this.isMemoized = isMemoized;
 			this.mustAddSignature = mustAddSignature;
+			this.ruleMethodNames = ruleMethodNames;
+			this.signatures = signatures;
+			this.invokers = invokers;
 		}
 
 		private static Invoker CreateInvoker(String baseName) => (i, p, s, f) => $"{baseName}({i}, {p}, {s}, {f})"; // Invocation
 
 		private void AddSignature(IParseFunction target, Access access, Invoker invoker)
 		{
-			parsnipCode.MapFunctionInvocation(target, invoker);
-			parsnipCode.AddSignature(new Signature(baseName, access, target, invoker, isMemoized));
+			this.invokers[target] = invoker;
+			this.signatures.Add(new Signature(baseName, access, target, invoker, isMemoized));
 		}
 
-		private void AddInvoker(IParseFunction target, Invoker invoker) => this.parsnipCode.MapFunctionInvocation(target, invoker);
+		private void AddInvoker(IParseFunction target, Invoker invoker) => this.invokers[target] = invoker;
 
 		public void Visit(Selection target, Access access)
 		{
@@ -54,15 +67,26 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				index++;
 				String stepBaseName = $"{baseName}_{letter}{index}";
 
-				var visitor = new GenerateSignaturesVisitor(parsnipCode, stepBaseName, isMemoized: false, mustAddSignature: false);
+				var visitor = new GenerateSignaturesVisitor(stepBaseName, isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
 				func.ApplyVisitor(visitor, Access.Private);
 			}
 		}
 
 		public void Visit(Intrinsic target, Access access)
 		{
-			var methodName = parsnipCode.Intrinsics[target.Type];
-			Invoker invoker = (i, p, s, f) => $"{methodName}({i}, {p}, {s}, {f})"; // Invocation
+			var methodName = target.Type switch
+			{
+				IntrinsicType.AnyCharacter => "ParseIntrinsic_AnyCharacter",
+				IntrinsicType.AnyLetter => "ParseIntrinsic_AnyLetter",
+				IntrinsicType.AnyDigit => "ParseIntrinsic_AnyDigit",
+				IntrinsicType.EndOfLine => "ParseIntrinsic_EndOfLine",
+				IntrinsicType.EndOfStream => "ParseIntrinsic_EndOfStream",
+				IntrinsicType.EndOfLineOrStream => "ParseIntrinsic_EndOfLineOrStream",
+				IntrinsicType.CString => "ParseIntrinsic_CString",
+				IntrinsicType.OptionalHorizontalWhitespace => "ParseIntrinsic_OptionalHorizontalWhitespace",
+			};
+
+			Invoker invoker = CreateInvoker(methodName);
 			if (this.mustAddSignature)
 			{
 				AddSignature(target, access, invoker);
@@ -89,7 +113,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 
 		public void Visit(ReferencedRule target, Access access)
 		{
-			var methodName = parsnipCode.RuleMethodNames[target.Identifier];
+			var methodName = this.ruleMethodNames[target.Identifier];
 			Invoker invoker = (i, p, s, f) => $"{methodName}({i}, {p}, {s}, {f})"; // Invocation
 			if (this.mustAddSignature)
 			{
@@ -107,7 +131,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			AddSignature(target, access, invoker);
 
 			var inner = target.InnerParseFunction;
-			var visitor = new GenerateSignaturesVisitor(parsnipCode, baseName + "_M", isMemoized: false, mustAddSignature: false);
+			var visitor = new GenerateSignaturesVisitor(baseName + "_M", isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
 			inner.ApplyVisitor(visitor, Access.Private);
 		}
 
@@ -116,7 +140,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var invoker = CreateInvoker(baseName);
 			AddSignature(target, access, invoker);
 
-			var visitor = new GenerateSignaturesVisitor(parsnipCode, baseName + "_D", isMemoized: false, mustAddSignature: false);
+			var visitor = new GenerateSignaturesVisitor(baseName + "_D", isMemoized: false, mustAddSignature: false, ruleMethodNames, this.signatures, this.invokers);
 			target.RepeatedToken.ApplyVisitor(visitor, Access.Private);
 			target.DelimiterToken.ApplyVisitor(visitor, Access.Private);
 		}

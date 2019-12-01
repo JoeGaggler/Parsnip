@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class SeriesToken : IToken
+	internal class SeriesToken : IToken
 	{
 		public SeriesToken(IToken repeatedToken, IToken delimiterToken)
 		{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.CodeWriting
 {
-	public class LocalVarDecl
+	internal class LocalVarDecl
 	{
 		public LocalVarDecl(String typeName, String localName)
 		{

@@ -12,13 +12,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 	{
 		private readonly CodeWriter writer;
 		private readonly String interfaceName;
-		private readonly ParsnipCode parsnipCode;
+		private readonly IReadOnlyDictionary<IParseFunction, Invoker> invokers;
 
-		public GenerateMethodsVisitor(ParsnipCode parsnipCode, CodeWriter writer, String interfaceName)
-		{
+		public GenerateMethodsVisitor(CodeWriter writer, String interfaceName, IReadOnlyDictionary<SemanticModel.IParseFunction, Invoker> invokers)
+        {
 			this.writer = writer;
 			this.interfaceName = interfaceName;
-			this.parsnipCode = parsnipCode;
+			this.invokers = invokers;
 		}
 
 		private class Decl
@@ -72,7 +72,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		{
 			var resultName = "r";
 			var nodeName = $"{resultName}.Node";
-			var invoker = this.parsnipCode.Invokers[target];
+			var invoker = this.invokers[target];
 			writer.VarAssign(resultName, invoker("input", "inputPosition", "states", "factory")); // Invocation
 			writer.IfNullReturnNull(resultName);
 
@@ -94,7 +94,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			{
 				stepIndex++;
 				var func = step.Function;
-				var invoker = this.parsnipCode.Invokers[func];
+				var invoker = this.invokers[func];
 				var resultName = $"r{stepIndex}";
 
 				writer.VarAssign(resultName, invoker("input", "inputPosition", "states", "factory")); // Invocation
@@ -137,7 +137,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				stepIndex++;
 				var func = step.Function;
 				var type = func.ReturnType;
-				var invoker = this.parsnipCode.Invokers[func];
+				var invoker = this.invokers[func];
 				var resultName = $"r{stepIndex}";
 				var nodeName = $"{resultName}.Node";
 
@@ -194,7 +194,7 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			}
 
 			var innerFunc = target.InnerParseFunction;
-			var innerInvocation = parsnipCode.Invokers[innerFunc]("i", "p", "s", "f"); // Invocation
+			var innerInvocation = this.invokers[innerFunc]("i", "p", "s", "f"); // Invocation
 			var invocation = $"{methodName}(input, inputPosition, states, factory, (i, p, s, f) => {innerInvocation})"; // Invocation
 
 			var resultName = "result";
@@ -218,10 +218,10 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 			var methodName = "ParseSeries";
 
 			var repeatedFunc = target.RepeatedToken;
-			var repeatedInvocation = parsnipCode.Invokers[repeatedFunc]("i", "p", "s", "f"); // Invocation
+			var repeatedInvocation = this.invokers[repeatedFunc]("i", "p", "s", "f"); // Invocation
 
 			var delimFunc = target.DelimiterToken;
-			var delimInvocation = parsnipCode.Invokers[delimFunc]("i", "p", "s", "f"); // Invocation
+			var delimInvocation = this.invokers[delimFunc]("i", "p", "s", "f"); // Invocation
 
 			var invocation = $"{methodName}(input, inputPosition, states, factory, (i, p, s, f) => {repeatedInvocation}, (i, p, s, f) => {delimInvocation})"; // Invocation
 

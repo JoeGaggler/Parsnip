@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.VSIXProject.CodeWriting
 {
-	public static class CodeWriterExtensions
+	internal static class CodeWriterExtensions
 	{
 		public static void Assign(this CodeWriter writer, String left, String right) => writer.LineOfCode($"{left} = {right};");
 

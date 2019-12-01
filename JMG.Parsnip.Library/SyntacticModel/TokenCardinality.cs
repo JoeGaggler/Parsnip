@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class TokenCardinality
+	internal class TokenCardinality
 	{
 		public TokenCardinality(IToken token, Cardinality cardinality)
 		{

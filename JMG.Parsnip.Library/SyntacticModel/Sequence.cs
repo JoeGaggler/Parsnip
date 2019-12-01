@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class Sequence
+	internal class Sequence
 	{
 		public Sequence(IReadOnlyList<Segment> segments)
 		{

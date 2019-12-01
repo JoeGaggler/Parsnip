@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class RuleHeadPrefix
+	internal class RuleHeadPrefix
 	{
 		public RuleHeadPrefix(RuleIdentifier id)
 		{

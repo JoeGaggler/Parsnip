@@ -26,5 +26,13 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		public Boolean IsMemoized { get; }
 	}
 
+	/// <summary>
+	/// Delegate that creates an parse function invocation from the available context
+	/// </summary>
+	/// <param name="inputName">Reference to the input</param>
+	/// <param name="inputPositionName">Reference to the input</param>
+	/// <param name="statesName">Reference to the states</param>
+	/// <param name="factoryName">Reference to the factory</param>
+	/// <returns>C# expression (as a String) that invokes a parse function</returns>
 	internal delegate String Invoker(String inputName, String inputPositionName, String statesName, String factoryName);
 }
