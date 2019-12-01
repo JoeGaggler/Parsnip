@@ -16,6 +16,7 @@ namespace JMG.Parsnip.SemanticModel
 		}
 
 		public IParseFunction RepeatedToken { get; }
+
 		public IParseFunction DelimiterToken { get; }
 
 		public INodeType ReturnType
