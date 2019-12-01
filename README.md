@@ -1,10 +1,37 @@
 # Parsnip
 
-A Visual Studio C# Project Extension that contains a single-file-generator for producing a parser class from a grammar file.
+A dotnet tool that produces a [packrat parser](https://en.wikipedia.org/wiki/Packrat_parser) from a grammar file.
+
+This solution also contains a Visual Studio C# Project Extension with a single-file-generator that runs the dotnet tool as a convenience.
 
 ## Overview
-A grammar file defines the structure of the target. The definition consists of a series of recursive parse rules, with each rule resolving to a C# type. The first rule in the definition is the root of the parse tree, and so the result of parse operation is the type indicated by this first rule. 
 
-Each rule contains a union of possible productions, with each production resolving to the rule's type. A production consists of a sequence of tokens. A production that is recognized by the parser is fed to a factory method to produce an instance of the rule's type.
+Parnsip provides a very convenient C# text parser generator when more robust solutions are too cumbersome. 
+Parsnip generates the **complete** C# code into your target project so that your target application does not need to incorporate any a generated libraries or parser runtimes.
+Since the parser is generated in your C# solution as if you had manually coded it, the parser does not incur the cost of runtime generation.
 
+## Grammar
 
+A grammar file defines the structure of the parser's input, and this grammar file is the input Parsnip so that it can generate the parser.
+
+Similar to other [PEG definitions](https://en.wikipedia.org/wiki/Parsing_expression_grammar#Definition), the grammar definition consists of a series of recursive descent production rules.
+
+The first rule in the definition is the start token.
+
+### Rule
+
+A rule is defined by a line that starts with a name followed by a colon, and optionally the C# type:
+
+```
+my-parse-rule: ResultType
+```
+
+Subsequent lines define possible productions for this rule. Recall that productions in packrat parsers are [ordered](https://en.wikipedia.org/wiki/Parsing_expression_grammar#Ambiguity_detection_and_influence_of_rule_order_on_language_that_is_matched).
+
+## Node Factory Interface
+
+Instead of returning the entire [parse tree](https://en.wikipedia.org/wiki/Parse_tree), Parsnip generates a parser that returns a single C# type that should be simpler and more practical to the target application.
+This type is defined by the first production rule in the grammar definition (i.e. the start symbol), however instantiation of this type is **not** defined in the grammar. 
+Instead Parsnip generates a **Node factory interface** alongside the parser which must be implemented by the application and provided to the parser along with the input to be parsed.
+This interface contains a method for each production rule, which returns the associated C# type, and has a parameter for each of the C# types that were recursively returned by methods associated with the tokens of the production rule.
+Separating the instantiation from the grammar allows the grammar to remain simple, while providing the freedom to use the full-expressiveness of C#.
