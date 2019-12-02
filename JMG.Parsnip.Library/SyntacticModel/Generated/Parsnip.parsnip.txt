@@ -46,7 +46,7 @@ rule-identifier
 `"(" union `")"
 
 rule-identifier: RuleIdentifier
-<Aa> (<Aa> | "-")*
+<Aa> (<Aa> | "-" | <#>)*
 
 class-identifier: ClassIdentifier
 csharp-identifier/"."

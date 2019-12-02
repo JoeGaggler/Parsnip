@@ -29,6 +29,8 @@ my-parse-rule: ResultType
 Subsequent lines define possible productions (i.e. the "right hand side") for this rule. 
 Recall that productions in packrat parsers are [ordered](https://en.wikipedia.org/wiki/Parsing_expression_grammar#Ambiguity_detection_and_influence_of_rule_order_on_language_that_is_matched).
 
+The rule name starts with a letter, followed by letters, numbers, and hyphens.
+
 ## Production
 
 A production consists of a sequence of tokens, separated by spaces:
@@ -54,10 +56,10 @@ A **literal token** is a token that matches the input, literally. This token is 
 ### Intrinsic token
 
 An **intrinsic token** is a "built-in" token that recognizes common inputs using shorthand. Most intrinsic tokens are defined by surrounding its code in angle brackets, 
-for example the intrinsic token that recognizes a digit:
+for example here is the production that recognizes a digit at the end of the input:
 
 ```
-<#>
+<#> <END>
 ```
 
 Currently supported intrinsic tokens:
@@ -71,6 +73,29 @@ Currently supported intrinsic tokens:
 * `<CSTRING>` - matches a "C style string"
 * `<TAB>` - matches a tab
 * `<SP>` or `<SPACE>` - matches a single space
+
+## Token modifiers
+
+Tokens can be modified by prefixes and postfixes to change the matching behavior.
+
+### Match action modifiers
+
+A prefix attached to a token change the match action. If no prefix is attached, the default action is "consume", which means that the input is consumed, and then proceeds to the next token in the production rule.
+These are the supported match action modifiers:
+* (no prefix) - consume, which advances the input so that subsequent tokens can be matched
+* `\`` - ignore, which consumes the token, but does not forward it to the parent
+* `~` - fail, which immediately fails the rule if the token matches
+* `&` - rewind, which matches the token, but rewinds so that the token is not yet consumed
+* (no prefix) - consume
+
+### Cardinality modifiers
+
+A postfix attached to a token changes the cardinality of the match. If no postfix is attached, the default cardinality is "one", which means the token is matched once-and-only-once.
+These are the supported cardinality modifiers:
+* (no postfix) - one
+* `?` - maybe, zero or one
+* `*` - star, zero or more
+* `+` - plus, one or more
 
 # Node Factory Interface
 

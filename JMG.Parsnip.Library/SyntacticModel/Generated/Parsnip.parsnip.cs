@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.24
-// Date: 2019-12-01 14:02:56
+// Date: 2019-12-01 17:53:47
 
 using System;
 using System.Linq;
@@ -584,7 +584,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<Union>(r2.Node, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced - inputPosition);
 		}
 
-		// Sequence: <Aa> (<Aa> | "-")*
+		// Sequence: <Aa> (<Aa> | "-" | <#>)*
 		private static ParseResult<RuleIdentifier> ParseRule_RuleIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (states[inputPosition].Mem_ParseRule_RuleIdentifier is var mem && mem != null) { return mem; }
@@ -596,13 +596,15 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return states[inputPosition].Mem_ParseRule_RuleIdentifier = new ParseResult<RuleIdentifier>(factory.RuleIdentifier1(r1.Node, r2.Node), inputPosition + r1.Advanced + r2.Advanced - inputPosition);
 		}
 
-		// Selection: <Aa> | "-"
+		// Selection: <Aa> | "-" | <#>
 		private static ParseResult<String> ParseRule_RuleIdentifier_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
 			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
 			var r2 = ParseLexeme(input, inputPosition, "-");
 			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
+			var r3 = ParseIntrinsic_AnyDigit(input, inputPosition, states, factory);
+			if (r3 != null) return new ParseResult<String>(r3.Node, r3.Advanced);
 			return null;
 		}
 
