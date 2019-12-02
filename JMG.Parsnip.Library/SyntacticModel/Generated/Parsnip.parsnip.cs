@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.24
-// Date: 2019-12-02 12:38:45
+// Date: 2019-12-02 12:51:11
 
 using System;
 using System.Linq;
@@ -144,14 +144,10 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
 		}
 
-		private static ParseResult<String> ParseIntrinsic_AnyCharacter(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			if (inputPosition >= input.Length)
-			{
-				return null;
-			}
-			return new ParseResult<String>(input.Substring(inputPosition, 1), 1);
-		}
+		private static ParseResult<String> ParseIntrinsic_AnyCharacter(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory) =>
+			(inputPosition < input.Length) ?
+			new ParseResult<String>(input.Substring(inputPosition, 1), 1) :
+			null;
 
 		private static ParseResult<String> ParseIntrinsic_AnyLetter(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory) =>
 			(inputPosition < input.Length && Char.IsLetter(input[inputPosition])) ?

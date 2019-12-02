@@ -233,13 +233,11 @@ namespace JMG.Parsnip
 						writer.EndOfLine();
 
 						// Any Character
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyCharacter", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyCharacter", typicalParams))
 						{
-							using (writer.If("inputPosition >= input.Length"))
-							{
-								writer.Return("null");
-							}
-							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, 1), 1)");
+							writer.LineOfCode($"(inputPosition < input.Length) ?");
+							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
+							writer.LineOfCode($"null;");
 						}
 
 						// Any Letter
