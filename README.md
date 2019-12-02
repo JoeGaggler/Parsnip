@@ -97,6 +97,30 @@ These are the supported cardinality modifiers:
 * `*` - star, zero or more
 * `+` - plus, one or more
 
+## Special tokens
+
+Parnsip also includes special syntax that simplifies common patterns.
+
+### Series
+
+It is common to want to parse a series of tokens that are separated by another token, for example a comma-separated-values of numbers.
+The Parsnip syntax to match this series is to separate the item token from the separator token with a forward-slash, as shown below for a list of csv-numbers:
+
+```
+number/","
+```
+
+### Union
+
+A union is used when you want to match equivalent sequences in a single production rule, for example if a keyword in your grammar has multiple aliases. 
+In this case "equivalent" means that the number and types of the tokens in each sequence are the same.
+
+Here is an example of rule that matches a request to add two numbers:
+
+```
+number ("plus" | "and") number
+```
+
 # Node Factory Interface
 
 Instead of returning the entire [parse tree](https://en.wikipedia.org/wiki/Parse_tree), Parsnip generates a parser that returns a single C# type that should be simpler and more practical to the target application.
