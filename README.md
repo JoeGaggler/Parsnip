@@ -31,6 +31,8 @@ Recall that productions in packrat parsers are [ordered](https://en.wikipedia.or
 
 The rule name starts with a letter, followed by letters, numbers, and hyphens.
 
+If the rule does not include a C# type, then its results will be effectively "ignored" (see "match action modifiers").
+
 ## Production
 
 A production consists of a sequence of tokens, separated by spaces:
@@ -128,3 +130,9 @@ This type is defined by the first production rule in the grammar definition (i.e
 Instead Parsnip generates a **Node factory interface** alongside the parser which must be implemented by the application and provided to the parser along with the input to be parsed.
 This interface contains a method for each production rule, which returns the associated C# type, and has a parameter for each of the C# types that were recursively returned by methods associated with the tokens of the production rule.
 Separating the instantiation from the grammar allows the grammar to remain simple, while providing the freedom to use the full-expressiveness of C#.
+
+# Notes
+
+Parsnip parses itself! 
+Since Parsnip takes a grammar definition as input to produce a custom parser, its own grammar definition is used to produce the Parsnip parser! 
+The definition and the resulting parser are located in this repo.
