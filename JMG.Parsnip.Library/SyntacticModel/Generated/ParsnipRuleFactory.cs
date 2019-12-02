@@ -27,8 +27,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => t0.Concat();
 
-		String IParsnipRuleFactory.IntrinsicIdentifier2(String t0) => t0;
-
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 
 		RuleBody IParsnipRuleFactory.RuleBody1(IReadOnlyList<Choice> t0) => new RuleBody(t0);

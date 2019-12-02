@@ -77,6 +77,9 @@ namespace JMG.Parsnip.SerializedModel
 				case IntrinsicType.AnyCharacter: value = "."; break;
 				case IntrinsicType.AnyDigit: value = "<#>"; break;
 				case IntrinsicType.AnyLetter: value = "<Aa>"; break;
+				case IntrinsicType.AnyLetterOrDigit: value = "<Aa#>"; break;
+				case IntrinsicType.UpperLetter: value = "<A>"; break;
+				case IntrinsicType.LowerLetter: value = "<a>"; break;
 				case IntrinsicType.CString: value = "<CSTRING>"; break;
 				case IntrinsicType.EndOfLine: value = "<EOL>"; break;
 				case IntrinsicType.EndOfStream: value = "<EOS>"; break;

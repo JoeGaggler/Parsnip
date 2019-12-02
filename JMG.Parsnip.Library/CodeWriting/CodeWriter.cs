@@ -262,6 +262,21 @@ namespace JMG.Parsnip.CodeWriting
 		}
 
 		/// <summary>
+		/// Writes an inline method
+		/// </summary>
+		/// <param name="access">Access modifier</param>
+		/// <param name="isStatic">Static</param>
+		/// <param name="returnType">Return type</param>
+		/// <param name="methodName">Name</param>
+		/// <param name="parameters">Parameters</param>
+		/// <returns>Disposable that writes the closing brace when disposed</returns>
+		public IDisposable InlineMethod(Access access, Boolean isStatic, String returnType, String methodName, IReadOnlyList<LocalVarDecl> parameters)
+		{
+			LineOfCode($"{access.ToAccessString()}{(isStatic ? " static" : "")} {returnType} {methodName}({parameters.GetParameterListString()}) =>");
+			return new _IndentationScope(this);
+		}
+
+		/// <summary>
 		/// Writes a for-each block
 		/// </summary>
 		/// <param name="enumerable">Enumerable</param>

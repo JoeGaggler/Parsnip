@@ -244,35 +244,47 @@ namespace JMG.Parsnip
 
 						// Any Letter
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetter", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetter", typicalParams))
 						{
-							using (writer.If("inputPosition >= input.Length"))
-							{
-								writer.Return("null");
-							}
-							using (writer.ElseIf("!Char.IsLetter(input[inputPosition])"))
-							{
-								writer.Return("null");
-
-							}
-							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, 1), 1)");
+							writer.LineOfCode($"(inputPosition < input.Length && Char.IsLetter(input[inputPosition])) ?");
+							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
+							writer.LineOfCode($"null;");
 						}
 
+						// Upper Letter
+						writer.EndOfLine();
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_UpperLetter", typicalParams))
+						{
+							writer.LineOfCode($"(inputPosition < input.Length && Char.IsUpper(input[inputPosition])) ?");
+							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
+							writer.LineOfCode($"null;");
+						}
+
+						// Lower Letter
+						writer.EndOfLine();
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_LowerLetter", typicalParams))
+						{
+							writer.LineOfCode($"(inputPosition < input.Length && Char.IsLower(input[inputPosition])) ?");
+							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
+							writer.LineOfCode($"null;");
+						}
 
 						// Any Digit
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyDigit", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyDigit", typicalParams))
 						{
-							using (writer.If("inputPosition >= input.Length"))
-							{
-								writer.Return("null");
-							}
-							using (writer.ElseIf("!Char.IsDigit(input[inputPosition])"))
-							{
-								writer.Return("null");
+							writer.LineOfCode($"(inputPosition < input.Length && Char.IsDigit(input[inputPosition])) ?");
+							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
+							writer.LineOfCode($"null;");
+						}
 
-							}
-							writer.Return($"new {parseResultClassName}<String>(input.Substring(inputPosition, 1), 1)");
+						// Any Letter or Digit
+						writer.EndOfLine();
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetterOrDigit", typicalParams))
+						{
+							writer.LineOfCode($"(inputPosition < input.Length && Char.IsLetterOrDigit(input[inputPosition])) ?");
+							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
+							writer.LineOfCode($"null;");
 						}
 
 						// End of Line

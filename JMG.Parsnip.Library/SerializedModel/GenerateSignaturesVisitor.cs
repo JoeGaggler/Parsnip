@@ -90,6 +90,9 @@ namespace JMG.Parsnip.SerializedModel
 			{
 				IntrinsicType.AnyCharacter => "ParseIntrinsic_AnyCharacter",
 				IntrinsicType.AnyLetter => "ParseIntrinsic_AnyLetter",
+				IntrinsicType.AnyLetterOrDigit => "ParseIntrinsic_AnyLetterOrDigit",
+				IntrinsicType.UpperLetter => "ParseIntrinsic_UpperLetter",
+				IntrinsicType.LowerLetter => "ParseIntrinsic_LowerLetter",
 				IntrinsicType.AnyDigit => "ParseIntrinsic_AnyDigit",
 				IntrinsicType.EndOfLine => "ParseIntrinsic_EndOfLine",
 				IntrinsicType.EndOfStream => "ParseIntrinsic_EndOfStream",

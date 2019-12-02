@@ -15,7 +15,7 @@ namespace JMG.Parsnip.SerializedModel
 		private readonly IReadOnlyDictionary<IParseFunction, Invoker> invokers;
 
 		public GenerateMethodsVisitor(CodeWriter writer, String interfaceName, IReadOnlyDictionary<SemanticModel.IParseFunction, Invoker> invokers)
-        {
+		{
 			this.writer = writer;
 			this.interfaceName = interfaceName;
 			this.invokers = invokers;
@@ -34,7 +34,7 @@ namespace JMG.Parsnip.SerializedModel
 		}
 
 		private String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
-        {
+		{
 			String nodeString;
 			if (returnType == EmptyNodeType.Instance)
 			{
@@ -131,7 +131,8 @@ namespace JMG.Parsnip.SerializedModel
 			var returnedResults = new List<Decl>();
 
 			int stepIndex = 0;
-            var currentInputPosition = "inputPosition";
+			var currentInputPosition = "inputPosition";
+			String currentAdvanced = null;
 			foreach (var step in target.Steps)
 			{
 				stepIndex++;
@@ -148,17 +149,30 @@ namespace JMG.Parsnip.SerializedModel
 
 				writer.VarAssign(resultName, invoker("input", currentInputPosition, "states", "factory")); // Invocation
 
+				var thisAdvanced = $"{resultName}.Advanced";
 				switch (step.MatchAction)
 				{
-					case MatchAction.Consume: writer.IfNullReturnNull(resultName); break;
-					case MatchAction.Fail: writer.IfNotNullReturnNull(resultName); break;
-					case MatchAction.Rewind: writer.IfNullReturnNull(resultName); break;
-					case MatchAction.Ignore: writer.IfNullReturnNull(resultName); break;
-				}
-                currentInputPosition = $"{currentInputPosition} + {resultName}.Advanced";
-            }
+					case MatchAction.Consume:
+						writer.IfNullReturnNull(resultName);
+						currentInputPosition = $"{currentInputPosition} + {thisAdvanced}";
+						currentAdvanced = (currentAdvanced == null) ? (thisAdvanced) : ($"{currentAdvanced} + {thisAdvanced}");
+						break;
 
-			var returnExpression = GetReturnExpression(target.ReturnType, returnedResults, $"{currentInputPosition} - inputPosition", "factory", target.InterfaceMethod);
+					case MatchAction.Fail:
+						writer.IfNotNullReturnNull(resultName); break;
+
+					case MatchAction.Rewind:
+						writer.IfNullReturnNull(resultName); break;
+
+					case MatchAction.Ignore:
+						writer.IfNullReturnNull(resultName);
+						currentInputPosition = $"{currentInputPosition} + {thisAdvanced}";
+						currentAdvanced = (currentAdvanced == null) ? (thisAdvanced) : ($"{currentAdvanced} + {thisAdvanced}");
+						break;
+				}
+			}
+
+			var returnExpression = GetReturnExpression(target.ReturnType, returnedResults, currentAdvanced, "factory", target.InterfaceMethod);
 			if (input.IsMemoized)
 			{
 				var memField = NameGen.MemoizedFieldName(input.Name);

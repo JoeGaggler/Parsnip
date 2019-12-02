@@ -55,7 +55,7 @@ csharp-identifier: String
 <Aa> (<Aa> | <#>)*
 
 intrinsic-identifier: String
-<Aa>+ | "#"
+(~">" .)+
 
 comment: String
 `"//" (~<EOLOS> .)* `<EOLOS>

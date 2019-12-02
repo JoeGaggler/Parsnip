@@ -13,6 +13,9 @@ namespace JMG.Parsnip.SemanticModel
 		EndOfLineOrStream,
 		AnyCharacter,
 		AnyLetter,
+		AnyLetterOrDigit,
+		LowerLetter,
+		UpperLetter,
 		CString,
 		OptionalHorizontalWhitespace,
 		AnyDigit
@@ -38,6 +41,9 @@ namespace JMG.Parsnip.SemanticModel
 				{
 					case IntrinsicType.AnyDigit:
 					case IntrinsicType.AnyLetter:
+					case IntrinsicType.AnyLetterOrDigit:
+					case IntrinsicType.UpperLetter:
+					case IntrinsicType.LowerLetter:
 					case IntrinsicType.AnyCharacter:
 					case IntrinsicType.CString:
 					case IntrinsicType.EndOfLine:
