@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.24
-// Date: 2019-12-02 12:51:11
+// Date: 2019-12-03 09:32:34
 
 using System;
 using System.Linq;
@@ -578,7 +578,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<Union>(r2.Node, r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
-		// Sequence: <Aa> (<Aa> | "-" | <#>)*
+		// Sequence: <Aa> (<Aa#> | "-")*
 		private static ParseResult<RuleIdentifier> ParseRule_RuleIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (states[inputPosition].Mem_ParseRule_RuleIdentifier is var mem && mem != null) { return mem; }
@@ -590,15 +590,13 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return states[inputPosition].Mem_ParseRule_RuleIdentifier = new ParseResult<RuleIdentifier>(factory.RuleIdentifier1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
-		// Selection: <Aa> | "-" | <#>
+		// Selection: <Aa#> | "-"
 		private static ParseResult<String> ParseRule_RuleIdentifier_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
+			var r1 = ParseIntrinsic_AnyLetterOrDigit(input, inputPosition, states, factory);
 			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
 			var r2 = ParseLexeme(input, inputPosition, "-");
 			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
-			var r3 = ParseIntrinsic_AnyDigit(input, inputPosition, states, factory);
-			if (r3 != null) return new ParseResult<String>(r3.Node, r3.Advanced);
 			return null;
 		}
 
@@ -612,26 +610,16 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return states[inputPosition].Mem_ParseRule_ClassIdentifier = new ParseResult<ClassIdentifier>(factory.ClassIdentifier1(result.Node), result.Advanced);
 		}
 
-		// Sequence: <Aa> (<Aa> | <#>)*
+		// Sequence: <Aa> <Aa#>*
 		private static ParseResult<String> ParseRule_CsharpIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (states[inputPosition].Mem_ParseRule_CsharpIdentifier is var mem && mem != null) { return mem; }
 
 			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
 			if (r1 == null) return null;
-			var r2 = ParseStar(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseRule_CsharpIdentifier_S2_M(i, p, s, f));
+			var r2 = ParseStar(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseIntrinsic_AnyLetterOrDigit(i, p, s, f));
 			if (r2 == null) return null;
 			return states[inputPosition].Mem_ParseRule_CsharpIdentifier = new ParseResult<String>(factory.CsharpIdentifier1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
-		}
-
-		// Selection: <Aa> | <#>
-		private static ParseResult<String> ParseRule_CsharpIdentifier_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition, states, factory);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
-			var r2 = ParseIntrinsic_AnyDigit(input, inputPosition, states, factory);
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
-			return null;
 		}
 
 		// Repetition: (~">" .)+
