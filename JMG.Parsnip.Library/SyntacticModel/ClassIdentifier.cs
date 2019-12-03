@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class ClassIdentifier
+	internal class ClassIdentifier
 	{
 		public ClassIdentifier(String text)
 		{

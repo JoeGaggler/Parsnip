@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.Extensions;
+using JMG.Parsnip.Extensions;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel
+namespace JMG.Parsnip.SemanticModel
 {
-	internal static class AppendingExtensions
+	internal static class ParsnipModelExtensions
 	{
 		public static ParsnipModel AddingRule(this ParsnipModel model, Rule rule) => new ParsnipModel(model.Rules.Appending(rule), model.InterfaceMethods);
 

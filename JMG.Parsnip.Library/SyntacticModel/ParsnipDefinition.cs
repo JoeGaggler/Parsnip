@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class ParsnipDefinition
+	internal class ParsnipDefinition
 	{
 		public ParsnipDefinition(IReadOnlyList<IParsnipDefinitionItem> items)
 		{

@@ -46,16 +46,16 @@ rule-identifier
 `"(" union `")"
 
 rule-identifier: RuleIdentifier
-<Aa> (<Aa> | "-")*
+<Aa> (<Aa#> | "-")*
 
 class-identifier: ClassIdentifier
 csharp-identifier/"."
 
 csharp-identifier: String
-<Aa> (<Aa> | <#>)*
+<Aa> <Aa#>*
 
 intrinsic-identifier: String
-<Aa>+ | "#"
+(~">" .)+
 
 comment: String
 `"//" (~<EOLOS> .)* `<EOLOS>

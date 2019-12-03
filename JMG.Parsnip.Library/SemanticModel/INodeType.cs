@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.Visiting;
+using JMG.Parsnip.Visiting;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel
+namespace JMG.Parsnip.SemanticModel
 {
 	internal interface INodeType
 	{

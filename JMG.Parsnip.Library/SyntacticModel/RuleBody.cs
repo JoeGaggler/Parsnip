@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class RuleBody
+	internal class RuleBody
 	{
 		public RuleBody(IReadOnlyList<Choice> choices)
 		{

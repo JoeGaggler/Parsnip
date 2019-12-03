@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.SemanticModel;
+using JMG.Parsnip.SemanticModel;
 
-namespace JMG.Parsnip.VSIXProject.SerializedModel
+namespace JMG.Parsnip.SerializedModel
 {
+	/// <summary>
+	/// Parse function visitor that produces a textual definition of the parse function
+	/// </summary>
 	internal class CommentParseFunctionVisitor : IParseFunctionFuncVisitor<String>
 	{
 		private readonly Boolean ShowHeader;
@@ -74,6 +77,9 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 				case IntrinsicType.AnyCharacter: value = "."; break;
 				case IntrinsicType.AnyDigit: value = "<#>"; break;
 				case IntrinsicType.AnyLetter: value = "<Aa>"; break;
+				case IntrinsicType.AnyLetterOrDigit: value = "<Aa#>"; break;
+				case IntrinsicType.UpperLetter: value = "<A>"; break;
+				case IntrinsicType.LowerLetter: value = "<a>"; break;
 				case IntrinsicType.CString: value = "<CSTRING>"; break;
 				case IntrinsicType.EndOfLine: value = "<EOL>"; break;
 				case IntrinsicType.EndOfStream: value = "<EOS>"; break;
@@ -134,7 +140,15 @@ namespace JMG.Parsnip.VSIXProject.SerializedModel
 		{
 			var value1 = target.RepeatedToken.ApplyVisitor(WithoutHeader);
 			var value2 = target.DelimiterToken.ApplyVisitor(WithoutHeader);
-			return $"Series: {value1}/{value2}";
+			if (ShowHeader)
+			{
+				return $"Series: {value1}/{value2}";
+			}
+			if (ShowWrapped)
+			{
+				return $"({value1}/{value2})";
+			}
+			return $"{value1}/{value2}";
 		}
 	}
 }

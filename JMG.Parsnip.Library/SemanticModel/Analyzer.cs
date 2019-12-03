@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.Extensions;
+using JMG.Parsnip.Extensions;
 using JMG.Parsnip.SyntacticModel;
-using JMG.Parsnip.VSIXProject.Visiting;
+using JMG.Parsnip.Visiting;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel
+namespace JMG.Parsnip.SemanticModel
 {
 	internal class Analyzer
 	{
@@ -191,8 +191,11 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 					{
 						case ".": type = IntrinsicType.AnyCharacter; break;
 						case "--": type = IntrinsicType.OptionalHorizontalWhitespace; break;
-						case "#": type = IntrinsicType.AnyDigit; break;
+						case "#": case "0": type = IntrinsicType.AnyDigit; break;
 						case "Aa": type = IntrinsicType.AnyLetter; break;
+						case "Aa#": case "Aa0": type = IntrinsicType.AnyLetterOrDigit; break;
+						case "A": type = IntrinsicType.UpperLetter; break;
+						case "a": type = IntrinsicType.LowerLetter; break;
 						default:
 						{
 							switch (target.Identifier.ToUpperInvariant()) // Case-insensitive identifiers
@@ -207,7 +210,6 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 								case "SPACE": return new LiteralString(" ", interfaceMethod: null);
 								default:
 								{
-
 									throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
 								}
 							}

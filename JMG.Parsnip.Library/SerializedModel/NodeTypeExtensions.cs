@@ -1,11 +1,11 @@
-﻿using JMG.Parsnip.VSIXProject.SemanticModel;
+﻿using JMG.Parsnip.SemanticModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.SerializedModel
+namespace JMG.Parsnip.SerializedModel
 {
 	internal static class NodeTypeExtensions
 	{

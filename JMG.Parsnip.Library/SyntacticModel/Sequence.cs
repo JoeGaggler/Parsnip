@@ -1,4 +1,4 @@
-﻿using JMG.Parsnip.VSIXProject.Extensions;
+﻿using JMG.Parsnip.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class Sequence
+	internal class Sequence
 	{
 		public Sequence(IReadOnlyList<Segment> segments)
 		{
@@ -15,10 +15,5 @@ namespace JMG.Parsnip.SyntacticModel
 		}
 
 		public IReadOnlyList<Segment> Segments { get; private set; }
-
-		//internal void HackReplaceSegment(Segment oldSegment, Segment newSegment)
-		//{
-		//	this.Segments = this.Segments.Replacing(oldSegment, newSegment);
-		//}
 	}
 }

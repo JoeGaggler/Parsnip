@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public enum MatchAction
+	internal enum MatchAction
 	{
 		Consume,
 		Ignore,

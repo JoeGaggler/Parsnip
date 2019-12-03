@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel
+namespace JMG.Parsnip.SemanticModel
 {
 	internal enum IntrinsicType
 	{
@@ -13,6 +13,9 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 		EndOfLineOrStream,
 		AnyCharacter,
 		AnyLetter,
+		AnyLetterOrDigit,
+		LowerLetter,
+		UpperLetter,
 		CString,
 		OptionalHorizontalWhitespace,
 		AnyDigit
@@ -38,6 +41,9 @@ namespace JMG.Parsnip.VSIXProject.SemanticModel
 				{
 					case IntrinsicType.AnyDigit:
 					case IntrinsicType.AnyLetter:
+					case IntrinsicType.AnyLetterOrDigit:
+					case IntrinsicType.UpperLetter:
+					case IntrinsicType.LowerLetter:
 					case IntrinsicType.AnyCharacter:
 					case IntrinsicType.CString:
 					case IntrinsicType.EndOfLine:

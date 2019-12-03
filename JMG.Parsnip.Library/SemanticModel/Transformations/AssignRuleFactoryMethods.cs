@@ -4,8 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.SemanticModel.Transformations
+namespace JMG.Parsnip.SemanticModel.Transformations
 {
+	/// <summary>
+	/// Assigns rule factory methods to all of the grammar rules
+	/// </summary>
+	/// <remarks>
+	/// This should be run after all other rule transformations, otherwise the signature of the factory method may no longer match the transformed rule.
+	/// </remarks>
 	internal static class AssignRuleFactoryMethods
 	{
 		public static ParsnipModel Go(ParsnipModel model)

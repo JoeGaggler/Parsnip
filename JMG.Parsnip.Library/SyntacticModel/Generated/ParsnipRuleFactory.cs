@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JMG.Parsnip.VSIXProject.Extensions;
+using JMG.Parsnip.Extensions;
 
 namespace JMG.Parsnip.SyntacticModel.Generated
 {
@@ -26,8 +26,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3() => null;
 
 		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => t0.Concat();
-
-		String IParsnipRuleFactory.IntrinsicIdentifier2(String t0) => t0;
 
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 

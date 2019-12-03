@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class AnyToken : IToken
+	internal class AnyToken : IToken
 	{
 		public void ApplyVisitor(ITokenActionVisitor visitor) => visitor.Visit(this);
 

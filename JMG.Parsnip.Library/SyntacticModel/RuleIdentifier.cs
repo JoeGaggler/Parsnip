@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JMG.Parsnip.SyntacticModel
 {
-	public class RuleIdentifier
+	internal class RuleIdentifier
 	{
 		public RuleIdentifier(String text)
 		{

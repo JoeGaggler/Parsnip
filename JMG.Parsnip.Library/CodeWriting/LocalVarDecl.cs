@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JMG.Parsnip.VSIXProject.CodeWriting
+namespace JMG.Parsnip.CodeWriting
 {
-	public class LocalVarDecl
+	internal class LocalVarDecl
 	{
 		public LocalVarDecl(String typeName, String localName)
 		{
