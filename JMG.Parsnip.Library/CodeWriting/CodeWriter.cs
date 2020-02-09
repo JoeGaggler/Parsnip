@@ -197,7 +197,7 @@ namespace JMG.Parsnip.CodeWriting
 		public IDisposable DoWhile(String whileCondition)
 		{
 			LineOfCode("do");
-			var whileString = String.Format(" while ({0});", whileCondition);
+			var whileString = $" while ({whileCondition});";
 			return new BraceScope(this, withClosingBrace: whileString);
 		}
 

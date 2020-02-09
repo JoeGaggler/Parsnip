@@ -8,15 +8,18 @@ namespace JMG.Parsnip.SemanticModel
 {
 	internal class LiteralString : IParseFunction
 	{
-		public LiteralString(String text, InterfaceMethod interfaceMethod)
+		public LiteralString(String text, InterfaceMethod interfaceMethod, StringComparison stringComparison)
 		{
 			this.Text = text;
 			this.InterfaceMethod = interfaceMethod;
+			this.StringComparison = stringComparison;
 		}
 
 		public InterfaceMethod InterfaceMethod { get; }
 
 		public String Text { get; }
+
+		public StringComparison StringComparison { get; }
 
 		public INodeType ReturnType => new SingleNodeType("String");
 		

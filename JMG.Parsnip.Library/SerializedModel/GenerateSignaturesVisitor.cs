@@ -109,8 +109,8 @@ namespace JMG.Parsnip.SerializedModel
 		public void Visit(LiteralString target, Access access)
 		{
 			AddSignature(target, access, requiresGeneration: false); // Lexeme is built-in
-			var expanded = target.Text.Replace("\\", "\\\\");
-			Invoker invoker = (i, p, s, f) => $"ParseLexeme({i}, {p}, \"{expanded}\")"; // Invocation
+			var expanded = target.Text.Replace("\\", "\\\\", StringComparison.Ordinal);
+			Invoker invoker = (i, p, s, f) => $"ParseLexeme({i}, {p}, \"{expanded}\", StringComparison.{target.StringComparison})"; // Invocation
 			AddInvoker(target, invoker);
 		}
 

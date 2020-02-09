@@ -40,7 +40,7 @@ token ("+" | "?" | "*")?
 
 token: IToken
 `"."
-<CSTRING>
+<CSTRING> "i"?
 rule-identifier
 `"<" intrinsic-identifier `">" | "--"
 `"(" union `")"

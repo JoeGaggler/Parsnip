@@ -24,6 +24,11 @@ namespace JMG.Parsnip
 		{
 			try
 			{
+				if (String.IsNullOrEmpty(inputString))
+				{
+					throw new ArgumentNullException(nameof(inputString), "Unable to generate parser for empty input");
+				}
+
 				var fileBaseName = Path.GetFileNameWithoutExtension(fileName);
 				var className = NameGen.ClassName(fileBaseName);
 
@@ -289,13 +294,13 @@ namespace JMG.Parsnip
 						writer.EndOfLine();
 						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLine", typicalParams))
 						{
-							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\")"); // Invocation
+							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result1 != null"))
 							{
 								writer.Return($"new {parseResultClassName}<String>(result1.Node, result1.Advanced)");
 							}
 
-							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\")"); // Invocation
+							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result2 != null"))
 							{
 								writer.Return($"new {parseResultClassName}<String>(result2.Node, result2.Advanced)");
@@ -324,13 +329,13 @@ namespace JMG.Parsnip
 								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, 0)");
 							}
 
-							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\")"); // Invocation
+							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result1 != null"))
 							{
 								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, result1.Advanced)");
 							}
 
-							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\")"); // Invocation
+							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result2 != null"))
 							{
 								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, result2.Advanced)");
@@ -343,14 +348,14 @@ namespace JMG.Parsnip
 						writer.EndOfLine();
 						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_CString", typicalParams))
 						{
-							writer.VarAssign("resultStart", "ParseLexeme(input, inputPosition, \"\\\"\")"); // Invocation
+							writer.VarAssign("resultStart", "ParseLexeme(input, inputPosition, \"\\\"\", StringComparison.Ordinal)"); // Invocation
 							writer.IfNullReturnNull("resultStart");
 							writer.VarAssign("nextInputPosition", "inputPosition + resultStart.Advanced");
 							writer.VarAssign("sb", "new System.Text.StringBuilder()");
 							using (writer.While("true"))
 							{
 								writer.VarAssign("inputPosition2", "nextInputPosition");
-								writer.VarAssign("resultEscape", "ParseLexeme(input, inputPosition2, \"\\\\\")"); // Invocation
+								writer.VarAssign("resultEscape", "ParseLexeme(input, inputPosition2, \"\\\\\", StringComparison.Ordinal)"); // Invocation
 								using (writer.If("resultEscape != null"))
 								{
 									writer.Assign("inputPosition2", "inputPosition2 + resultEscape.Advanced");
@@ -378,7 +383,7 @@ namespace JMG.Parsnip
 
 									writer.Continue();
 								}
-								writer.VarAssign("resultEnd", "ParseLexeme(input, inputPosition2, \"\\\"\")"); // Invocation
+								writer.VarAssign("resultEnd", "ParseLexeme(input, inputPosition2, \"\\\"\", StringComparison.Ordinal)"); // Invocation
 								using (writer.If("resultEnd != null"))
 								{
 									writer.Return($"new {parseResultClassName}<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition)");
@@ -417,11 +422,12 @@ namespace JMG.Parsnip
 						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseLexeme", new[] {
 							new LocalVarDecl("String", "input"), // Invocation
 							new LocalVarDecl("Int32", "inputPosition"),
-							new LocalVarDecl("String", "lexeme") }))
+							new LocalVarDecl("String", "lexeme"),
+							new LocalVarDecl("StringComparison", "stringComparison")}))
 						{
 							writer.VarAssign("lexemeLength", "lexeme.Length");
 							writer.IfTrueReturnNull("inputPosition + lexemeLength > input.Length");
-							writer.IfTrueReturnNull("input.Substring(inputPosition, lexemeLength) != lexeme");
+							writer.IfTrueReturnNull("!String.Equals(input.Substring(inputPosition, lexemeLength), lexeme, stringComparison)"); 
 							writer.Return($"new {parseResultClassName}<String>(lexeme, lexemeLength)");
 						}
 
@@ -469,7 +475,9 @@ namespace JMG.Parsnip
 
 				return writer.GetText();
 			}
+#pragma warning disable CA1031 // Do not catch general exception types
 			catch (Exception exception)
+#pragma warning restore CA1031 // Do not catch general exception types
 			{
 				return exception.ToString();
 			}

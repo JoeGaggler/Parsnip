@@ -33,7 +33,7 @@ namespace JMG.Parsnip.SerializedModel
 			public String Name { get; }
 		}
 
-		private String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
+		private static String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
 		{
 			String nodeString;
 			if (returnType == EmptyNodeType.Instance)

@@ -40,3 +40,9 @@ dotnet_style_qualification_for_field = true:none
 dotnet_style_qualification_for_property = true:none
 dotnet_style_qualification_for_method = true:none
 dotnet_style_qualification_for_event = true:none
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = suggestion
+
+# CA1825: Avoid zero-length array allocations.
+dotnet_diagnostic.CA1825.severity = suggestion

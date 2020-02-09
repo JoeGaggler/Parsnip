@@ -71,7 +71,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		IToken IParsnipRuleFactory.Token1() => new IntrinsicToken(".");
 
-		IToken IParsnipRuleFactory.Token2(String t0) => new LiteralStringToken(t0);
+		IToken IParsnipRuleFactory.Token2(String t0, String t1) => new LiteralStringToken(t0, t1);
 
 		IToken IParsnipRuleFactory.Token3(RuleIdentifier t0) => new RuleIdentifierToken(t0);
 
