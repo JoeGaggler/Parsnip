@@ -236,12 +236,23 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 					{
 						case "\\":
 						case "\"":
+						{
+							sb.Append(resultToken.Node);
+							break;
+						}
 						case "t":
+						{
+							sb.Append("\t");
+							break;
+						}
 						case "r":
+						{
+							sb.Append("\r");
+							break;
+						}
 						case "n":
 						{
-							sb.Append("\\");
-							sb.Append(resultToken.Node);
+							sb.Append("\n");
 							break;
 						}
 						default:
@@ -249,7 +260,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 							return null;
 						}
 					}
-					inputPosition2 = inputPosition2 + resultToken.Advanced;
+					nextInputPosition = inputPosition2 + resultToken.Advanced;
 					continue;
 				}
 				var resultEnd = ParseLexeme(input, inputPosition2, "\"", StringComparison.Ordinal);
