@@ -322,23 +322,23 @@ namespace JMG.Parsnip
 
 						// End of Line Or Stream
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<EmptyNode>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
 						{
 							using (writer.If("inputPosition == input.Length"))
 							{
-								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, 0)");
+								writer.Return($"new {parseResultClassName}<String>(String.Empty, 0)");
 							}
 
 							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result1 != null"))
 							{
-								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, result1.Advanced)");
+								writer.Return($"new {parseResultClassName}<String>(result1.Node, result1.Advanced)");
 							}
 
 							writer.VarAssign("result2", "ParseLexeme(input, inputPosition, \"\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result2 != null"))
 							{
-								writer.Return($"new {parseResultClassName}<EmptyNode>(EmptyNode.Instance, result2.Advanced)");
+								writer.Return($"new {parseResultClassName}<String>(result2.Node, result2.Advanced)");
 							}
 
 							writer.Return("null");
@@ -365,13 +365,27 @@ namespace JMG.Parsnip
 									{
 										writer.LineOfCode("case \"\\\\\":");
 										writer.LineOfCode("case \"\\\"\":");
+										using (writer.BraceScope())
+										{
+											writer.LineOfCode("sb.Append(resultToken.Node);");
+											writer.SwitchBreak();
+										}
 										writer.LineOfCode("case \"t\":");
+										using (writer.BraceScope())
+										{
+											writer.LineOfCode("sb.Append(\"\\t\");");
+											writer.SwitchBreak();
+										}
 										writer.LineOfCode("case \"r\":");
+										using (writer.BraceScope())
+										{
+											writer.LineOfCode("sb.Append(\"\\r\");");
+											writer.SwitchBreak();
+										}
 										writer.LineOfCode("case \"n\":");
 										using (writer.BraceScope())
 										{
-											writer.LineOfCode("sb.Append(\"\\\\\");");
-											writer.LineOfCode("sb.Append(resultToken.Node);");
+											writer.LineOfCode("sb.Append(\"\\n\");");
 											writer.SwitchBreak();
 										}
 										using (writer.SwitchDefault())
@@ -379,7 +393,7 @@ namespace JMG.Parsnip
 											writer.Return("null");
 										}
 									}
-									writer.Assign("inputPosition2", "inputPosition2 + resultToken.Advanced");
+									writer.Assign("nextInputPosition", "inputPosition2 + resultToken.Advanced");
 
 									writer.Continue();
 								}

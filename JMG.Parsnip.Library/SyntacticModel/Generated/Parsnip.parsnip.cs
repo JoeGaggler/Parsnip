@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.25.6
-// Date: 2020-02-08 22:58:41
+// Version: 1.25.20
+// Date: 2020-02-11 20:34:17
 
 using System;
 using System.Linq;
@@ -198,21 +198,21 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return null;
 		}
 
-		private static ParseResult<EmptyNode> ParseIntrinsic_EndOfLineOrStream(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
+		private static ParseResult<String> ParseIntrinsic_EndOfLineOrStream(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (inputPosition == input.Length)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, 0);
+				return new ParseResult<String>(String.Empty, 0);
 			}
 			var result1 = ParseLexeme(input, inputPosition, "\r\n", StringComparison.Ordinal);
 			if (result1 != null)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, result1.Advanced);
+				return new ParseResult<String>(result1.Node, result1.Advanced);
 			}
 			var result2 = ParseLexeme(input, inputPosition, "\n", StringComparison.Ordinal);
 			if (result2 != null)
 			{
-				return new ParseResult<EmptyNode>(EmptyNode.Instance, result2.Advanced);
+				return new ParseResult<String>(result2.Node, result2.Advanced);
 			}
 			return null;
 		}
