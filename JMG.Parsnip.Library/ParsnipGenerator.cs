@@ -167,7 +167,9 @@ namespace JMG.Parsnip
 									writer.SwitchBreak();
 								}
 								writer.LineOfCode("list.Add(nextResult.Node);");
-								writer.Assign("nextResultInputPosition", "nextResultInputPosition + nextResult.Advanced");
+								writer.VarAssign("advanced", "nextResult.Advanced");
+								writer.LineOfCode("if (advanced == 0) break;");
+								writer.Assign("nextResultInputPosition", "nextResultInputPosition + advanced");
 							}
 							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 						}
@@ -195,7 +197,9 @@ namespace JMG.Parsnip
 									writer.SwitchBreak();
 								}
 								writer.LineOfCode("list.Add(nextResult.Node);");
-								writer.Assign("nextResultInputPosition", "nextResultInputPosition + nextResult.Advanced");
+								writer.VarAssign("advanced", "nextResult.Advanced");
+								writer.LineOfCode("if (advanced == 0) break;");
+								writer.Assign("nextResultInputPosition", "nextResultInputPosition + advanced");
 							}
 							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
 						}

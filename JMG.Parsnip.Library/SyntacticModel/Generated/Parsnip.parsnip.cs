@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.25.21
-// Date: 2020-02-11 21:39:22
+// Date: 2020-02-11 21:59:46
 
 using System;
 using System.Linq;
@@ -622,14 +622,24 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return null;
 		}
 
-		// Series: csharp-identifier/"."
+		// Repetition: (~<EOLOS> .)+
 		private static ParseResult<ClassIdentifier> ParseRule_ClassIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (states[inputPosition].Mem_ParseRule_ClassIdentifier is var mem && mem != null) { return mem; }
 
-			var result = ParseSeries(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_CsharpIdentifier(i, p, s, f), (i, p, s, f) => ParseLexeme(i, p, ".", StringComparison.Ordinal));
+			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_ClassIdentifier_M(i, p, s, f));
 			if (result == null) return null;
 			return states[inputPosition].Mem_ParseRule_ClassIdentifier = new ParseResult<ClassIdentifier>(factory.ClassIdentifier1(result.Node), result.Advanced);
+		}
+
+		// Sequence: ~<EOLOS> .
+		private static ParseResult<String> ParseRule_ClassIdentifier_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
+		{
+			var r1 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition, states, factory);
+			if (r1 != null) return null;
+			var r2 = ParseIntrinsic_AnyCharacter(input, inputPosition, states, factory);
+			if (r2 == null) return null;
+			return new ParseResult<String>(r2.Node, r2.Advanced);
 		}
 
 		// Sequence: <Aa> <Aa#>*

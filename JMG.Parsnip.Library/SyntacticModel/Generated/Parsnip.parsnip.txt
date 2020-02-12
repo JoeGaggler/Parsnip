@@ -49,7 +49,7 @@ rule-identifier: RuleIdentifier
 <Aa> (<Aa#> | "-")*
 
 class-identifier: ClassIdentifier
-csharp-identifier/"."
+(~<EOLOS> .)+
 
 csharp-identifier: String
 <Aa> <Aa#>*
