@@ -441,8 +441,9 @@ namespace JMG.Parsnip
 						{
 							writer.VarAssign("lexemeLength", "lexeme.Length");
 							writer.IfTrueReturnNull("inputPosition + lexemeLength > input.Length");
-							writer.IfTrueReturnNull("!String.Equals(input.Substring(inputPosition, lexemeLength), lexeme, stringComparison)"); 
-							writer.Return($"new {parseResultClassName}<String>(lexeme, lexemeLength)");
+							writer.VarAssign("actualLexeme", "input.Substring(inputPosition, lexemeLength)");
+							writer.IfTrueReturnNull("!String.Equals(actualLexeme, lexeme, stringComparison)"); 
+							writer.Return($"new {parseResultClassName}<String>(actualLexeme, lexemeLength)");
 						}
 
 						// Generate methods

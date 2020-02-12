@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.25.20
-// Date: 2020-02-11 20:34:17
+// Version: 1.25.21
+// Date: 2020-02-11 21:39:22
 
 using System;
 using System.Linq;
@@ -299,8 +299,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		{
 			var lexemeLength = lexeme.Length;
 			if (inputPosition + lexemeLength > input.Length) return null;
-			if (!String.Equals(input.Substring(inputPosition, lexemeLength), lexeme, stringComparison)) return null;
-			return new ParseResult<String>(lexeme, lexemeLength);
+			var actualLexeme = input.Substring(inputPosition, lexemeLength);
+			if (!String.Equals(actualLexeme, lexeme, stringComparison)) return null;
+			return new ParseResult<String>(actualLexeme, lexemeLength);
 		}
 
 		// Repetition: definition-item+
