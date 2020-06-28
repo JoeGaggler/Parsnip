@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>JMG.Parsnip.CLI</RootNamespace>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>parsnip</ToolCommandName>
+    <ToolCommandName>dotnet-parsnip</ToolCommandName>
     <AssemblyName>JMG.Parsnip</AssemblyName>
     <Version>1.25</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
