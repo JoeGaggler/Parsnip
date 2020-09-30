@@ -42,7 +42,7 @@ namespace JMG.Parsnip.SemanticModel.Transformations
 				this.interfaceMethodName = interfaceMethodName;
 			}
 
-			private IReadOnlyList<INodeType> GetParameterTypesFromReturnType(INodeType funcReturnType)
+			private static IReadOnlyList<INodeType> GetParameterTypesFromReturnType(INodeType funcReturnType)
 			{
 				if (funcReturnType == EmptyNodeType.Instance)
 				{
@@ -127,7 +127,7 @@ namespace JMG.Parsnip.SemanticModel.Transformations
 				{
 					return (target, new InterfaceMethod[0]);
 				}
-				return (new LiteralString(target.Text, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
+				return (new LiteralString(target.Text, interfaceMethod, target.StringComparison), new InterfaceMethod[] { interfaceMethod });
 			}
 
 			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(ReferencedRule target, INodeType input)

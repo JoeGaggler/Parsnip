@@ -47,11 +47,11 @@ namespace JMG.Parsnip.SemanticModel
 					case IntrinsicType.AnyCharacter:
 					case IntrinsicType.CString:
 					case IntrinsicType.EndOfLine:
+					case IntrinsicType.EndOfLineOrStream:
 					case IntrinsicType.OptionalHorizontalWhitespace:
 					return new SingleNodeType("String");
 
 					case IntrinsicType.EndOfStream:
-					case IntrinsicType.EndOfLineOrStream:
 					return EmptyNodeType.Instance;
 
 					default: throw new NotImplementedException();

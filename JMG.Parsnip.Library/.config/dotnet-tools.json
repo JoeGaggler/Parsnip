@@ -2,8 +2,8 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "JMG.Parsnip": {
-      "version": "1.22.2",
+    "jmg.parsnip": {
+      "version": "1.25",
       "commands": [
         "parsnip"
       ]

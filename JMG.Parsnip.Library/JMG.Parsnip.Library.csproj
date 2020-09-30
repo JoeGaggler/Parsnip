@@ -10,6 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="SyntacticModel\Generated\Parsnip.parsnip.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -19,7 +26,7 @@
 
   <ItemGroup>
     <None Update="SyntacticModel\Generated\Parsnip.parsnip.txt">
-      <Generator>Parsnip</Generator>
+      <Generator>DotNetCLIToolCsCodeGenerator</Generator>
       <LastGenOutput>Parsnip.parsnip.cs</LastGenOutput>
     </None>
   </ItemGroup>

@@ -16,7 +16,7 @@ namespace JMG.Parsnip.VSIXProject
     [Guid("381F20E9-2A4C-4F5B-8355-58A76B23DDCA")]
     public sealed class ParsnipSingleFileGenerator : BaseCodeGeneratorWithSite
     {
-        public override string GetDefaultExtension()
+        public override String GetDefaultExtension()
         {
             return ".cs";
         }
@@ -45,14 +45,14 @@ namespace JMG.Parsnip.VSIXProject
             return true;
         }
 
-        protected override byte[] GenerateCode(string inputFileName, string inputFileContent)
+        protected override Byte[] GenerateCode(String inputFileName, String inputFileContent)
         {
             String result = Generate(inputFileContent, this.FileNamespace, inputFileName);
             var bytes = Encoding.UTF8.GetBytes(result);
             return bytes;
         }
 
-        private string Generate(string fileContents, string defaultNamespace, string inputFilePath)
+        private String Generate(String fileContents, String defaultNamespace, String inputFilePath)
         {
             try
             {
@@ -67,18 +67,20 @@ namespace JMG.Parsnip.VSIXProject
 
                 String args = $"{command} --namespace \"{defaultNamespace}\" --name \"{baseName}\" --extension \"{extension}\"";
 
-                var processStartInfo = new ProcessStartInfo("dotnet", args);
-                processStartInfo.RedirectStandardInput = true;
-                processStartInfo.RedirectStandardOutput = true;
-                processStartInfo.RedirectStandardError = true;
-                processStartInfo.CreateNoWindow = true;
-                processStartInfo.ErrorDialog = false;
-                processStartInfo.StandardOutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
-                processStartInfo.UseShellExecute = false;
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                processStartInfo.WorkingDirectory = folder;
+				var processStartInfo = new ProcessStartInfo("dotnet", args)
+				{
+					RedirectStandardInput = true,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					CreateNoWindow = true,
+					ErrorDialog = false,
+					StandardOutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true),
+					UseShellExecute = false,
+					WindowStyle = ProcessWindowStyle.Hidden,
+					WorkingDirectory = folder
+				};
 
-                var p = Process.Start(processStartInfo);
+				var p = Process.Start(processStartInfo);
 
                 using (var writer = p.StandardInput)
                 {
@@ -88,7 +90,7 @@ namespace JMG.Parsnip.VSIXProject
                 var outputString = p.StandardOutput.ReadToEnd();
                 var errorString = p.StandardError.ReadToEnd();
 
-                var didExit = p.WaitForExit((int)TimeSpan.FromSeconds(10).TotalMilliseconds);
+                var didExit = p.WaitForExit((Int32)TimeSpan.FromSeconds(10).TotalMilliseconds);
                 if (didExit)
                 {
                     if (p.ExitCode == 0)
@@ -108,7 +110,7 @@ namespace JMG.Parsnip.VSIXProject
             }
             catch (Exception exc)
             {
-                return GetErrorHeader() + $"#error Failed to launch the generator{Environment.NewLine}/*{Environment.NewLine}{exc.ToString()}{Environment.NewLine}*/";
+				return GetErrorHeader() + $"#error Failed to launch the generator{Environment.NewLine}/*{Environment.NewLine}{exc}{Environment.NewLine}*/";
             }
         }
 

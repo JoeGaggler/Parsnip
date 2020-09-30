@@ -96,7 +96,12 @@ namespace JMG.Parsnip.SerializedModel
 
 		public String Visit(LiteralString target)
 		{
-			var value = $"\"{target.Text}\"";
+			var escaped = target.Text
+				.Replace("\r", "\\r", StringComparison.Ordinal)
+				.Replace("\n", "\\n", StringComparison.Ordinal)
+				.Replace("\t", "\\t", StringComparison.Ordinal);
+
+			var value = $"\"{escaped}\"";
 			if (this.ShowHeader)
 			{
 				value = $"Lexeme: {value}";

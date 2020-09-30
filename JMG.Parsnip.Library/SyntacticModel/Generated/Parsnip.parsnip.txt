@@ -40,7 +40,7 @@ token ("+" | "?" | "*")?
 
 token: IToken
 `"."
-<CSTRING>
+<CSTRING> "i"?
 rule-identifier
 `"<" intrinsic-identifier `">" | "--"
 `"(" union `")"
@@ -49,7 +49,7 @@ rule-identifier: RuleIdentifier
 <Aa> (<Aa#> | "-")*
 
 class-identifier: ClassIdentifier
-csharp-identifier/"."
+(~<EOLOS> .)+
 
 csharp-identifier: String
 <Aa> <Aa#>*

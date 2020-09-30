@@ -33,7 +33,7 @@ namespace JMG.Parsnip.SerializedModel
 			public String Name { get; }
 		}
 
-		private String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
+		private static String GetReturnExpression(INodeType returnType, IReadOnlyList<Decl> nodes, String inputPositionReference, String factoryName, InterfaceMethod interfaceMethod)
 		{
 			String nodeString;
 			if (returnType == EmptyNodeType.Instance)
@@ -78,7 +78,7 @@ namespace JMG.Parsnip.SerializedModel
 
 			var decl = new Decl(target.ReturnType, nodeName);
 
-			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, "inputPosition", "factory", interfaceMethod);
+			var returnExpression = GetReturnExpression(target.ReturnType, new[] { decl }, $"{resultName}.Advanced", "factory", interfaceMethod);
 			if (signature.IsMemoized)
 			{
 				var memField = NameGen.MemoizedFieldName(signature.Name);

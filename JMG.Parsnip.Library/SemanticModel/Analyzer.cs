@@ -182,7 +182,7 @@ namespace JMG.Parsnip.SemanticModel
 
 				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text, ruleNodeType: null, interfaceMethod: null);
 
-				public IParseFunction Visit(LiteralStringToken target) => new LiteralString(target.Text, interfaceMethod: null);
+				public IParseFunction Visit(LiteralStringToken target) => new LiteralString(target.Text, interfaceMethod: null, stringComparison: target.StringComparison);
 
 				public IParseFunction Visit(IntrinsicToken target)
 				{
@@ -205,9 +205,9 @@ namespace JMG.Parsnip.SemanticModel
 								case "EOL": type = IntrinsicType.EndOfLine; break;
 								case "EOLOS": type = IntrinsicType.EndOfLineOrStream; break;
 								case "CSTRING": type = IntrinsicType.CString; break;
-								case "TAB": return new LiteralString("\t", interfaceMethod: null);
+								case "TAB": return new LiteralString("\t", interfaceMethod: null, stringComparison: StringComparison.Ordinal);
 								case "SP":
-								case "SPACE": return new LiteralString(" ", interfaceMethod: null);
+								case "SPACE": return new LiteralString(" ", interfaceMethod: null, stringComparison: StringComparison.Ordinal);
 								default:
 								{
 									throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
@@ -219,8 +219,6 @@ namespace JMG.Parsnip.SemanticModel
 
 					return new Intrinsic(type, interfaceMethod: null);
 				}
-
-				public IParseFunction Visit(AnyToken target) => new Intrinsic(IntrinsicType.AnyCharacter, interfaceMethod: null);
 
 				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union, isMemoized);
 

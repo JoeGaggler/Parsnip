@@ -21,7 +21,6 @@ namespace JMG.Parsnip.SyntacticModel
 		IActionVisitor<RuleIdentifierToken>,
 		IActionVisitor<LiteralStringToken>,
 		IActionVisitor<IntrinsicToken>,
-		IActionVisitor<AnyToken>,
 		IActionVisitor<UnionToken>,
 		IActionVisitor<SeriesToken>
 	{
@@ -32,7 +31,6 @@ namespace JMG.Parsnip.SyntacticModel
 		IFuncVisitor<RuleIdentifierToken, TOutput>,
 		IFuncVisitor<LiteralStringToken, TOutput>,
 		IFuncVisitor<IntrinsicToken, TOutput>,
-		IFuncVisitor<AnyToken, TOutput>,
 		IFuncVisitor<UnionToken, TOutput>,
 		IFuncVisitor<SeriesToken, TOutput>
 	{
