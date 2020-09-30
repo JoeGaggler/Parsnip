@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
-// Version: 1.25.21
-// Date: 2020-02-11 21:59:46
+// Version: 1.25
+// Date: 2020-09-30 15:24:13
 
 using System;
 using System.Linq;
@@ -86,7 +86,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 					break;
 				}
 				list.Add(nextResult.Node);
-				nextResultInputPosition = nextResultInputPosition + nextResult.Advanced;
+				var advanced = nextResult.Advanced;
+				if (advanced == 0) break;
+				nextResultInputPosition = nextResultInputPosition + advanced;
 			}
 			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
 		}
@@ -110,7 +112,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 					break;
 				}
 				list.Add(nextResult.Node);
-				nextResultInputPosition = nextResultInputPosition + nextResult.Advanced;
+				var advanced = nextResult.Advanced;
+				if (advanced == 0) break;
+				nextResultInputPosition = nextResultInputPosition + advanced;
 			}
 			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
 		}

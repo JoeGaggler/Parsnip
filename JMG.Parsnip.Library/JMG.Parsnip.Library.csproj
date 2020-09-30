@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <None Update="SyntacticModel\Generated\Parsnip.parsnip.txt">
-      <Generator>Parsnip</Generator>
+      <Generator>DotNetCLIToolCsCodeGenerator</Generator>
       <LastGenOutput>Parsnip.parsnip.cs</LastGenOutput>
     </None>
   </ItemGroup>
