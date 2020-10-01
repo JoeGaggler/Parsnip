@@ -23,7 +23,7 @@ jobs:
       run: dotnet restore JMG.Parsnip.CLI\JMG.Parsnip.CLI.sln
       
     - name: Build
-      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-restore
+      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --no-restore
 
     - name: Pack Prerelease
       run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-build --version-suffix ci-test-${{ github.run_number }}
