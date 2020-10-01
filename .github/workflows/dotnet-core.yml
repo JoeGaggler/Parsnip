@@ -22,10 +22,16 @@ jobs:
     - name: Install dependencies
       run: dotnet restore JMG.Parsnip.CLI\JMG.Parsnip.CLI.sln
       
-    - name: Build Prerelease
-      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-restore --version-suffix ci-test-${{ github.run_number }}
+    - name: Build
+      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-restore
+
+    - name: Pack Prerelease
+      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-build --version-suffix ci-test-${{ github.run_number }}
       if: ${{ github.ref != 'refs/heads/master' }}
     
-    - name: Build Production
-      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-restore
+    - name: Pack Production
+      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-build
       if: ${{ github.ref == 'refs/heads/master' }}
+    
+    - name: Push NuGet Package
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
