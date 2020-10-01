@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMG.Parsnip.CLI", "JMG.Parsnip.CLI.csproj", "{5156E0F1-0B64-47E6-9417-B2A716CC7A65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMG.Parsnip.VSIXProject", "..\JMG.Parsnip.VSIXProject\JMG.Parsnip.VSIXProject.csproj", "{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMG.Parsnip.Library", "..\JMG.Parsnip.Library\JMG.Parsnip.Library.csproj", "{33FAF8BD-82E4-42C4-AF18-27A1A48B4062}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMG.Parsnip.Library", "..\JMG.Parsnip.Library\JMG.Parsnip.Library.csproj", "{33FAF8BD-82E4-42C4-AF18-27A1A48B4062}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,18 +29,6 @@ Global
 		{5156E0F1-0B64-47E6-9417-B2A716CC7A65}.Release|x64.Build.0 = Release|Any CPU
 		{5156E0F1-0B64-47E6-9417-B2A716CC7A65}.Release|x86.ActiveCfg = Release|Any CPU
 		{5156E0F1-0B64-47E6-9417-B2A716CC7A65}.Release|x86.Build.0 = Release|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Debug|x64.Build.0 = Debug|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Debug|x86.Build.0 = Debug|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Release|x64.ActiveCfg = Release|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Release|x64.Build.0 = Release|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Release|x86.ActiveCfg = Release|Any CPU
-		{2C8EF6F3-B50B-4816-A37C-A9D9E6979B28}.Release|x86.Build.0 = Release|Any CPU
 		{33FAF8BD-82E4-42C4-AF18-27A1A48B4062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33FAF8BD-82E4-42C4-AF18-27A1A48B4062}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33FAF8BD-82E4-42C4-AF18-27A1A48B4062}.Debug|x64.ActiveCfg = Debug|Any CPU
