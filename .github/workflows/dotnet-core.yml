@@ -1,0 +1,37 @@
+name: .NET Core
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2      
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+
+    - name: Install dependencies
+      run: dotnet restore JMG.Parsnip.CLI\JMG.Parsnip.CLI.sln
+      
+    - name: Build
+      run: dotnet build JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --no-restore
+
+    - name: Pack Prerelease
+      run: dotnet pack JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-build --version-suffix ci-test-${{ github.run_number }}
+      if: ${{ github.ref != 'refs/heads/master' }}
+    
+    - name: Pack Production
+      run: dotnet pack JMG.Parsnip.CLI\JMG.Parsnip.CLI.csproj --configuration Release --output . --no-build
+      if: ${{ github.ref == 'refs/heads/master' }}
+    
+    - name: Push NuGet Package
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
