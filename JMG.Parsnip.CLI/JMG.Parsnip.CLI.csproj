@@ -7,7 +7,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>parsnip</ToolCommandName>
     <AssemblyName>JMG.Parsnip</AssemblyName>
-    <Version>1.25</Version>
+    <VersionPrefix>1.25</VersionPrefix>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
