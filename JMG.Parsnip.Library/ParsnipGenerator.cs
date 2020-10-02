@@ -52,6 +52,11 @@ namespace JMG.Parsnip
 					new LocalVarDecl($"{packratStateClassName}[]", "states"),
 					new LocalVarDecl(interfaceName, "factory")
 				};
+				var statelessParams = new List<LocalVarDecl>
+				{
+					new LocalVarDecl("String", "input"), // Invocation
+					new LocalVarDecl("Int32", "inputPosition")
+				};
 				var cardParams = new[] {
 					new LocalVarDecl("String", "input"), // Invocation
 					new LocalVarDecl("Int32", "inputPosition"),
@@ -242,7 +247,7 @@ namespace JMG.Parsnip
 						writer.EndOfLine();
 
 						// Any Character
-						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyCharacter", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyCharacter", statelessParams))
 						{
 							writer.LineOfCode($"(inputPosition < input.Length) ?");
 							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
@@ -251,7 +256,7 @@ namespace JMG.Parsnip
 
 						// Any Letter
 						writer.EndOfLine();
-						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetter", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetter", statelessParams))
 						{
 							writer.LineOfCode($"(inputPosition < input.Length && Char.IsLetter(input[inputPosition])) ?");
 							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
@@ -260,7 +265,7 @@ namespace JMG.Parsnip
 
 						// Upper Letter
 						writer.EndOfLine();
-						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_UpperLetter", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_UpperLetter", statelessParams))
 						{
 							writer.LineOfCode($"(inputPosition < input.Length && Char.IsUpper(input[inputPosition])) ?");
 							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
@@ -269,7 +274,7 @@ namespace JMG.Parsnip
 
 						// Lower Letter
 						writer.EndOfLine();
-						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_LowerLetter", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_LowerLetter", statelessParams))
 						{
 							writer.LineOfCode($"(inputPosition < input.Length && Char.IsLower(input[inputPosition])) ?");
 							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
@@ -278,7 +283,7 @@ namespace JMG.Parsnip
 
 						// Any Digit
 						writer.EndOfLine();
-						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyDigit", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyDigit", statelessParams))
 						{
 							writer.LineOfCode($"(inputPosition < input.Length && Char.IsDigit(input[inputPosition])) ?");
 							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
@@ -287,7 +292,7 @@ namespace JMG.Parsnip
 
 						// Any Letter or Digit
 						writer.EndOfLine();
-						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetterOrDigit", typicalParams))
+						using (writer.InlineMethod(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_AnyLetterOrDigit", statelessParams))
 						{
 							writer.LineOfCode($"(inputPosition < input.Length && Char.IsLetterOrDigit(input[inputPosition])) ?");
 							writer.LineOfCode($"new ParseResult<String>(input.Substring(inputPosition, 1), 1) :");
@@ -296,7 +301,7 @@ namespace JMG.Parsnip
 
 						// End of Line
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLine", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLine", statelessParams))
 						{
 							writer.VarAssign("result1", "ParseLexeme(input, inputPosition, \"\\r\\n\", StringComparison.Ordinal)"); // Invocation
 							using (writer.If("result1 != null"))
@@ -315,7 +320,7 @@ namespace JMG.Parsnip
 
 						// End of Stream
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<EmptyNode>", "ParseIntrinsic_EndOfStream", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<EmptyNode>", "ParseIntrinsic_EndOfStream", statelessParams))
 						{
 							using (writer.If("inputPosition == input.Length"))
 							{
@@ -326,7 +331,7 @@ namespace JMG.Parsnip
 
 						// End of Line Or Stream
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLineOrStream", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_EndOfLineOrStream", statelessParams))
 						{
 							using (writer.If("inputPosition == input.Length"))
 							{
@@ -350,7 +355,7 @@ namespace JMG.Parsnip
 
 						// C-String
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_CString", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_CString", statelessParams))
 						{
 							writer.VarAssign("resultStart", "ParseLexeme(input, inputPosition, \"\\\"\", StringComparison.Ordinal)"); // Invocation
 							writer.IfNullReturnNull("resultStart");
@@ -363,7 +368,7 @@ namespace JMG.Parsnip
 								using (writer.If("resultEscape != null"))
 								{
 									writer.Assign("inputPosition2", "inputPosition2 + resultEscape.Advanced");
-									writer.VarAssign("resultToken", "ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory)"); // Invocation
+									writer.VarAssign("resultToken", "ParseIntrinsic_AnyCharacter(input, inputPosition2)"); // Invocation
 									writer.IfNullReturnNull("resultToken");
 									using (writer.Switch("resultToken.Node"))
 									{
@@ -406,7 +411,7 @@ namespace JMG.Parsnip
 								{
 									writer.Return($"new {parseResultClassName}<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition)");
 								}
-								writer.VarAssign("resultChar", "ParseIntrinsic_AnyCharacter(input, inputPosition2, states, factory)"); // Invocation
+								writer.VarAssign("resultChar", "ParseIntrinsic_AnyCharacter(input, inputPosition2)"); // Invocation
 								writer.IfNullReturnNull("resultChar");
 								writer.LineOfCode("sb.Append(resultChar.Node);");
 								writer.Assign("nextInputPosition", "inputPosition2 + resultChar.Advanced");
@@ -415,7 +420,7 @@ namespace JMG.Parsnip
 
 						// Optional Horizontal Whitespace
 						writer.EndOfLine();
-						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", typicalParams))
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseIntrinsic_OptionalHorizontalWhitespace", statelessParams))
 						{
 							using (writer.If("inputPosition >= input.Length"))
 							{
