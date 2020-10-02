@@ -38,6 +38,8 @@ namespace JMG.Parsnip.SerializedModel
 
 		private static Invoker CreateInvoker(String baseName) => (i, p, s, f) => $"{baseName}({i}, {p}, {s}, {f})"; // Invocation
 
+		private static Invoker CreateStatelessInvoker(String baseName) => (i, p, s, f) => $"{baseName}({i}, {p})"; // Invocation
+
 		private Boolean AddSignature(IParseFunction target, Access access, Boolean requiresGeneration)
 		{
 			if (requiresGeneration || this.mustAddSignature)
@@ -102,7 +104,7 @@ namespace JMG.Parsnip.SerializedModel
 				_ => throw new InvalidOperationException($"Unexpected IntrinsicType: {target.Type}")
 			};
 
-			Invoker invoker = CreateInvoker(methodName);
+			Invoker invoker = CreateStatelessInvoker(methodName);
 			AddInvoker(target, invoker);
 		}
 
