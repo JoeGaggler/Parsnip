@@ -1,0 +1,4 @@
+﻿files:
+- file: Parsnip.txt
+  tool: parsnip
+  extension: .cs
