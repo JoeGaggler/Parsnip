@@ -109,6 +109,16 @@ namespace JMG.Parsnip.SerializedModel
 			return value;
 		}
 
+		public String Visit(LexemeIdentifier target)
+		{
+			var value = target.Identifier;
+			if (this.ShowHeader)
+			{
+				value = $"Lex: {value}";
+			}
+			return value;
+		}
+
 		public String Visit(ReferencedRule target)
 		{
 			var value = target.Identifier;

@@ -23,9 +23,13 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem2(String t0) => null;
 
-		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3() => null;
+		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3(String t0) => new LexemeIdentifier(t0);
+
+		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem4() => null;
 
 		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => t0.Concat();
+
+		String IParsnipRuleFactory.Lexeme1(String t0) => t0;
 
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 

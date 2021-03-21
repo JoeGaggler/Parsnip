@@ -33,6 +33,8 @@ namespace JMG.Parsnip.SemanticModel.Transformations
 
 		public IParseFunction Visit(LiteralString target) => target;
 
+		public IParseFunction Visit(LexemeIdentifier target) => target;
+
 		public IParseFunction Visit(ReferencedRule target) => (ReferencedRule == null) ? target : (ReferencedRule(target));
 
 		public IParseFunction Visit(Repetition target)

@@ -159,6 +159,16 @@ namespace JMG.Parsnip.SemanticModel.Transformations
 				}
 				return (new Series(target.RepeatedToken, target.DelimiterToken, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
 			}
+
+			public (IParseFunction, IReadOnlyList<InterfaceMethod>) Visit(LexemeIdentifier target, INodeType input)
+			{
+				var interfaceMethod = GenerateInterfaceMethod(target.ReturnType, input);
+				if (interfaceMethod == null)
+				{
+					return (target, new InterfaceMethod[0]);
+				}
+				return (new LexemeIdentifier(target.Identifier, interfaceMethod), new InterfaceMethod[] { interfaceMethod });
+			}
 		}
 	}
 }

@@ -4,6 +4,7 @@ definition-item+
 definition-item: IParsnipDefinitionItem
 rule
 comment
+lexeme
 `<EOL>
 
 rule: Rule
@@ -59,3 +60,6 @@ intrinsic-identifier: String
 
 comment: String
 `"//" (~<EOLOS> .)* `<EOLOS>
+
+lexeme: String
+`"<" csharp-identifier `">" `-- `<EOLOS>

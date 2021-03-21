@@ -18,17 +18,17 @@ namespace JMG.Parsnip.CLI
 					?? "unknown";
 
 			// Bootstrap command, run from "Generated" directory: 
-			// ..\..\..\JMG.Parsnip.CLI\bin\Debug\netcoreapp3.0\JMG.Parsnip.exe --namespace "JMG.Parsnip.SyntacticModel.Generated" --name Parsnip --extension ".txt" < Parsnip.parsnip.txt > Parsnip.parsnip.cs
+			// ..\..\..\JMG.Parsnip.CLI\bin\Debug\net5.0\JMG.Parsnip.exe --namespace "JMG.Parsnip.SyntacticModel.Generated" --name Parsnip --extension ".txt" < Parsnip.txt > Parsnip.cs
 			if (args.Length < 6)
 			{
 				args = new[]
 				{
 					"--namespace",
 					 "JMG.Parsnip.SyntacticModel.Generated",
-					 "--name", 
-                     "Parsnip",
-                     "--extension", 
-                     ".txt"
+					 "--name",
+					 "Parsnip",
+					 "--extension",
+					 ".txt"
 				};
 
 				Console.Error.WriteLine("#error Expected arguments: namespace, name, extension");
@@ -37,6 +37,7 @@ namespace JMG.Parsnip.CLI
 			String defaultNamespace = null;
 			String nameArg = null;
 			String extensionArg = null;
+			String inputFileName = null;
 
 			String currentArg = null;
 			foreach (var arg in args)
@@ -46,6 +47,7 @@ namespace JMG.Parsnip.CLI
 					case "--namespace": defaultNamespace = arg; currentArg = null; break;
 					case "--name": nameArg = arg; currentArg = null; break;
 					case "--extension": extensionArg = arg; currentArg = null; break;
+					case "--input": inputFileName = arg; currentArg = null; break;
 					case null: currentArg = arg; break;
 				}
 			}
@@ -66,10 +68,17 @@ namespace JMG.Parsnip.CLI
 			}
 
 			String fileContents;
-			using (var inputStream = Console.OpenStandardInput())
-			using (var reader = new StreamReader(inputStream))
+			if (inputFileName != null)
 			{
-				fileContents = await reader.ReadToEndAsync();
+				fileContents = File.ReadAllText(inputFileName);
+			}
+			else
+			{
+				using (var inputStream = Console.OpenStandardInput())
+				using (var reader = new StreamReader(inputStream))
+				{
+					fileContents = await reader.ReadToEndAsync();
+				}
 			}
 
 			var output = ParsnipGenerator.Generate(fileContents, defaultNamespace, $"{nameArg}{extensionArg}", versionString);

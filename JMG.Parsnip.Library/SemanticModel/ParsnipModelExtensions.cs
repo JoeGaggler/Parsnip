@@ -9,11 +9,13 @@ namespace JMG.Parsnip.SemanticModel
 {
 	internal static class ParsnipModelExtensions
 	{
-		public static ParsnipModel AddingRule(this ParsnipModel model, Rule rule) => new ParsnipModel(model.Rules.Appending(rule), model.InterfaceMethods);
+		public static ParsnipModel AddingRule(this ParsnipModel model, Rule rule) => new ParsnipModel(model.Rules.Appending(rule), model.InterfaceMethods, model.LexemeIdentifiers);
 
-		public static ParsnipModel ReplacingRule(this ParsnipModel model, Rule oldRule, Rule newRule) => new ParsnipModel(model.Rules.Replacing(oldRule, newRule), model.InterfaceMethods);
+		public static ParsnipModel AddingLexemeIdentifier(this ParsnipModel model, LexemeIdentifier id) => new ParsnipModel(model.Rules, model.InterfaceMethods, model.LexemeIdentifiers.Appending(id));
 
-		public static ParsnipModel AddingInterfaceMethod(this ParsnipModel model, InterfaceMethod method) => new ParsnipModel(model.Rules, model.InterfaceMethods.Appending(method));
+		public static ParsnipModel ReplacingRule(this ParsnipModel model, Rule oldRule, Rule newRule) => new ParsnipModel(model.Rules.Replacing(oldRule, newRule), model.InterfaceMethods, model.LexemeIdentifiers);
+
+		public static ParsnipModel AddingInterfaceMethod(this ParsnipModel model, InterfaceMethod method) => new ParsnipModel(model.Rules, model.InterfaceMethods.Appending(method), model.LexemeIdentifiers);
 
 		public static Rule WithParseFunction(this Rule rule, IParseFunction func) => new Rule(rule.RuleIdentifier, rule.ReturnType, func);
 

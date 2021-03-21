@@ -34,7 +34,8 @@ namespace JMG.Parsnip.SemanticModel
 		IActionVisitor<LiteralString>,
 		IActionVisitor<ReferencedRule>,
 		IActionVisitor<Repetition>,
-		IActionVisitor<Series>
+		IActionVisitor<Series>,
+		IActionVisitor<LexemeIdentifier>
 	{
 
 	}
@@ -46,7 +47,8 @@ namespace JMG.Parsnip.SemanticModel
 		IActionVisitor<LiteralString, TInput>,
 		IActionVisitor<ReferencedRule, TInput>,
 		IActionVisitor<Repetition, TInput>,
-		IActionVisitor<Series, TInput>
+		IActionVisitor<Series, TInput>,
+		IActionVisitor<LexemeIdentifier, TInput>
 	{
 
 	}
@@ -58,7 +60,8 @@ namespace JMG.Parsnip.SemanticModel
 		IActionVisitor<LiteralString, T0, T1>,
 		IActionVisitor<ReferencedRule, T0, T1>,
 		IActionVisitor<Repetition, T0, T1>,
-		IActionVisitor<Series, T0, T1>
+		IActionVisitor<Series, T0, T1>,
+		IActionVisitor<LexemeIdentifier, T0, T1>
 	{
 
 	}
@@ -70,7 +73,8 @@ namespace JMG.Parsnip.SemanticModel
 		IFuncVisitor<LiteralString, TOutput>,
 		IFuncVisitor<ReferencedRule, TOutput>,
 		IFuncVisitor<Repetition, TOutput>,
-		IFuncVisitor<Series, TOutput>
+		IFuncVisitor<Series, TOutput>,
+		IFuncVisitor<LexemeIdentifier, TOutput>
 	{
 
 	}
@@ -82,7 +86,8 @@ namespace JMG.Parsnip.SemanticModel
 		IFuncVisitor<LiteralString, TInput, TOutput>,
 		IFuncVisitor<ReferencedRule, TInput, TOutput>,
 		IFuncVisitor<Repetition, TInput, TOutput>,
-		IFuncVisitor<Series, TInput, TOutput>
+		IFuncVisitor<Series, TInput, TOutput>,
+		IFuncVisitor<LexemeIdentifier, TInput, TOutput>
 	{
 
 	}
