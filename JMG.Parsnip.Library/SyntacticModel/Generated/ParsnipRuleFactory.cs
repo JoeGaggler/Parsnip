@@ -15,21 +15,17 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		String IParsnipRuleFactory.Comment1(IReadOnlyList<String> t0) => t0.Concat();
 
-		String IParsnipRuleFactory.CsharpIdentifier1(String t0, IReadOnlyList<String> t1) => t0 + t1.Concat();
-
 		ParsnipDefinition IParsnipRuleFactory.Definition1(IReadOnlyList<IParsnipDefinitionItem> t0) => new ParsnipDefinition(t0.Where(i => i != null).ToList());
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem1(Rule t0) => t0;
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem2(String t0) => null;
 
-		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3(String t0) => new LexemeIdentifier(t0);
+		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem3(String t0) => new LexemeIdentifier(t0.Substring(1, t0.Length - 2)); // Remove angle-brackets
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem4() => null;
 
 		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => t0.Concat();
-
-		String IParsnipRuleFactory.Lexeme1(String t0) => t0;
 
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 
@@ -84,5 +80,18 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		IToken IParsnipRuleFactory.Token5(Union t0) => new UnionToken(t0);
 
 		Union IParsnipRuleFactory.Union1(IReadOnlyList<Sequence> t0) => new Union(t0);
+
+		public String TOKENID(String input, Int32 position)
+		{
+			if (position >= input.Length) { return null; }
+			if (input[position] != '<') { return null; }
+			var last = position + 1;
+			while (last < input.Length)
+			{
+				if (input[last] == '>') { return input.Substring(position, last - position + 1); }
+				last++;
+			}
+			return null;
+		}
 	}
 }

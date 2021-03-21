@@ -1,10 +1,12 @@
-﻿definition: ParsnipDefinition
+﻿<TOKENID>
+
+definition: ParsnipDefinition
 definition-item+
 
 definition-item: IParsnipDefinitionItem
 rule
 comment
-lexeme
+<TOKENID>
 `<EOL>
 
 rule: Rule
@@ -52,14 +54,8 @@ rule-identifier: RuleIdentifier
 class-identifier: ClassIdentifier
 (~<EOLOS> .)+
 
-csharp-identifier: String
-<Aa> <Aa#>*
-
 intrinsic-identifier: String
 (~">" .)+
 
 comment: String
 `"//" (~<EOLOS> .)* `<EOLOS>
-
-lexeme: String
-`"<" csharp-identifier `">" `-- `<EOLOS>

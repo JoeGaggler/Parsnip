@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.27
-// Date: 2021-03-21 11:18:38
+// Date: 2021-03-21 17:40:32
 
 using System;
 using System.Linq;
@@ -36,10 +36,10 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		IToken Token5(Union t0);
 		RuleIdentifier RuleIdentifier1(String t0, IReadOnlyList<String> t1);
 		ClassIdentifier ClassIdentifier1(IReadOnlyList<String> t0);
-		String CsharpIdentifier1(String t0, IReadOnlyList<String> t1);
 		String IntrinsicIdentifier1(IReadOnlyList<String> t0);
 		String Comment1(IReadOnlyList<String> t0);
-		String Lexeme1(String t0);
+
+		String TOKENID(String input, int position);
 	}
 
 	internal class Parsnip
@@ -326,7 +326,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return states[inputPosition].Mem_ParseRule_Definition = new ParseResult<ParsnipDefinition>(factory.Definition1(result.Node), result.Advanced);
 		}
 
-		// Selection: rule | comment | lexeme | (`<EOL>)
+		// Selection: rule | comment | TOKENID | (`<EOL>)
 		private static ParseResult<IParsnipDefinitionItem> ParseRule_DefinitionItem(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (states[inputPosition].Mem_ParseRule_DefinitionItem is var mem && mem != null) { return mem; }
@@ -335,7 +335,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (r1 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem1(r1.Node), r1.Advanced);
 			var r2 = ParseRule_Comment(input, inputPosition, states, factory);
 			if (r2 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem2(r2.Node), r2.Advanced);
-			var r3 = ParseRule_Lexeme(input, inputPosition, states, factory);
+			var r3 = ParseCustomLexeme(input, inputPosition, factory.TOKENID);
 			if (r3 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem3(r3.Node), r3.Advanced);
 			var r4 = ParseRule_DefinitionItem_C4(input, inputPosition, states, factory);
 			if (r4 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem4(), r4.Advanced);
@@ -656,18 +656,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<String>(r2.Node, r2.Advanced);
 		}
 
-		// Sequence: <Aa> <Aa#>*
-		private static ParseResult<String> ParseRule_CsharpIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			if (states[inputPosition].Mem_ParseRule_CsharpIdentifier is var mem && mem != null) { return mem; }
-
-			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition);
-			if (r1 == null) return null;
-			var r2 = ParseStar(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseIntrinsic_AnyLetterOrDigit(i, p));
-			if (r2 == null) return null;
-			return states[inputPosition].Mem_ParseRule_CsharpIdentifier = new ParseResult<String>(factory.CsharpIdentifier1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
-		}
-
 		// Repetition: (~">" .)+
 		private static ParseResult<String> ParseRule_IntrinsicIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
@@ -712,24 +700,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<String>(r2.Node, r2.Advanced);
 		}
 
-		// Sequence: `"<" csharp-identifier `">" `-- `<EOLOS>
-		private static ParseResult<String> ParseRule_Lexeme(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			if (states[inputPosition].Mem_ParseRule_Lexeme is var mem && mem != null) { return mem; }
-
-			var r1 = ParseLexeme(input, inputPosition, "<", StringComparison.Ordinal);
-			if (r1 == null) return null;
-			var r2 = ParseRule_CsharpIdentifier(input, inputPosition + r1.Advanced, states, factory);
-			if (r2 == null) return null;
-			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ">", StringComparison.Ordinal);
-			if (r3 == null) return null;
-			var r4 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced);
-			if (r4 == null) return null;
-			var r5 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced);
-			if (r5 == null) return null;
-			return states[inputPosition].Mem_ParseRule_Lexeme = new ParseResult<String>(factory.Lexeme1(r2.Node), r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced + r5.Advanced);
-		}
-
 		private class PackratState
 		{
 			internal ParseResult<ParsnipDefinition> Mem_ParseRule_Definition;
@@ -747,10 +717,8 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			internal ParseResult<IToken> Mem_ParseRule_Token;
 			internal ParseResult<RuleIdentifier> Mem_ParseRule_RuleIdentifier;
 			internal ParseResult<ClassIdentifier> Mem_ParseRule_ClassIdentifier;
-			internal ParseResult<String> Mem_ParseRule_CsharpIdentifier;
 			internal ParseResult<String> Mem_ParseRule_IntrinsicIdentifier;
 			internal ParseResult<String> Mem_ParseRule_Comment;
-			internal ParseResult<String> Mem_ParseRule_Lexeme;
 		}
 	}
 }
