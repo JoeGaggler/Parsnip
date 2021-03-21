@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.27
-// Date: 2021-03-21 17:40:32
+// Date: 2021-03-21 18:56:58
 
 using System;
 using System.Linq;
@@ -33,10 +33,10 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		IToken Token2(String t0, String t1);
 		IToken Token3(RuleIdentifier t0);
 		IToken Token4(String t0);
-		IToken Token5(Union t0);
+		IToken Token5(String t0);
+		IToken Token6(Union t0);
 		RuleIdentifier RuleIdentifier1(String t0, IReadOnlyList<String> t1);
 		ClassIdentifier ClassIdentifier1(IReadOnlyList<String> t0);
-		String IntrinsicIdentifier1(IReadOnlyList<String> t0);
 		String Comment1(IReadOnlyList<String> t0);
 
 		String TOKENID(String input, int position);
@@ -544,7 +544,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return null;
 		}
 
-		// Selection: (`".") | (<CSTRING> "i"?) | rule-identifier | ((`"<" intrinsic-identifier `">") | "--") | (`"(" union `")")
+		// Selection: (`".") | (<CSTRING> "i"?) | rule-identifier | TOKENID | "--" | (`"(" union `")")
 		private static ParseResult<IToken> ParseRule_Token(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			if (states[inputPosition].Mem_ParseRule_Token is var mem && mem != null) { return mem; }
@@ -555,10 +555,12 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (r2 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token2(r2.Node.Item1, r2.Node.Item2), r2.Advanced);
 			var r3 = ParseRule_RuleIdentifier(input, inputPosition, states, factory);
 			if (r3 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token3(r3.Node), r3.Advanced);
-			var r4 = ParseRule_Token_C4(input, inputPosition, states, factory);
+			var r4 = ParseCustomLexeme(input, inputPosition, factory.TOKENID);
 			if (r4 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token4(r4.Node), r4.Advanced);
-			var r5 = ParseRule_Token_C5(input, inputPosition, states, factory);
+			var r5 = ParseLexeme(input, inputPosition, "--", StringComparison.Ordinal);
 			if (r5 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token5(r5.Node), r5.Advanced);
+			var r6 = ParseRule_Token_C6(input, inputPosition, states, factory);
+			if (r6 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token6(r6.Node), r6.Advanced);
 			return null;
 		}
 
@@ -580,30 +582,8 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<(String, String)>((r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
-		// Selection: (`"<" intrinsic-identifier `">") | "--"
-		private static ParseResult<String> ParseRule_Token_C4(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			var r1 = ParseRule_Token_C4_C1(input, inputPosition, states, factory);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
-			var r2 = ParseLexeme(input, inputPosition, "--", StringComparison.Ordinal);
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
-			return null;
-		}
-
-		// Sequence: `"<" intrinsic-identifier `">"
-		private static ParseResult<String> ParseRule_Token_C4_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			var r1 = ParseLexeme(input, inputPosition, "<", StringComparison.Ordinal);
-			if (r1 == null) return null;
-			var r2 = ParseRule_IntrinsicIdentifier(input, inputPosition + r1.Advanced, states, factory);
-			if (r2 == null) return null;
-			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ">", StringComparison.Ordinal);
-			if (r3 == null) return null;
-			return new ParseResult<String>(r2.Node, r1.Advanced + r2.Advanced + r3.Advanced);
-		}
-
 		// Sequence: `"(" union `")"
-		private static ParseResult<Union> ParseRule_Token_C5(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
+		private static ParseResult<Union> ParseRule_Token_C6(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseLexeme(input, inputPosition, "(", StringComparison.Ordinal);
 			if (r1 == null) return null;
@@ -656,26 +636,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			return new ParseResult<String>(r2.Node, r2.Advanced);
 		}
 
-		// Repetition: (~">" .)+
-		private static ParseResult<String> ParseRule_IntrinsicIdentifier(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			if (states[inputPosition].Mem_ParseRule_IntrinsicIdentifier is var mem && mem != null) { return mem; }
-
-			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_IntrinsicIdentifier_M(i, p, s, f));
-			if (result == null) return null;
-			return states[inputPosition].Mem_ParseRule_IntrinsicIdentifier = new ParseResult<String>(factory.IntrinsicIdentifier1(result.Node), result.Advanced);
-		}
-
-		// Sequence: ~">" .
-		private static ParseResult<String> ParseRule_IntrinsicIdentifier_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
-		{
-			var r1 = ParseLexeme(input, inputPosition, ">", StringComparison.Ordinal);
-			if (r1 != null) return null;
-			var r2 = ParseIntrinsic_AnyCharacter(input, inputPosition);
-			if (r2 == null) return null;
-			return new ParseResult<String>(r2.Node, r2.Advanced);
-		}
-
 		// Sequence: `"//" (~<EOLOS> .)* `<EOLOS>
 		private static ParseResult<String> ParseRule_Comment(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
@@ -717,7 +677,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			internal ParseResult<IToken> Mem_ParseRule_Token;
 			internal ParseResult<RuleIdentifier> Mem_ParseRule_RuleIdentifier;
 			internal ParseResult<ClassIdentifier> Mem_ParseRule_ClassIdentifier;
-			internal ParseResult<String> Mem_ParseRule_IntrinsicIdentifier;
 			internal ParseResult<String> Mem_ParseRule_Comment;
 		}
 	}

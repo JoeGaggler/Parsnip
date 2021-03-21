@@ -25,8 +25,6 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		IParsnipDefinitionItem IParsnipRuleFactory.DefinitionItem4() => null;
 
-		String IParsnipRuleFactory.IntrinsicIdentifier1(IReadOnlyList<String> t0) => t0.Concat();
-
 		Rule IParsnipRuleFactory.Rule1(RuleHead t0, RuleBody t1) => new Rule(t0, t1);
 
 		RuleBody IParsnipRuleFactory.RuleBody1(IReadOnlyList<Choice> t0) => new RuleBody(t0);
@@ -75,13 +73,15 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 
 		IToken IParsnipRuleFactory.Token3(RuleIdentifier t0) => new RuleIdentifierToken(t0);
 
-		IToken IParsnipRuleFactory.Token4(String t0) => new IntrinsicToken(t0);
+		IToken IParsnipRuleFactory.Token4(String t0) => new IntrinsicToken(t0.Substring(1, t0.Length - 2)); // Remove angle-brackets
 
-		IToken IParsnipRuleFactory.Token5(Union t0) => new UnionToken(t0);
+		IToken IParsnipRuleFactory.Token5(String t0) => new IntrinsicToken(t0);
+
+		IToken IParsnipRuleFactory.Token6(Union t0) => new UnionToken(t0);
 
 		Union IParsnipRuleFactory.Union1(IReadOnlyList<Sequence> t0) => new Union(t0);
 
-		public String TOKENID(String input, Int32 position)
+		String IParsnipRuleFactory.TOKENID(String input, Int32 position)
 		{
 			if (position >= input.Length) { return null; }
 			if (input[position] != '<') { return null; }

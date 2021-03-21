@@ -45,7 +45,8 @@ token: IToken
 `"."
 <CSTRING> "i"?
 rule-identifier
-`"<" intrinsic-identifier `">" | "--"
+<TOKENID>
+"--"
 `"(" union `")"
 
 rule-identifier: RuleIdentifier
@@ -53,9 +54,6 @@ rule-identifier: RuleIdentifier
 
 class-identifier: ClassIdentifier
 (~<EOLOS> .)+
-
-intrinsic-identifier: String
-(~">" .)+
 
 comment: String
 `"//" (~<EOLOS> .)* `<EOLOS>
