@@ -257,8 +257,7 @@ namespace JMG.Parsnip.SerializedModel
 
 		public void Visit(LexemeIdentifier target, Signature input)
 		{
-			writer.Comment($"GenerateMethodsVisitor Visit(LexemeIdentifier)");
-			//BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
 		}
 	}
 }
