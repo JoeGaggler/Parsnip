@@ -112,15 +112,26 @@ namespace JMG.Parsnip
 					{
 						using (writer.Class(parseResultClassNameT, Access.Private))
 						{
+							writer.LineOfCode("public readonly Boolean IsValid;");
 							writer.LineOfCode("public readonly T Node;");
 							writer.LineOfCode("public readonly Int32 Advanced;");
+							writer.LineOfCode("public readonly String ErrorMessage;");
 							writer.EndOfLine();
 							using (writer.Constructor(Access.Public, parseResultClassName, new[] {
 							   new LocalVarDecl("T", "node"),
 							   new LocalVarDecl("Int32", "advanced") }))
 							{
+								writer.Assign("this.IsValid", "true");
 								writer.Assign("this.Node", "node");
 								writer.Assign("this.Advanced", "advanced");
+							}
+							writer.EndOfLine();
+
+							using (writer.Constructor(Access.Public, parseResultClassName, new[] {
+							   new LocalVarDecl("String", "errorMessage")}))
+							{
+								writer.Assign("this.IsValid", "false");
+								writer.Assign("this.ErrorMessage", "errorMessage");
 							}
 						}
 						writer.EndOfLine();

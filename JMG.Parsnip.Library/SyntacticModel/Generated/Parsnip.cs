@@ -1,6 +1,6 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.28
-// Date: 2021-03-22 13:12:46
+// Date: 2021-03-22 13:35:03
 
 using System;
 using System.Linq;
@@ -44,13 +44,22 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 	{
 		private class ParseResult<T>
 		{
+			public readonly Boolean IsValid;
 			public readonly T Node;
 			public readonly Int32 Advanced;
+			public readonly String ErrorMessage;
 
 			public ParseResult(T node, Int32 advanced)
 			{
+				this.IsValid = true;
 				this.Node = node;
 				this.Advanced = advanced;
+			}
+
+			public ParseResult(String errorMessage)
+			{
+				this.IsValid = false;
+				this.ErrorMessage = errorMessage;
 			}
 		}
 
