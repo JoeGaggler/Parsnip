@@ -254,5 +254,10 @@ namespace JMG.Parsnip.SerializedModel
 			}
 			writer.Return(returnExpression);
 		}
+
+		public void Visit(LexemeIdentifier target, Signature input)
+		{
+			BasicTargetWithInterfaceMethod(target, target.InterfaceMethod, input);
+		}
 	}
 }

@@ -97,6 +97,15 @@ namespace JMG.Parsnip
 							var parameterTypeList = String.Join(", ", parameterTypes);
 							writer.LineOfCode($"{returnType} {name}({parameterTypeList});");
 						}
+
+						if (semanticModel.LexemeIdentifiers is var lexes && lexes.Count > 0)
+						{
+							writer.EndOfLine();
+							foreach (var id in lexes)
+							{
+								writer.LineOfCode($"String {id.Identifier}(String input, int position);");
+							}
+						}
 					}
 					writer.EndOfLine();
 
@@ -451,8 +460,19 @@ namespace JMG.Parsnip
 							writer.VarAssign("lexemeLength", "lexeme.Length");
 							writer.IfTrueReturnNull("inputPosition + lexemeLength > input.Length");
 							writer.VarAssign("actualLexeme", "input.Substring(inputPosition, lexemeLength)");
-							writer.IfTrueReturnNull("!String.Equals(actualLexeme, lexeme, stringComparison)"); 
+							writer.IfTrueReturnNull("!String.Equals(actualLexeme, lexeme, stringComparison)");
 							writer.Return($"new {parseResultClassName}<String>(actualLexeme, lexemeLength)");
+						}
+
+						// Write Custom Lexeme
+						using (writer.Method(Access.Private, true, $"{parseResultClassName}<String>", "ParseCustomLexeme", new[] {
+							new LocalVarDecl("String", "input"), // Invocation
+							new LocalVarDecl("Int32", "inputPosition"),
+							new LocalVarDecl("Func<String, Int32, String>", "func")}))
+						{
+							writer.VarAssign("result", "func(input, inputPosition)");
+							writer.IfTrueReturnNull("result == null");
+							writer.Return($"new {parseResultClassName}<String>(result, result.Length)");
 						}
 
 						// Generate methods

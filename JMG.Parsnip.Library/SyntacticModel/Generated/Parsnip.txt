@@ -1,9 +1,12 @@
-﻿definition: ParsnipDefinition
+﻿<TOKENID>
+
+definition: ParsnipDefinition
 definition-item+
 
 definition-item: IParsnipDefinitionItem
 rule
 comment
+<TOKENID>
 `<EOL>
 
 rule: Rule
@@ -42,7 +45,8 @@ token: IToken
 `"."
 <CSTRING> "i"?
 rule-identifier
-`"<" intrinsic-identifier `">" | "--"
+<TOKENID>
+"--"
 `"(" union `")"
 
 rule-identifier: RuleIdentifier
@@ -50,12 +54,6 @@ rule-identifier: RuleIdentifier
 
 class-identifier: ClassIdentifier
 (~<EOLOS> .)+
-
-csharp-identifier: String
-<Aa> <Aa#>*
-
-intrinsic-identifier: String
-(~">" .)+
 
 comment: String
 `"//" (~<EOLOS> .)* `<EOLOS>

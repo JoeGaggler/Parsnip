@@ -16,14 +16,16 @@ namespace JMG.Parsnip.SyntacticModel
 
 	internal interface IParsnipDefinitionItemVisitor :
 		IActionVisitor<Rule>,
-		IActionVisitor<Comment>
+		IActionVisitor<Comment>,
+		IActionVisitor<LexemeIdentifier>
 	{
 
 	}
 
 	internal interface IParsnipDefinitionItemFuncVisitor<TOutput> :
 		IFuncVisitor<Rule, TOutput>,
-		IFuncVisitor<Comment, TOutput>
+		IFuncVisitor<Comment, TOutput>,
+		IFuncVisitor<LexemeIdentifier, TOutput>
 	{
 
 	}

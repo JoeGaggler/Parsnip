@@ -188,5 +188,12 @@ namespace JMG.Parsnip.SerializedModel
 			
 			AddInvoker(target, invoker);
 		}
+
+		public void Visit(LexemeIdentifier target, Access access)
+		{
+			AddSignature(target, access, requiresGeneration: false); // Custom Lexeme is built-in
+			Invoker invoker = (i, p, s, f) => $"ParseCustomLexeme({i}, {p}, {f}.{target.Identifier})"; // Invocation
+			AddInvoker(target, invoker);
+		}
 	}
 }

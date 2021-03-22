@@ -15,8 +15,15 @@ namespace JMG.Parsnip.SemanticModel
 		{
 			var model = new ParsnipModel();
 
+			// Capture Lexemes
+			var lexVisitor = new LexVisitor(model);
+			foreach (var i in syntacticModel.Items)
+			{
+				model = i.ApplyVisitor(lexVisitor);
+			}
+
 			// Populate rules
-			var ruleVisitor = new RuleVisitor();
+			var ruleVisitor = new RuleVisitor(model);
 			foreach (var i in syntacticModel.Items)
 			{
 				model = i.ApplyVisitor(ruleVisitor);
@@ -42,12 +49,29 @@ namespace JMG.Parsnip.SemanticModel
 			return new SingleNodeType(name);
 		}
 
+		private class LexVisitor : IParsnipDefinitionItemFuncVisitor<ParsnipModel>
+		{
+			private ParsnipModel model;
+
+			public LexVisitor(ParsnipModel model)
+			{
+				this.model = model;
+			}
+
+			public ParsnipModel Visit(SyntacticModel.Rule target) => model;
+
+			public ParsnipModel Visit(Comment target) => model;
+
+			public ParsnipModel Visit(SyntacticModel.LexemeIdentifier target) => model = model.AddingLexemeIdentifier(new LexemeIdentifier(target.Id, interfaceMethod: null));
+		}
+
 		private class RuleVisitor : IParsnipDefinitionItemFuncVisitor<ParsnipModel>
 		{
-			private ParsnipModel model = new ParsnipModel();
+			private ParsnipModel model;
 
-			public RuleVisitor()
+			public RuleVisitor(ParsnipModel model)
 			{
+				this.model = model;
 			}
 
 			public ParsnipModel Visit(SyntacticModel.Rule target)
@@ -61,6 +85,11 @@ namespace JMG.Parsnip.SemanticModel
 			}
 
 			public ParsnipModel Visit(SyntacticModel.Comment target)
+			{
+				return model;
+			}
+
+			public ParsnipModel Visit(SyntacticModel.LexemeIdentifier target)
 			{
 				return model;
 			}
@@ -84,7 +113,7 @@ namespace JMG.Parsnip.SemanticModel
 				var selection = new Selection(new SelectionStep[0]);
 				foreach (var choice in target.Body.Choices)
 				{
-					var func = VisitChoice(choice, false);
+					var func = VisitChoice(choice, false, model);
 					var step = new SelectionStep(func, interfaceMethod: null);
 					selection = selection.AddingStep(step);
 				}
@@ -99,14 +128,14 @@ namespace JMG.Parsnip.SemanticModel
 				return model;
 			}
 
-			internal static Selection VisitChoice(SyntacticModel.Choice target, Boolean isMemoized) => VisitUnion(target.Union, isMemoized);
+			internal static Selection VisitChoice(SyntacticModel.Choice target, Boolean isMemoized, ParsnipModel model) => VisitUnion(target.Union, isMemoized, model);
 
-			internal static Selection VisitUnion(SyntacticModel.Union union, Boolean isMemoized)
+			internal static Selection VisitUnion(SyntacticModel.Union union, Boolean isMemoized, ParsnipModel model)
 			{
 				var selection = new Selection(new SelectionStep[0]);
 				foreach (var sequence in union.Sequences)
 				{
-					var func = VisitSequence(sequence, false);
+					var func = VisitSequence(sequence, false, model);
 					var step = new SelectionStep(func, interfaceMethod: null);
 					selection = selection.AddingStep(step);
 				}
@@ -125,12 +154,12 @@ namespace JMG.Parsnip.SemanticModel
 				}
 			}
 
-			internal static Sequence VisitSequence(SyntacticModel.Sequence target, Boolean isMemoized)
+			internal static Sequence VisitSequence(SyntacticModel.Sequence target, Boolean isMemoized, ParsnipModel model)
 			{
 				var sequence = new Sequence(new SequenceStep[0], interfaceMethod: null);
 				foreach (var segment in target.Segments)
 				{
-					var func = VisitCardinality(segment.Item, Convert(segment.Cardinality), false);
+					var func = VisitCardinality(segment.Item, Convert(segment.Cardinality), false, model);
 
 					MatchAction action;
 					switch (segment.Action)
@@ -147,9 +176,9 @@ namespace JMG.Parsnip.SemanticModel
 				return sequence;
 			}
 
-			internal static IParseFunction VisitCardinality(IToken item, Cardinality cardinality, Boolean isMemoized)
+			internal static IParseFunction VisitCardinality(IToken item, Cardinality cardinality, Boolean isMemoized, ParsnipModel model)
 			{
-				var func = VisitToken(item, false);
+				var func = VisitToken(item, false, model);
 				switch (cardinality)
 				{
 					case Cardinality.One:
@@ -169,15 +198,19 @@ namespace JMG.Parsnip.SemanticModel
 				}
 			}
 
-			internal static IParseFunction VisitToken(IToken item, Boolean isMemoized) => item.ApplyVisitor(new TokenVisitor(isMemoized));
+			internal static IParseFunction VisitToken(IToken item, Boolean isMemoized, ParsnipModel model) => item.ApplyVisitor(new TokenVisitor(isMemoized, model));
+
+			public ParsnipModel Visit(SyntacticModel.LexemeIdentifier target) => this.model;
 
 			private class TokenVisitor : ITokenFuncVisitor<IParseFunction>
 			{
 				private readonly Boolean isMemoized;
+				private readonly ParsnipModel model;
 
-				public TokenVisitor(Boolean isMemoized)
+				public TokenVisitor(Boolean isMemoized, ParsnipModel model)
 				{
 					this.isMemoized = isMemoized;
+					this.model = model;
 				}
 
 				public IParseFunction Visit(RuleIdentifierToken target) => new ReferencedRule(target.Identifier.Text, ruleNodeType: null, interfaceMethod: null);
@@ -210,7 +243,14 @@ namespace JMG.Parsnip.SemanticModel
 								case "SPACE": return new LiteralString(" ", interfaceMethod: null, stringComparison: StringComparison.Ordinal);
 								default:
 								{
-									throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
+									if (model.LexemeIdentifiers.Any(i => i.Identifier == target.Identifier))
+									{
+										return new LexemeIdentifier(target.Identifier, interfaceMethod: null);
+									}
+									else
+									{
+										throw new NotImplementedException($"Unrecognized intrinsic: {target.Identifier}");
+									}
 								}
 							}
 							break;
@@ -220,7 +260,7 @@ namespace JMG.Parsnip.SemanticModel
 					return new Intrinsic(type, interfaceMethod: null);
 				}
 
-				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union, isMemoized);
+				public IParseFunction Visit(UnionToken target) => VisitUnion(target.Union, isMemoized, model);
 
 				public IParseFunction Visit(SeriesToken target)
 				{
