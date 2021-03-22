@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>JMG.Parsnip</RootNamespace>
   </PropertyGroup>
 
@@ -10,24 +10,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SyntacticModel\Generated\Parsnip.parsnip.cs">
+    <Compile Update="SyntacticModel\Generated\Parsnip.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Parsnip.parsnip.txt</DependentUpon>
+      <DependentUpon>Parsnip.txt</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SyntacticModel\Generated\Parsnip.parsnip.txt">
-      <Generator>DotNetCLIToolCsCodeGenerator</Generator>
-      <LastGenOutput>Parsnip.parsnip.cs</LastGenOutput>
+    <None Update="SyntacticModel\Generated\Parsnip.txt">
+      <Generator>Jmg.CodeGen</Generator>
+      <LastGenOutput>Parsnip.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
