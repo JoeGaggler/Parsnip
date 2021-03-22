@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using JMG.Parsnip.CodeWriting;
 using JMG.Parsnip.SerializedModel;
 
@@ -80,8 +81,6 @@ namespace JMG.Parsnip
 				writer.EndOfLine();
 				writer.UsingNamespace("System");
 				writer.UsingNamespace("System.Linq");
-				writer.UsingNamespace("System.Diagnostics");
-				writer.UsingNamespace("System.Threading.Tasks");
 				writer.UsingNamespace("System.Collections.Generic");
 				writer.EndOfLine();
 
@@ -182,7 +181,7 @@ namespace JMG.Parsnip
 								}
 								writer.LineOfCode("list.Add(nextResult.Node);");
 								writer.VarAssign("advanced", "nextResult.Advanced");
-								writer.LineOfCode("if (advanced == 0) break;");
+								writer.LineOfCode("if (advanced == 0) { break; }");
 								writer.Assign("nextResultInputPosition", "nextResultInputPosition + advanced");
 							}
 							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");
@@ -212,7 +211,7 @@ namespace JMG.Parsnip
 								}
 								writer.LineOfCode("list.Add(nextResult.Node);");
 								writer.VarAssign("advanced", "nextResult.Advanced");
-								writer.LineOfCode("if (advanced == 0) break;");
+								writer.LineOfCode("if (advanced == 0) { break; }");
 								writer.Assign("nextResultInputPosition", "nextResultInputPosition + advanced");
 							}
 							writer.Return($"new {parseResultClassName}<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition)");

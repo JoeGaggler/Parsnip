@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using JMG.Parsnip.CodeWriting;
 using JMG.Parsnip.SemanticModel;
 
@@ -89,7 +88,7 @@ namespace JMG.Parsnip.SerializedModel
 
 		public void Visit(Selection target, Signature input)
 		{
-			int stepIndex = 0;
+			Int32 stepIndex = 0;
 			foreach (var step in target.Steps)
 			{
 				stepIndex++;
@@ -119,7 +118,7 @@ namespace JMG.Parsnip.SerializedModel
 					var memField = NameGen.MemoizedFieldName(input.Name);
 					returnExpression = $"states[inputPosition].{memField} = {returnExpression}";
 				}
-				writer.LineOfCode($"if ({resultName} != null) return {returnExpression};");
+				writer.LineOfCode($"if ({resultName} != null) {{ return {returnExpression}; }}");
 			}
 
 			// No choices matched
@@ -130,7 +129,7 @@ namespace JMG.Parsnip.SerializedModel
 		{
 			var returnedResults = new List<Decl>();
 
-			int stepIndex = 0;
+			Int32 stepIndex = 0;
 			var currentInputPosition = "inputPosition";
 			String currentAdvanced = null;
 			foreach (var step in target.Steps)

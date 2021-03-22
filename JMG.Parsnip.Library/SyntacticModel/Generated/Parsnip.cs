@@ -1,11 +1,9 @@
 // Code Generated via Parsnip Packrat Parser Producer
 // Version: 1.28
-// Date: 2021-03-21 20:52:48
+// Date: 2021-03-22 13:12:46
 
 using System;
 using System.Linq;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace JMG.Parsnip.SyntacticModel.Generated
@@ -89,7 +87,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 				}
 				list.Add(nextResult.Node);
 				var advanced = nextResult.Advanced;
-				if (advanced == 0) break;
+				if (advanced == 0) { break; }
 				nextResultInputPosition = nextResultInputPosition + advanced;
 			}
 			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
@@ -115,7 +113,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 				}
 				list.Add(nextResult.Node);
 				var advanced = nextResult.Advanced;
-				if (advanced == 0) break;
+				if (advanced == 0) { break; }
 				nextResultInputPosition = nextResultInputPosition + advanced;
 			}
 			return new ParseResult<IReadOnlyList<T>>(list, nextResultInputPosition - inputPosition);
@@ -226,7 +224,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseIntrinsic_CString(String input, Int32 inputPosition)
 		{
 			var resultStart = ParseLexeme(input, inputPosition, "\"", StringComparison.Ordinal);
-			if (resultStart == null) return null;
+			if (resultStart == null) { return null; }
 			var nextInputPosition = inputPosition + resultStart.Advanced;
 			var sb = new System.Text.StringBuilder();
 			while (true)
@@ -237,7 +235,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 				{
 					inputPosition2 = inputPosition2 + resultEscape.Advanced;
 					var resultToken = ParseIntrinsic_AnyCharacter(input, inputPosition2);
-					if (resultToken == null) return null;
+					if (resultToken == null) { return null; }
 					switch (resultToken.Node)
 					{
 						case "\\":
@@ -275,7 +273,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 					return new ParseResult<String>(sb.ToString(), inputPosition2 + resultEnd.Advanced - inputPosition);
 				}
 				var resultChar = ParseIntrinsic_AnyCharacter(input, inputPosition2);
-				if (resultChar == null) return null;
+				if (resultChar == null) { return null; }
 				sb.Append(resultChar.Node);
 				nextInputPosition = inputPosition2 + resultChar.Advanced;
 			}
@@ -304,15 +302,15 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseLexeme(String input, Int32 inputPosition, String lexeme, StringComparison stringComparison)
 		{
 			var lexemeLength = lexeme.Length;
-			if (inputPosition + lexemeLength > input.Length) return null;
+			if (inputPosition + lexemeLength > input.Length) { return null; }
 			var actualLexeme = input.Substring(inputPosition, lexemeLength);
-			if (!String.Equals(actualLexeme, lexeme, stringComparison)) return null;
+			if (!String.Equals(actualLexeme, lexeme, stringComparison)) { return null; }
 			return new ParseResult<String>(actualLexeme, lexemeLength);
 		}
 		private static ParseResult<String> ParseCustomLexeme(String input, Int32 inputPosition, Func<String, Int32, String> func)
 		{
 			var result = func(input, inputPosition);
-			if (result == null) return null;
+			if (result == null) { return null; }
 			return new ParseResult<String>(result, result.Length);
 		}
 
@@ -322,7 +320,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Definition is var mem && mem != null) { return mem; }
 
 			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_DefinitionItem(i, p, s, f));
-			if (result == null) return null;
+			if (result == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Definition = new ParseResult<ParsnipDefinition>(factory.Definition1(result.Node), result.Advanced);
 		}
 
@@ -332,13 +330,13 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_DefinitionItem is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_Rule(input, inputPosition, states, factory);
-			if (r1 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem1(r1.Node), r1.Advanced);
+			if (r1 != null) { return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem1(r1.Node), r1.Advanced); }
 			var r2 = ParseRule_Comment(input, inputPosition, states, factory);
-			if (r2 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem2(r2.Node), r2.Advanced);
+			if (r2 != null) { return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem2(r2.Node), r2.Advanced); }
 			var r3 = ParseCustomLexeme(input, inputPosition, factory.TOKENID);
-			if (r3 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem3(r3.Node), r3.Advanced);
+			if (r3 != null) { return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem3(r3.Node), r3.Advanced); }
 			var r4 = ParseRule_DefinitionItem_C4(input, inputPosition, states, factory);
-			if (r4 != null) return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem4(), r4.Advanced);
+			if (r4 != null) { return states[inputPosition].Mem_ParseRule_DefinitionItem = new ParseResult<IParsnipDefinitionItem>(factory.DefinitionItem4(), r4.Advanced); }
 			return null;
 		}
 
@@ -346,7 +344,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<EmptyNode> ParseRule_DefinitionItem_C4(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_EndOfLine(input, inputPosition);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			return new ParseResult<EmptyNode>(EmptyNode.Instance, r1.Advanced);
 		}
 
@@ -356,9 +354,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Rule is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_RuleHead(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseRule_RuleBody(input, inputPosition + r1.Advanced, states, factory);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Rule = new ParseResult<Rule>(factory.Rule1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
@@ -368,9 +366,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_RuleHead is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_RuleHead_C1(input, inputPosition, states, factory);
-			if (r1 != null) return states[inputPosition].Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead1(r1.Node.Item1, r1.Node.Item2), r1.Advanced);
+			if (r1 != null) { return states[inputPosition].Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead1(r1.Node.Item1, r1.Node.Item2), r1.Advanced); }
 			var r2 = ParseRule_RuleHead_C2(input, inputPosition, states, factory);
-			if (r2 != null) return states[inputPosition].Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead2(r2.Node), r2.Advanced);
+			if (r2 != null) { return states[inputPosition].Mem_ParseRule_RuleHead = new ParseResult<RuleHead>(factory.RuleHead2(r2.Node), r2.Advanced); }
 			return null;
 		}
 
@@ -378,15 +376,15 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<(RuleHeadPrefix, ClassIdentifier)> ParseRule_RuleHead_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseRule_RuleHeadPrefix(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseRule_ClassIdentifier(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			var r4 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced);
-			if (r4 == null) return null;
+			if (r4 == null) { return null; }
 			var r5 = ParseIntrinsic_EndOfLine(input, inputPosition + r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced);
-			if (r5 == null) return null;
+			if (r5 == null) { return null; }
 			return new ParseResult<(RuleHeadPrefix, ClassIdentifier)>((r1.Node, r3.Node), r1.Advanced + r2.Advanced + r3.Advanced + r4.Advanced + r5.Advanced);
 		}
 
@@ -394,11 +392,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<RuleHeadPrefix> ParseRule_RuleHead_C2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseRule_RuleHeadPrefix(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseIntrinsic_EndOfLine(input, inputPosition + r1.Advanced + r2.Advanced);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return new ParseResult<RuleHeadPrefix>(r1.Node, r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -408,11 +406,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_RuleHeadPrefix is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_RuleIdentifier(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ":", StringComparison.Ordinal);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_RuleHeadPrefix = new ParseResult<RuleHeadPrefix>(factory.RuleHeadPrefix1(r1.Node), r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -422,7 +420,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_RuleBody is var mem && mem != null) { return mem; }
 
 			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Choice(i, p, s, f));
-			if (result == null) return null;
+			if (result == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_RuleBody = new ParseResult<RuleBody>(factory.RuleBody1(result.Node), result.Advanced);
 		}
 
@@ -432,11 +430,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Choice is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_Union(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Choice = new ParseResult<Choice>(factory.Choice1(r1.Node), r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -446,7 +444,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Union is var mem && mem != null) { return mem; }
 
 			var result = ParseSeries(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Sequence(i, p, s, f), (i, p, s, f) => ParseRule_Union_D(i, p, s, f));
-			if (result == null) return null;
+			if (result == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Union = new ParseResult<Union>(factory.Union1(result.Node), result.Advanced);
 		}
 
@@ -454,11 +452,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<(String, String, String)> ParseRule_Union_D(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseLexeme(input, inputPosition + r1.Advanced, "|", StringComparison.Ordinal);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseIntrinsic_OptionalHorizontalWhitespace(input, inputPosition + r1.Advanced + r2.Advanced);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return new ParseResult<(String, String, String)>((r1.Node, r2.Node, r3.Node), r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -468,7 +466,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Sequence is var mem && mem != null) { return mem; }
 
 			var result = ParseSeries(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Special(i, p, s, f), (i, p, s, f) => ParseIntrinsic_OptionalHorizontalWhitespace(i, p));
-			if (result == null) return null;
+			if (result == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Sequence = new ParseResult<Sequence>(factory.Sequence1(result.Node), result.Advanced);
 		}
 
@@ -478,9 +476,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Special is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_Special_C1(input, inputPosition, states, factory);
-			if (r1 != null) return states[inputPosition].Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special1(r1.Node.Item1, r1.Node.Item2), r1.Advanced);
+			if (r1 != null) { return states[inputPosition].Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special1(r1.Node.Item1, r1.Node.Item2), r1.Advanced); }
 			var r2 = ParseRule_Segment(input, inputPosition, states, factory);
-			if (r2 != null) return states[inputPosition].Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special2(r2.Node), r2.Advanced);
+			if (r2 != null) { return states[inputPosition].Mem_ParseRule_Special = new ParseResult<Segment>(factory.Special2(r2.Node), r2.Advanced); }
 			return null;
 		}
 
@@ -488,11 +486,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<(IToken, IToken)> ParseRule_Special_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseRule_Token(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseLexeme(input, inputPosition + r1.Advanced, "/", StringComparison.Ordinal);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseRule_Token(input, inputPosition + r1.Advanced + r2.Advanced, states, factory);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return new ParseResult<(IToken, IToken)>((r1.Node, r3.Node), r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -502,9 +500,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Segment is var mem && mem != null) { return mem; }
 
 			var r1 = ParseMaybe(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_Segment_S1_M(i, p, s, f));
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseRule_Cardinality(input, inputPosition + r1.Advanced, states, factory);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Segment = new ParseResult<Segment>(factory.Segment1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
@@ -512,11 +510,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseRule_Segment_S1_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseLexeme(input, inputPosition, "`", StringComparison.Ordinal);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			if (r1 != null) { return new ParseResult<String>(r1.Node, r1.Advanced); }
 			var r2 = ParseLexeme(input, inputPosition, "~", StringComparison.Ordinal);
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
+			if (r2 != null) { return new ParseResult<String>(r2.Node, r2.Advanced); }
 			var r3 = ParseLexeme(input, inputPosition, "&", StringComparison.Ordinal);
-			if (r3 != null) return new ParseResult<String>(r3.Node, r3.Advanced);
+			if (r3 != null) { return new ParseResult<String>(r3.Node, r3.Advanced); }
 			return null;
 		}
 
@@ -526,9 +524,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Cardinality is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_Token(input, inputPosition, states, factory);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseMaybe(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseRule_Cardinality_S2_M(i, p, s, f));
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Cardinality = new ParseResult<TokenCardinality>(factory.Cardinality1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
@@ -536,11 +534,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseRule_Cardinality_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseLexeme(input, inputPosition, "+", StringComparison.Ordinal);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			if (r1 != null) { return new ParseResult<String>(r1.Node, r1.Advanced); }
 			var r2 = ParseLexeme(input, inputPosition, "?", StringComparison.Ordinal);
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
+			if (r2 != null) { return new ParseResult<String>(r2.Node, r2.Advanced); }
 			var r3 = ParseLexeme(input, inputPosition, "*", StringComparison.Ordinal);
-			if (r3 != null) return new ParseResult<String>(r3.Node, r3.Advanced);
+			if (r3 != null) { return new ParseResult<String>(r3.Node, r3.Advanced); }
 			return null;
 		}
 
@@ -550,17 +548,17 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Token is var mem && mem != null) { return mem; }
 
 			var r1 = ParseRule_Token_C1(input, inputPosition, states, factory);
-			if (r1 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token1(), r1.Advanced);
+			if (r1 != null) { return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token1(), r1.Advanced); }
 			var r2 = ParseRule_Token_C2(input, inputPosition, states, factory);
-			if (r2 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token2(r2.Node.Item1, r2.Node.Item2), r2.Advanced);
+			if (r2 != null) { return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token2(r2.Node.Item1, r2.Node.Item2), r2.Advanced); }
 			var r3 = ParseRule_RuleIdentifier(input, inputPosition, states, factory);
-			if (r3 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token3(r3.Node), r3.Advanced);
+			if (r3 != null) { return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token3(r3.Node), r3.Advanced); }
 			var r4 = ParseCustomLexeme(input, inputPosition, factory.TOKENID);
-			if (r4 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token4(r4.Node), r4.Advanced);
+			if (r4 != null) { return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token4(r4.Node), r4.Advanced); }
 			var r5 = ParseLexeme(input, inputPosition, "--", StringComparison.Ordinal);
-			if (r5 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token5(r5.Node), r5.Advanced);
+			if (r5 != null) { return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token5(r5.Node), r5.Advanced); }
 			var r6 = ParseRule_Token_C6(input, inputPosition, states, factory);
-			if (r6 != null) return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token6(r6.Node), r6.Advanced);
+			if (r6 != null) { return states[inputPosition].Mem_ParseRule_Token = new ParseResult<IToken>(factory.Token6(r6.Node), r6.Advanced); }
 			return null;
 		}
 
@@ -568,7 +566,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<EmptyNode> ParseRule_Token_C1(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseLexeme(input, inputPosition, ".", StringComparison.Ordinal);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			return new ParseResult<EmptyNode>(EmptyNode.Instance, r1.Advanced);
 		}
 
@@ -576,9 +574,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<(String, String)> ParseRule_Token_C2(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_CString(input, inputPosition);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseMaybe(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseLexeme(i, p, "i", StringComparison.Ordinal));
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return new ParseResult<(String, String)>((r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
@@ -586,11 +584,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<Union> ParseRule_Token_C6(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseLexeme(input, inputPosition, "(", StringComparison.Ordinal);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseRule_Union(input, inputPosition + r1.Advanced, states, factory);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseLexeme(input, inputPosition + r1.Advanced + r2.Advanced, ")", StringComparison.Ordinal);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return new ParseResult<Union>(r2.Node, r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -600,9 +598,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_RuleIdentifier is var mem && mem != null) { return mem; }
 
 			var r1 = ParseIntrinsic_AnyLetter(input, inputPosition);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseStar(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseRule_RuleIdentifier_S2_M(i, p, s, f));
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_RuleIdentifier = new ParseResult<RuleIdentifier>(factory.RuleIdentifier1(r1.Node, r2.Node), r1.Advanced + r2.Advanced);
 		}
 
@@ -610,9 +608,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseRule_RuleIdentifier_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_AnyLetterOrDigit(input, inputPosition);
-			if (r1 != null) return new ParseResult<String>(r1.Node, r1.Advanced);
+			if (r1 != null) { return new ParseResult<String>(r1.Node, r1.Advanced); }
 			var r2 = ParseLexeme(input, inputPosition, "-", StringComparison.Ordinal);
-			if (r2 != null) return new ParseResult<String>(r2.Node, r2.Advanced);
+			if (r2 != null) { return new ParseResult<String>(r2.Node, r2.Advanced); }
 			return null;
 		}
 
@@ -622,7 +620,7 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_ClassIdentifier is var mem && mem != null) { return mem; }
 
 			var result = ParsePlus(input, inputPosition, states, factory, (i, p, s, f) => ParseRule_ClassIdentifier_M(i, p, s, f));
-			if (result == null) return null;
+			if (result == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_ClassIdentifier = new ParseResult<ClassIdentifier>(factory.ClassIdentifier1(result.Node), result.Advanced);
 		}
 
@@ -630,9 +628,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseRule_ClassIdentifier_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition);
-			if (r1 != null) return null;
+			if (r1 != null) { return null; }
 			var r2 = ParseIntrinsic_AnyCharacter(input, inputPosition);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return new ParseResult<String>(r2.Node, r2.Advanced);
 		}
 
@@ -642,11 +640,11 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 			if (states[inputPosition].Mem_ParseRule_Comment is var mem && mem != null) { return mem; }
 
 			var r1 = ParseLexeme(input, inputPosition, "//", StringComparison.Ordinal);
-			if (r1 == null) return null;
+			if (r1 == null) { return null; }
 			var r2 = ParseStar(input, inputPosition + r1.Advanced, states, factory, (i, p, s, f) => ParseRule_Comment_S2_M(i, p, s, f));
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			var r3 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition + r1.Advanced + r2.Advanced);
-			if (r3 == null) return null;
+			if (r3 == null) { return null; }
 			return states[inputPosition].Mem_ParseRule_Comment = new ParseResult<String>(factory.Comment1(r2.Node), r1.Advanced + r2.Advanced + r3.Advanced);
 		}
 
@@ -654,9 +652,9 @@ namespace JMG.Parsnip.SyntacticModel.Generated
 		private static ParseResult<String> ParseRule_Comment_S2_M(String input, Int32 inputPosition, PackratState[] states, IParsnipRuleFactory factory)
 		{
 			var r1 = ParseIntrinsic_EndOfLineOrStream(input, inputPosition);
-			if (r1 != null) return null;
+			if (r1 != null) { return null; }
 			var r2 = ParseIntrinsic_AnyCharacter(input, inputPosition);
-			if (r2 == null) return null;
+			if (r2 == null) { return null; }
 			return new ParseResult<String>(r2.Node, r2.Advanced);
 		}
 
