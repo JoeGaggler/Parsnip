@@ -245,9 +245,7 @@ namespace JMG.Parsnip.SemanticModel
 								{
 									if (model.LexemeIdentifiers.Any(i => i.Identifier == target.Identifier))
 									{
-										// JOE: Fix this
 										return new LexemeIdentifier(target.Identifier, interfaceMethod: null);
-										//return new Intrinsic(IntrinsicType.AnyDigit, interfaceMethod: null);
 									}
 									else
 									{
